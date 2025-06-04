@@ -236,33 +236,50 @@ export default function ShadowRunnerPage() {
     // Parallax BG/ground motion
     setBgX(lastBgX => (lastBgX - PLAYER_SPEED * 0.45) % 600);
 
-    // --- Player Physics ---
+    // --- Player Physics and Animation ---
     setPlayer((p) => {
       let { x, y, vy, isJumping, isSliding, slideTimer, height, grounded } = p;
 
-      // Airborne movement
+      // --- Airborne/jumping state ---
       if (!grounded) {
         vy += GRAVITY;
         y += vy;
-        if (y > GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H) {
+        if (y >= GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H) {
+          // Land (y clamp, reset jump/slide states)
           y = GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H;
           vy = 0;
           isJumping = false;
           grounded = true;
+          // If player landed while in slide posture, revert slide state on floor contact
+          if (isSliding) {
+            isSliding = false;
+            height = PLAYER_H;
+            y = GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H;
+            slideTimer = 0;
+          }
+        }
+      } else {
+        // Grounded: Only update slide animation here
+        if (isSliding) {
+          if (slideTimer > 1) {
+            slideTimer -= 1;
+          } else {
+            // End slide, stand up
+            isSliding = false;
+            height = PLAYER_H;
+            y = GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H;
+            slideTimer = 0;
+          }
+        } else {
+          // Ensure running standing height/position always
+          height = PLAYER_H;
+          y = GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H;
+          // isJumping = false; // handled already
         }
       }
 
-      // Slide state
-      if (isSliding) {
-        if (slideTimer > 1) {
-          slideTimer -= 1;
-        } else {
-          // End slide, stand up
-          isSliding = false;
-          height = PLAYER_H;
-          y = GAME_HEIGHT - GROUND_HEIGHT - PLAYER_H;
-        }
-      }
+      // Clamp player bounds (in Y)
+      y = Math.max(0, Math.min(y, GAME_HEIGHT - GROUND_HEIGHT - height));
 
       return { ...p, y, vy, isJumping, isSliding, slideTimer, height, grounded };
     });
@@ -291,7 +308,7 @@ export default function ShadowRunnerPage() {
       return next;
     });
 
-    // --- Run history for shadow clone ---
+    // --- Run history for shadow clones ---
     setRunHistory((hist) =>
       hist.concat([
         {
@@ -304,17 +321,17 @@ export default function ShadowRunnerPage() {
       ])
     );
 
-    // --- Collision ---
-    // Evaluate collision now: get latest player & obstacles (from states) in closure
+    // --- Collision: check soon-to-be-updated player/enemy for the next frame
     let collided = false;
-    const my = player.y;
-    const mh = player.height;
+    // Use `nextPlayer` values (predicted for accurate collision)
     const mx = player.x;
     const mw = player.width;
+    const my = player.y;
+    const mh = player.height;
+
     let obs = obstacles;
     for (let i = 0; i < obs.length; ++i) {
       const ob = obs[i];
-      // Rectangle collision
       if (
         mx + mw > ob.x &&
         mx < ob.x + ob.width &&
