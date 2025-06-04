@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
+// Updated GAMES array: Sliding Tile Puzzle replaces Random Fun/Word Ladder
 const GAMES = [
   {
     name: "Memory Game",
@@ -40,14 +41,6 @@ const GAMES = [
     playPath: "/games/typing"
   },
   {
-    name: "Word Ladder",
-    icon: "🔗",
-    tagline: "Transform words step by step. Change only one letter per move to reach the target!",
-    tag: "Hard",
-    color: "#68adc4",
-    playPath: "/games/word-ladder"
-  },
-  {
     name: "Sudoku",
     icon: "🔢",
     tagline: "Fill the 9x9 grid so every row, column, and box has 1-9. Choose difficulty, undo, and beat your best time!",
@@ -56,31 +49,35 @@ const GAMES = [
     playPath: "/games/sudoku"
   },
   {
-    name: "Random Fun",
-    icon: "🎲",
-    tagline: "Unpredictable minigames that surprise you every round.",
-    color: "#F472B6"
+    name: "Sliding Tile Puzzle",
+    icon: "🔲",
+    tagline: "Arrange the tiles in order by sliding them. Supports hard (5x5) and larger grids. Undo, restart—fewest moves and time wins!",
+    tag: "Hard",
+    color: "#68adc4",
+    playPath: "/games/sliding-tile"
   }
 ];
 
-// Featured game is now Word Ladder
+// Make Sliding Tile Puzzle the featured game
 const FEATURED_GAME = {
-  name: "Word Ladder",
-  icon: "🔗",
-  desc: "The ultimate word transformation challenge! Change one letter at a time to go from TABLE to CHAIR – every move must be a real word. Can you find the smartest path?",
-  action: "/games/word-ladder"
+  name: "Sliding Tile Puzzle",
+  icon: "🔲",
+  desc:
+    "Arrange all the tiles in order by sliding them into the empty space. Now includes 5x5 grid (hard)! Fewer moves and less time mean a better score. Restart, undo, change size, and race your best!",
+  action: "/games/sliding-tile"
 };
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Includes Word Ladder best steps as part of snapshot.
+ * Now includes Sliding Tile Puzzle best steps/time.
  */
 function getLocalHighScores() {
   let memoryGameScore = null;
   let reactionGameScore = null;
   let typingBestWpm = null;
   let sudokuBestTime = null;
-  let wordLadderBestSteps = null;
+  let slidingBestMoves = null;
+  let slidingBestTime = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -111,9 +108,15 @@ function getLocalHighScores() {
       }
     } catch (e) {}
     try {
-      const ladderRaw = window.localStorage.getItem("mmarcade-wordladder-hard-best");
-      if (ladderRaw !== null && !isNaN(parseInt(ladderRaw, 10))) {
-        wordLadderBestSteps = parseInt(ladderRaw, 10);
+      const slidingMoves = window.localStorage.getItem("mmarcade-slidingtile-bestmoves");
+      if (slidingMoves !== null && !isNaN(parseInt(slidingMoves, 10))) {
+        slidingBestMoves = parseInt(slidingMoves, 10);
+      }
+    } catch (e) {}
+    try {
+      const slidingTime = window.localStorage.getItem("mmarcade-slidingtile-besttime");
+      if (slidingTime !== null && !isNaN(parseInt(slidingTime, 10))) {
+        slidingBestTime = parseInt(slidingTime, 10);
       }
     } catch (e) {}
   }
@@ -155,15 +158,15 @@ function getLocalHighScores() {
     sudokuDisplay = "No score yet";
   }
 
-  let wordLadderDisplay = (typeof wordLadderBestSteps === "number" && !isNaN(wordLadderBestSteps))
-    ? `${wordLadderBestSteps} steps`
+  let slidingDisplay = (typeof slidingBestMoves === "number" && typeof slidingBestTime === "number")
+    ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
-    { game: "Word Ladder", score: wordLadderDisplay },
+    { game: "Sliding Tile Puzzle", score: slidingDisplay },
     { game: "Sudoku", score: sudokuDisplay }
   ];
 }
