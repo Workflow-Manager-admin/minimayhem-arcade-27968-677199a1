@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-/* --- GAMES array: Snake Game REMOVED; only current, active games remain --- */
+/* --- GAMES array: Only current, active games remain. Snake references removed. --- */
 const GAMES = [
   {
     name: "Memory Game",
