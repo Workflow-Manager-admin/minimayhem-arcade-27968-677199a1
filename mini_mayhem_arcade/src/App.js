@@ -8,7 +8,8 @@ import ReactionRushPage from './ReactionRushPage.jsx';
 import TypingChallengePage from './TypingChallengePage.jsx';
 import QuickMathPage from './QuickMathPage.jsx';
 import SudokuGamePage from './SudokuGamePage.jsx';
-import WordLadderPage from './WordLadderPage.jsx';
+// REMOVE WordLadderPage import
+import SlidingTilePuzzlePage from './SlidingTilePuzzlePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -33,7 +34,7 @@ function App() {
             <Route path="/games/typing" element={<TypingChallengePage />} />
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
-            <Route path="/games/word-ladder" element={<WordLadderPage />} />
+            <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
         </main>
