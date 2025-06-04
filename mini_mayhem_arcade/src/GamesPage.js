@@ -80,7 +80,6 @@ function GamesPage() {
   }, []);
   return (
     <div className="games-page-root">
-      <Navbar />
       <main className="games-main-content">
         {FEATURE_GAME_ENABLED && (
           <FeaturedGameBanner game={FEATURED_GAME} />

@@ -2,22 +2,31 @@ import React from 'react';
 import './App.css';
 import Navbar from './Navbar';
 import LandingPage from './LandingPage';
+import GamesPage from './GamesPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
  * PUBLIC_INTERFACE
  * App component is the main container for the MiniMayhem Arcade app.
- * Displays the Navbar and the main content.
- * If using no router, show LandingPage by default as home.
+ * Sets up client-side routing using React Router.
+ * - Shows Navbar on all pages.
+ * - LandingPage at "/" (default)
+ * - GamesPage at "/games"
  */
 function App() {
   return (
-    <div className="app">
-      <Navbar />
-      {/* Render the new LandingPage as default content */}
-      <main>
-        <LandingPage />
-      </main>
-    </div>
+    <Router>
+      <div className="app">
+        <Navbar />
+        <main>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/games" element={<GamesPage />} />
+            {/* Optionally, add more routes like scoreboard/about/help in future */}
+          </Routes>
+        </main>
+      </div>
+    </Router>
   );
 }
 
