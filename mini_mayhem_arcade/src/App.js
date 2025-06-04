@@ -8,7 +8,7 @@ import ReactionRushPage from './ReactionRushPage.jsx';
 import TypingChallengePage from './TypingChallengePage.jsx';
 import QuickMathPage from './QuickMathPage.jsx';
 import SudokuGamePage from './SudokuGamePage.jsx';
-// REMOVE WordLadderPage import
+import SnakeGamePage from './SnakeGamePage.jsx';
 import SlidingTilePuzzlePage from './SlidingTilePuzzlePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
