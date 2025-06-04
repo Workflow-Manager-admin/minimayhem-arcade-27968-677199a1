@@ -9,6 +9,7 @@ import TypingChallengePage from './TypingChallengePage.jsx';
 import QuickMathPage from './QuickMathPage.jsx';
 import SudokuGamePage from './SudokuGamePage.jsx';
 import SlidingTilePuzzlePage from './SlidingTilePuzzlePage.jsx';
+import BlockGamePage from './BlockGamePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -28,6 +29,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/games" element={<GamesPage />} />
+            <Route path="/games/block" element={<BlockGamePage />} />
             <Route path="/games/memory" element={<MemoryGamePage />} />
             <Route path="/games/reaction" element={<ReactionRushPage />} />
             <Route path="/games/typing" element={<TypingChallengePage />} />
