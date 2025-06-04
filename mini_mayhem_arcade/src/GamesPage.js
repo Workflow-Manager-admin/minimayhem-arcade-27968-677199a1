@@ -131,11 +131,11 @@ function getLocalHighScores() {
         typingBestWpm = Math.round(parseFloat(typingRaw) * 100) / 100;
       }
     } catch (e) { }
-    // Read best score for Word Typing Challenge
+    // Word Typing Challenge: Best score
     try {
       const typingChallengeRaw = window.localStorage.getItem("mmarcade-word-typing-bestscore");
-      if (typingChallengeRaw !== null && !isNaN(parseFloat(typingChallengeRaw))) {
-        typingWordChallengeBest = Math.round(parseFloat(typingChallengeRaw) * 100) / 100;
+      if (typingChallengeRaw !== null && !isNaN(parseInt(typingChallengeRaw, 10))) {
+        typingWordChallengeBest = parseInt(typingChallengeRaw, 10);
       }
     } catch (e) { }
     try {
