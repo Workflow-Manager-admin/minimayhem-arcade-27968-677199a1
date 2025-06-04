@@ -181,6 +181,15 @@ function SnakeGamePage() {
   // Keyboard handler
   useEffect(() => {
     const handler = (e) => {
+      // Prevent browser scrolling with arrow keys
+      if (
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown" ||
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight"
+      ) {
+        e.preventDefault();
+      }
       if (["ArrowUp", "w", "W"].includes(e.key)) {
         setPendingDir(curr => turnToDir({ x: 0, y: -1 }));
       }
