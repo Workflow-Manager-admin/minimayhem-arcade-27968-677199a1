@@ -81,12 +81,33 @@
   margin-right: auto;
 }
 
-@media (max-width: 850px) {
+/* Limit visible cards to 6 (2 rows of 3) on desktop/large screens */
+.scoreboard-card-grid > *:nth-child(n+7) {
+  display: none;
+}
+
+/* Always 2 columns for mid-size screens */
+@media (max-width: 900px) {
   .scoreboard-card-grid {
     grid-template-columns: repeat(2, 1fr);
+    max-width: 650px;
   }
 }
 
+/* Stacking/cards on one column for smaller screens (mobile/tablet) */
+@media (max-width: 700px) {
+  .scoreboard-card-grid {
+    grid-template-columns: 1fr;
+    gap: 13px 0;
+    max-width: 440px;
+  }
+  /* Show all cards (remove 6-card limit) for accessibility and scroll */
+  .scoreboard-card-grid > * {
+    display: block;
+  }
+}
+
+/* Redundant: keep all on mobile, stacking naturally */
 @media (max-width: 520px) {
   .scoreboard-card-grid {
     grid-template-columns: 1fr;
