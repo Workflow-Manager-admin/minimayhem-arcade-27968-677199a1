@@ -38,7 +38,10 @@ function App() {
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
             <Route path="/scoreboard" element={<ScoreboardPage />} />
-            {/* Optionally, add more routes like scoreboard/about/help in future */}
+            {/* About & Privacy page should be routed to /about-privacy */}
+            {/* The referenced component will be hooked up here when available */}
+            {/* <Route path="/about-privacy" element={<AboutPrivacyPage />} /> */}
+            {/* Optionally, add more routes like scoreboard/help in future */}
           </Routes>
         </main>
       </div>
