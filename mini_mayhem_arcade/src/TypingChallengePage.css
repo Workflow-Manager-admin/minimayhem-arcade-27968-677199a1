@@ -1,0 +1,268 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
+
+.typing-root {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  font-family: 'Montserrat', 'Inter', 'Roboto', sans-serif;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  padding-top: 72px;
+}
+[data-theme="dark"] .typing-root {
+  background: linear-gradient(130deg, #191832 0%, #1a1a20 100%);
+}
+
+/* Floating background shapes */
+.typing-blur1, .typing-blur2 {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(46px);
+  opacity: 0.45;
+  border-radius: 50%;
+  animation: typing-float 18s infinite alternate;
+}
+.typing-blur1 {
+  width: 370px; height: 370px;
+  background: radial-gradient(circle at 40% 70%, #68adc4 77%, #bfbfff00 100%);
+  left: -110px; top: 21vh;
+}
+.typing-blur2 {
+  width: 250px; height: 260px;
+  background: radial-gradient(circle at 80% 30%, #ffc3a0 81%, #ffd7d755 100%);
+  right: -70px; top: 73vh;
+  animation-duration: 14s;
+}
+@keyframes typing-float {
+  0% { transform: translateY(0) scale(1);}
+  100% { transform: translateY(-37px) scale(1.06);}
+}
+
+/* Card container */
+.typing-main-card {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.97);
+  border-radius: 20px;
+  box-shadow: 0 13px 36px #6bbdfc18, 0 1px 26px #4f46e520;
+  padding: 32px 24px 31px 24px;
+  max-width: 500px;
+  width: 96vw;
+  margin-top: 34px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+[data-theme="dark"] .typing-main-card {
+  background: rgba(36,38,57,0.98);
+  box-shadow: 0 11px 32px #22217033, 0 1px 17px #1a1a1a30;
+}
+
+/* Header area */
+.typing-header {
+  width: 100%;
+  margin-bottom: 18px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 7px;
+}
+.typing-title {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: 2.13rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #68adc4;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.14;
+}
+[data-theme="dark"] .typing-title { color: #68adc4; }
+.typing-emoji { font-size: 1.52em; }
+.typing-instructions {
+  color: #4f46e5cc;
+  font-size: 1.08rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 4px 0;
+}
+[data-theme="dark"] .typing-instructions { color: #eceafdcc; }
+
+/* Sentence display & input */
+.typing-sentence-zone {
+  background: #f7fafc;
+  border: 1.7px solid #68adc4cc;
+  border-radius: 16px;
+  box-shadow: 0 3px 20px #68adc413;
+  padding: 17px 13px 14px 13px;
+  min-width: 210px;
+  width: 100%;
+  max-width: 410px;
+  margin-bottom: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  position: relative;
+}
+[data-theme="dark"] .typing-sentence-zone {
+  background: #151742fd;
+  border-color: #24273d;
+}
+.typing-sentence {
+  font-family: 'Menlo', 'Consolas', 'monospace';
+  font-size: 1.1rem;
+  line-height: 1.48;
+  letter-spacing: 0.03em;
+  user-select: none;
+  word-break: break-word;
+  margin-bottom: 2px;
+  text-align: left;
+  width: 100%;
+  padding: 0 1px;
+}
+.typing-input {
+  width: 100%;
+  font-size: 1.13rem;
+  font-family: inherit;
+  border-radius: 9px;
+  border: 2.3px solid #68adc4;
+  padding: 10px 9px;
+  margin: 0;
+  outline: none;
+  background: #fff;
+  color: #181932;
+  font-weight: 500;
+  box-shadow: 0 2px 8px #68adc41a;
+  transition: background 0.18s, border-color 0.18s, color 0.15s;
+}
+[data-theme="dark"] .typing-input {
+  background: #232547; color: #fff6b7;
+  border-color: #4f46e5;
+}
+.typing-input:focus-visible {
+  border: 2.8px solid #3730a3;
+  background: #fff7c1;
+  color: #20213a;
+}
+[data-theme="dark"] .typing-input:focus-visible {
+  background: #232549;
+  color: #fff;
+}
+
+/* Color for typed text */
+:root {
+  --typing-match: #26b950;
+  --typing-error: #ef4444;
+}
+[data-theme="dark"] {
+  --typing-match: #8fff72;
+  --typing-error: #ff8474;
+}
+
+/* Button row */
+.typing-btn-row {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin: 12px 0 8px 0;
+}
+.typing-btn {
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1.04rem;
+  border-radius: 13px;
+  border: none;
+  background: #68adc4;
+  color: #fff;
+  padding: 9px 21px;
+  box-shadow: 0 3px 14px #68adc429;
+  cursor: pointer;
+  transition: background 0.16s, transform 0.14s;
+  outline: none;
+}
+.typing-btn:hover,
+.typing-btn:focus-visible {
+  background: #3730a3;
+  color: #fff;
+  transform: scale(1.034);
+}
+.typing-btn.playagain { background: #4f46e5; }
+.typing-btn.submit { background: #f59e44; }
+.typing-btn.start { background: #68adc4; }
+
+/* Results section */
+.typing-results {
+  margin-top: 8px;
+  margin-bottom: 2px;
+  width: 100%;
+  text-align: center;
+}
+.typing-result-main {
+  font-size: 1.28em;
+  font-weight: 900;
+  color: #4f46e5;
+  letter-spacing: .02em;
+  margin-bottom: 3px;
+}
+.tr-label { color: #68adc4; font-size: 0.89em; font-weight: 700;}
+.tr-value.wpm { color: #22a897; font-size: 1.18em; margin: 0 7px;}
+.tr-value.acc { color: #efb844; font-size: 1.11em; margin-left: 5px;}
+.typing-result-msg {
+  font-size: 1.01em;
+  font-weight: 700;
+  margin: 4px 0 2px 0;
+  color: #353488;
+}
+[data-theme="dark"] .typing-result-main, [data-theme="dark"] .typing-result-msg {
+  color: #eceafd;
+}
+.typing-best-row {
+  margin-top: 8px;
+  color: #5682ba;
+  font-size: 1.02em;
+  opacity: 0.90;
+}
+.tb-value {
+  font-weight: 900;
+  color: #68adc4;
+  margin-left: 6px;
+}
+[data-theme="dark"] .tb-value { color: #fff6b7; }
+.tb-label { font-weight: 700; margin-right: 3px;}
+
+/* Back button */
+.typing-back-btn {
+  display: block;
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 1.03em;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 22px auto 0 auto;
+  text-decoration: underline;
+  transition: color 0.17s;
+}
+.typing-back-btn:focus-visible, .typing-back-btn:hover {
+  color: #68adc4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .typing-main-card { padding: 7vw 3vw 10vw 3vw; min-width: unset; }
+  .typing-title { font-size: 1.24rem; }
+  .typing-sentence-zone { font-size: 0.89rem; }
+  .typing-input { font-size: 0.99em; }
+}
+
+@media (max-width: 400px) {
+  .typing-title { font-size: 1.04rem; }
+  .typing-result-main, .typing-result-msg { font-size: 0.88em;}
+}
