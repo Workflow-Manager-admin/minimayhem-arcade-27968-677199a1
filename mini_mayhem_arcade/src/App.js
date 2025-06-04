@@ -33,7 +33,7 @@ function App() {
             <Route path="/games/typing" element={<TypingChallengePage />} />
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
-            <Route path="/games/emoji-reaction" element={<EmojiReactionTimePage />} />
+            <Route path="/games/word-ladder" element={<WordLadderPage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
         </main>
