@@ -21,7 +21,7 @@ function MemoryGamePage() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const timerRef = useRef();
-  const navigate = useNavigate ? useNavigate() : null; // If used standalone, no routing.
+  const navigate = useNavigate(); // Always call the hook; if not in a router context, it returns a no-op function
 
   // Shuffle and reset board
   function initializeBoard() {
