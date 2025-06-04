@@ -1,44 +1,43 @@
 :root {
-  --mmarcade-primary: #68adc4;
-  --mmarcade-accent: #121212;
-  --mmarcade-bg-light: #ffffff;
-  --mmarcade-bg-dark: #1d2233;
-  --mmarcade-title: #68adc4;
-  --mmarcade-shadow: 0 2px 10px rgba(0,0,0,0.04);
-  --mmarcade-navbar-height: 60px;
-  --mmarcade-navbar-radius: 0;
-  --mmarcade-link-hover: #e0f3fa;
-  --mmarcade-dropdown-bg: #23294a;
-  --mmarcade-border: rgba(80,80,110,.27);
-  --mmarcade-text: #222;
+  --navbar-bg: rgba(255,255,255,0.85);
+  --navbar-text: #222;
+  --navbar-hover: #4f46e5;
+  --navbar-shadow: 0 2px 6px rgba(0,0,0,0.15);
+
+  /* Used for smooth transitions */
+  --navbar-transition: background 0.35s cubic-bezier(.45,.39,.73,.79), 
+    color 0.28s, 
+    box-shadow 0.35s, 
+    filter 0.16s;
 }
 
+/* Dark theme overrides */
 [data-theme="dark"] {
-  --mmarcade-bg-light: #121212;
-  --mmarcade-bg-dark: #23294a;
-  --mmarcade-title: #d6f1ff;
-  --mmarcade-link-hover: #353a4f;
-  --mmarcade-drop-shadow: 0 2px 12px rgba(0,0,0,.22);
-  --mmarcade-dropdown-bg: #21242f;
-  --mmarcade-text: #f6f8fa;
+  --navbar-bg: rgba(0,0,0,0.85);
+  --navbar-text: #eee;
+  --navbar-hover: #4f46e5;
+  --navbar-shadow: 0 2px 8px rgba(0,0,0,0.6);
 }
 
 .mmarcade-navbar {
   width: 100%;
-  height: var(--mmarcade-navbar-height);
-  background: var(--mmarcade-bg-dark);
-  color: var(--mmarcade-title);
-  box-shadow: var(--mmarcade-shadow);
+  height: var(--mmarcade-navbar-height, 60px);
+  background: var(--navbar-bg);
+  color: var(--navbar-text);
+  box-shadow: var(--navbar-shadow);
   display: flex;
   flex-shrink: 0;
   position: sticky;
   top: 0;
   left: 0;
   z-index: 500;
-  border-bottom: 1px solid var(--mmarcade-border);
-  transition: background 0.2s;
+  border-bottom: 1px solid rgba(80,80,110,.16);
+  backdrop-filter: blur(14px) saturate(135%);
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+  transition: var(--navbar-transition);
 }
 
+/* Inner nav wrapper */
 .mmarcade-nav-inner {
   max-width: 1100px;
   width: 100%;
@@ -56,30 +55,31 @@
   font-size: 1.23rem;
   font-weight: 700;
   gap: 7px;
-  color: var(--mmarcade-title);
+  color: var(--navbar-text);
   display: flex;
   align-items: center;
   letter-spacing: 1px;
   user-select: none;
+  transition: color 0.3s;
 }
 .mmarcade-logo-symbol {
   font-size: 1.5rem;
-  color: var(--mmarcade-primary);
-  filter: drop-shadow(0 4px 7px #65b);
+  color: #68adc4;
+  filter: drop-shadow(0 4px 10px #65b4fd33);
+  transition: filter 0.25s;
 }
 .mmarcade-logo-text {
-  color: var(--mmarcade-title);
+  color: var(--navbar-text);
 }
 
-/* Nav Links */
+/* Nav links/actions */
 .mmarcade-nav-actions {
   display: flex;
   align-items: center;
   gap: 12px;
   position: relative;
 }
-
-/* Hide hamburger on desktop, show on mobile */
+/* Hamburger button only on mobile */
 .mmarcade-hamburger {
   background: none;
   border: none;
@@ -104,7 +104,7 @@
   position: absolute;
   width: 100%;
   height: 3.5px;
-  background: var(--mmarcade-title, #222);
+  background: var(--navbar-text, #222);
   border-radius: 2px;
   transition: all 0.3s cubic-bezier(.65,.06,.28,.89);
 }
@@ -123,7 +123,7 @@
   transform: rotate(-45deg);
 }
 
-/* Nav links style */
+/* Nav links list */
 .mmarcade-nav-links {
   display: flex;
   align-items: center;
@@ -136,19 +136,19 @@
   transition: none;
 }
 
-/* Settings parent for relative dropdown anchor */
+/* Settings parent for dropdown anchor */
 .mmarcade-settings-parent {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-/* Nav link button style */
+/* Nav link/button style */
 .mmarcade-nav-link {
   font-family: inherit;
   background: none;
   border: none;
-  color: var(--mmarcade-title);
+  color: var(--navbar-text);
   font-size: 1.05rem;
   outline: none;
   padding: 7px 18px;
@@ -157,14 +157,14 @@
   font-weight: 500;
   cursor: pointer;
   min-width: 0;
-  transition: background .14s, color .19s;
+  transition: background 0.18s, color 0.22s;
   display: flex;
   align-items: center;
 }
 .mmarcade-nav-link:hover,
 .mmarcade-nav-link:focus-visible {
-  background: var(--mmarcade-link-hover);
-  color: var(--mmarcade-primary);
+  background: var(--navbar-hover);
+  color: #fff;
 }
 
 /* Dropdown caret */
@@ -174,7 +174,7 @@
   margin-top: 1px;
 }
 
-/* Settings dropdown, hidden when not open */
+/* Settings dropdown menu */
 .mmarcade-settings-dropdown {
   --dropdown-width: 230px;
   position: absolute;
@@ -182,17 +182,18 @@
   right: 0;
   width: var(--dropdown-width);
   min-width: 170px;
-  background: var(--mmarcade-dropdown-bg);
-  color: var(--mmarcade-title);
+  background: var(--navbar-bg);
+  color: var(--navbar-text);
   border-radius: 15px;
-  box-shadow: var(--mmarcade-drop-shadow, 0 2px 20px #001a4022);
-  border: 1px solid var(--mmarcade-border);
+  box-shadow: 0 2px 26px #122c4520;
+  border: 1px solid rgba(80,80,110,.16);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(10px) scale(.99);
-  transition: opacity .15s cubic-bezier(.51,.32,.6,.82), transform .17s;
+  transform: translateY(12px) scale(.99);
+  transition: opacity .18s cubic-bezier(.51,.32,.6,.82), transform .19s, background 0.32s, color 0.21s;
   z-index: 1000;
   padding: 4px 0 2px 0;
+  backdrop-filter: blur(11px);
 }
 .mmarcade-settings-dropdown.open {
   opacity: 1;
@@ -211,11 +212,11 @@
   outline: none;
   border: none;
   text-align: left;
-  color: var(--mmarcade-title);
+  color: var(--navbar-text);
   padding: 10px 22px;
   font-size: 1.04rem;
   border-radius: 0;
-  transition: background .12s, color .13s;
+  transition: background .13s, color .19s;
   cursor: pointer;
   font-family: inherit;
   user-select: none;
@@ -223,13 +224,11 @@
 .dropdown-menu-item:focus,
 .dropdown-menu-item:hover,
 .dropdown-menu-item:active {
-  background: var(--mmarcade-link-hover);
-  color: var(--mmarcade-primary);
+  background: var(--navbar-hover);
+  color: #fff;
   outline: none;
   text-decoration: none;
 }
-
-/* Anchor dropdown links share same style as button */
 .dropdown-menu-item[href] {
   display: block;
   text-decoration: none;
@@ -237,11 +236,11 @@
 
 /* Divider/separator */
 .dropdown-divider {
-  border-top: 1px solid var(--mmarcade-border);
+  border-top: 1px solid rgba(80,80,110,.16);
   margin: 7px 0 7px 0;
 }
 
-/* Theme switch row is visually separated at the bottom */
+/* Theme toggle row is visually separated at the bottom */
 .dropdown-theme-row {
   display: flex;
   padding: 2px 10px 3px 9px;
@@ -250,27 +249,27 @@
   justify-content: flex-end;
 }
 
-/* Theme toggle button (compact) */
+/* Theme toggle button */
 .theme-toggle {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--mmarcade-link-hover);
+  background: var(--navbar-hover, #4f46e5);
   border: none;
   border-radius: 7px;
   cursor: pointer;
   padding: 7px 14px;
-  color: var(--mmarcade-title);
+  color: #fff;
   font-size: 1.05rem;
   min-width: 0;
   min-height: 37px;
-  transition: background .14s, box-shadow .11s;
-  box-shadow: 0 1px 5px 0 #14315511;
+  transition: background .14s, box-shadow .13s;
+  box-shadow: 0 1px 6px 0 #14315522;
   outline: none;
 }
 .theme-toggle:focus,
 .theme-toggle:hover {
-  background: var(--mmarcade-primary);
+  background: #3730a3;
   color: #fff;
 }
 .theme-toggle-icon {
@@ -287,16 +286,16 @@
 @media (max-width: 900px) {
   .mmarcade-nav-links {
     flex-direction: column;
-    background: var(--mmarcade-bg-dark);
+    background: var(--navbar-bg);
     position: fixed;
-    top: var(--mmarcade-navbar-height);
+    top: var(--mmarcade-navbar-height, 60px);
     right: 0;
     padding: 18px 0 8px 0;
     width: 248px;
-    height: calc(100vh - var(--mmarcade-navbar-height));
+    height: calc(100vh - var(--mmarcade-navbar-height, 60px));
     align-items: flex-start;
-    box-shadow: -1px 2px 15px #161e2f1c;
-    border-top: 1px solid var(--mmarcade-border);
+    box-shadow: -1px 2px 15px #161e2f25;
+    border-top: 1px solid rgba(80,80,110,.16);
     transform: translateX(120%);
     opacity: 0;
     visibility: hidden;
@@ -311,8 +310,6 @@
   .mmarcade-hamburger {
     display: flex;
   }
-
-  /* Position dropdown absolutely in mobile nav */
   .mmarcade-settings-dropdown {
     right: 16px;
     top: 133%;
@@ -321,7 +318,7 @@
 /* Overlay appears when mobile nav is open */
 .mmarcade-menu-overlay {
   position: fixed;
-  top: var(--mmarcade-navbar-height);
+  top: var(--mmarcade-navbar-height, 60px);
   left: 0;
   right: 0;
   bottom: 0;
@@ -344,18 +341,9 @@
 
 /* Slight adjust for smaller screens */
 @media (max-width: 600px) {
-  .mmarcade-nav-inner {
-    padding: 0 7px;
-  }
-  .mmarcade-nav-links {
-    width: 97vw;
-    min-width: unset;
-  }
-  .mmarcade-settings-dropdown {
-    width: 97vw;
-    min-width: unset;
-    right: 2vw;
-  }
+  .mmarcade-nav-inner { padding: 0 7px; }
+  .mmarcade-nav-links { width: 97vw; min-width: unset; }
+  .mmarcade-settings-dropdown { width: 97vw; min-width: unset; right: 2vw; }
   .theme-toggle { padding: 7px 6px; }
 }
 
