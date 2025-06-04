@@ -79,6 +79,24 @@
   gap: 12px;
   position: relative;
 }
+
+/* Ensures the theme toggle is visually on the far right (immediately after nav links/settings), and aligns/offsets accordingly */
+.navbar-theme-toggle-control {
+  display: flex;
+  align-items: center;
+  margin-left: 18px;
+}
+
+/* Prevent the theme toggle from shrinking/collapsing on small screens */
+.navbar-theme-toggle-control .theme-toggle {
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .navbar-theme-toggle-control {
+    margin-left: 7px;
+  }
+}
 /* Hamburger button only on mobile */
 .mmarcade-hamburger {
   background: none;

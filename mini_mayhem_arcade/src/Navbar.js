@@ -156,9 +156,9 @@ function Navbar() {
 /**
  * PUBLIC_INTERFACE
  * Settings Dropdown Menu
- * @param {open: boolean, onClose: fn, theme: string, setTheme: fn}
+ * @param {open: boolean, onClose: fn}
  */
-function SettingsDropdown({ open, onClose, theme, setTheme }) {
+function SettingsDropdown({ open, onClose }) {
   // Keyboard navigation
   const dropdownRef = useRef();
   useEffect(() => {
@@ -232,12 +232,6 @@ function SettingsDropdown({ open, onClose, theme, setTheme }) {
           </a>
         </li>
       </ul>
-      {/* Divider */}
-      <div className="dropdown-divider" aria-hidden="true"></div>
-      {/* Theme Toggle Row */}
-      <div className="dropdown-theme-row">
-        <ThemeToggle theme={theme} setTheme={setTheme} />
-      </div>
     </div>
   );
 }
