@@ -104,13 +104,34 @@
 .obstacle.bar { opacity: 0.81; }
 
 .shadowrunner-runner {
-  /* transition: filter 0.12s, opacity 0.14s; */
   filter: drop-shadow(0 2px 3px #4f46e52d);
-  /* Animate scaling for jump/slide: optional */
+  transition:
+    filter 0.12s,
+    opacity 0.14s,
+    transform 0.17s cubic-bezier(.47,.25,.27,1.29),
+    scale 0.2s cubic-bezier(.71,.02,.49,1.4);
+  will-change: filter, opacity, transform, scale;
 }
-.shadowrunner-runner.shadow { filter: blur(0.6px) opacity(0.89); }
-.shadowrunner-runner.slide { }
-.shadowrunner-runner.jump { }
+.shadowrunner-runner.shadow {
+  filter: blur(0.7px) opacity(0.81);
+  opacity: 0.78;
+}
+.shadowrunner-runner.run {
+  /* No animation, normal pose */
+  transform: scale(1, 1.0);
+}
+.shadowrunner-runner.slide {
+  /* Slightly squash for slide */
+  transform: scale(1.19, 0.72) translateY(6px);
+  filter: drop-shadow(0 3px 8px #18aabc2c) brightness(0.981);
+  opacity: 0.99;
+}
+.shadowrunner-runner.jump {
+  /* Slight stretch for jump, make jump more visually prominent */
+  transform: scale(0.92, 1.14) translateY(-2px);
+  filter: drop-shadow(0 7px 18px #aaaef747) brightness(1.085);
+}
+
 
 /* --- HUD BAR --- */
 .shadowrunner-hud {
