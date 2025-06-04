@@ -137,11 +137,14 @@ function Navbar() {
               <SettingsDropdown
                 open={settingsOpen}
                 onClose={closeSettings}
-                theme={theme}
-                setTheme={setTheme}
+                // Removed theme/setTheme props from dropdown
               />
             </li>
           </ul>
+          {/* Theme toggle button -- now visible at far right, not in dropdown */}
+          <div className="navbar-theme-toggle-control">
+            <ThemeToggle theme={theme} setTheme={setTheme} />
+          </div>
         </div>
       </div>
       {/* Overlay clickable on mobile menu open */}
