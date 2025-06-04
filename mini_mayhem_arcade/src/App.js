@@ -8,6 +8,7 @@ import ReactionRushPage from './ReactionRushPage.jsx';
 import TypingChallengePage from './TypingChallengePage.jsx';
 import QuickMathPage from './QuickMathPage.jsx';
 import SudokuGamePage from './SudokuGamePage.jsx';
+import EmojiReactionTimePage from './EmojiReactionTimePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
