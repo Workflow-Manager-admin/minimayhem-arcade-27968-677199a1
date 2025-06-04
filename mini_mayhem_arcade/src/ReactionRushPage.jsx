@@ -56,6 +56,8 @@ function ReactionRushPage() {
       try {
         if (typeof window !== "undefined") {
           window.localStorage.setItem("reaction_time_last", rt);
+          // Store latest Reaction Rush score for arcade dashboard
+          window.localStorage.setItem("reactionGameScore", rt);
         }
       } catch (e) { /* silent fail */ }
     }
