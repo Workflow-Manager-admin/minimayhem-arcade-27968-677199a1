@@ -77,9 +77,10 @@ const FEATURED_GAME = {
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Only includes supported games (no Snake).
+ * Supports new Block Game and removes Snake logic.
  */
 function getLocalHighScores() {
+  let blockHighScore = null;
   let memoryGameScore = null;
   let reactionGameScore = null;
   let typingBestWpm = null;
@@ -88,6 +89,13 @@ function getLocalHighScores() {
   let slidingBestTime = null;
 
   if (typeof window !== "undefined") {
+    try {
+      const blockScoreRaw = window.localStorage.getItem("mmarcade-blockgame-bestscore");
+      // Could also check "blockGameHighScore" for legacy, but we'll use "mmarcade-blockgame-bestscore"
+      if (blockScoreRaw !== null && !isNaN(parseInt(blockScoreRaw, 10))) {
+        blockHighScore = parseInt(blockScoreRaw, 10);
+      }
+    } catch (e) { }
     try {
       const memScoreRaw = window.localStorage.getItem("mmarcade-memgame-lastscore");
       if (memScoreRaw) {
@@ -115,18 +123,25 @@ function getLocalHighScores() {
         sudokuBestTime = parseInt(sudokuRaw, 10);
       }
     } catch (e) {}
+    // Sliding tile best data now uses object key: mmarcade-slidingtile-best-4 (or 5, 6)
+    // We'll use best 4x4 solve for snapshot display
     try {
-      const slidingMoves = window.localStorage.getItem("mmarcade-slidingtile-bestmoves");
-      if (slidingMoves !== null && !isNaN(parseInt(slidingMoves, 10))) {
-        slidingBestMoves = parseInt(slidingMoves, 10);
+      const slidingBestRaw = window.localStorage.getItem("mmarcade-slidingtile-best-4");
+      if (slidingBestRaw) {
+        const { moves, time } = JSON.parse(slidingBestRaw);
+        if (typeof moves === "number" && typeof time === "number") {
+          slidingBestMoves = moves;
+          slidingBestTime = time;
+        }
       }
     } catch (e) {}
-    try {
-      const slidingTime = window.localStorage.getItem("mmarcade-slidingtile-besttime");
-      if (slidingTime !== null && !isNaN(parseInt(slidingTime, 10))) {
-        slidingBestTime = parseInt(slidingTime, 10);
-      }
-    } catch (e) {}
+  }
+
+  let blockDisplay;
+  if (typeof blockHighScore === "number" && !isNaN(blockHighScore)) {
+    blockDisplay = blockHighScore;
+  } else {
+    blockDisplay = "No score yet";
   }
 
   let memoryDisplay;
@@ -170,8 +185,9 @@ function getLocalHighScores() {
     ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
-  // Score snapshot returning only the currently supported game scores
+  // Score snapshot returns Block Game (new), plus all supported games in order shown on dashboard
   return [
+    { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
