@@ -21,14 +21,16 @@ const GAMES = [
     icon: "🧠",
     tagline: "Sharpen your memory! Repeat sequences of colors, sounds, or patterns.",
     tag: "Classic",
-    color: "#00B0E0"
+    color: "#00B0E0",
+    playPath: "/games/memory"
   },
   {
     name: "Reaction Speed",
     icon: "⚡",
     tagline: "How fast can you react? Tap the right moment, beat your record!",
     tag: "Fast",
-    color: "#FACA15"
+    color: "#FACA15",
+    playPath: "/games/reaction"
   },
   {
     name: "Typing Challenge",
@@ -138,11 +140,8 @@ function GamesPage() {
           <h2 className="sr-only" id="games-gallery-title">Available Mini-Games</h2>
           <div className="games-card-grid" ref={gridRef}>
             {GAMES.map((g, i) => {
-              // Custom playPath for Memory Game to go to /games/memory, not /games/memory-game
-              let playPath =
-                g.name.toLowerCase().trim() === "memory game"
-                  ? "/games/memory"
-                  : `/games/${slugify(g.name)}`;
+              // Use pre-set playPath for special routes, else slugify
+              let playPath = g.playPath || `/games/${slugify(g.name)}`;
               return (
                 <GameCard
                   key={g.name}
@@ -152,7 +151,6 @@ function GamesPage() {
                   color={g.color}
                   tag={g.tag}
                   playPath={playPath}
-                  // use i for animation delay
                   style={{ animationDelay: (0.08 * i) + "s" }}
                 />
               );
