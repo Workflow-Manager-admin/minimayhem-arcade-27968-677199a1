@@ -214,11 +214,7 @@ function GamesPage() {
       <main className="games-main-content">
         {FEATURE_GAME_ENABLED && (
           <FeaturedGameBanner
-            game={
-              FEATURED_GAME && FEATURED_GAME.name === "Shadow Runner"
-                ? { ...FEATURED_GAME, action: "/games/shadow-runner" }
-                : FEATURED_GAME
-            }
+            game={FEATURED_GAME}
           />
         )}
 
@@ -238,24 +234,18 @@ function GamesPage() {
         <section className="games-card-gallery-section" aria-labelledby="games-gallery-title">
           <h2 className="sr-only" id="games-gallery-title">Available Mini-Games</h2>
           <div className="games-card-grid" ref={gridRef}>
-            {GAMES.map((g, i) => {
-              let playPath =
-                g.name === "Shadow Runner"
-                  ? "/games/shadow-runner"
-                  : g.playPath || `/games/${slugify(g.name)}`;
-              return (
-                <GameCard
-                  key={g.name}
-                  icon={g.icon}
-                  title={g.name}
-                  desc={g.tagline}
-                  color={g.color}
-                  tag={g.tag}
-                  playPath={playPath}
-                  style={{ animationDelay: (0.08 * i) + "s" }}
-                />
-              );
-            })}
+            {GAMES.map((g, i) => (
+              <GameCard
+                key={g.name}
+                icon={g.icon}
+                title={g.name}
+                desc={g.tagline}
+                color={g.color}
+                tag={g.tag}
+                playPath={g.playPath || `/games/${slugify(g.name)}`}
+                style={{ animationDelay: (0.08 * i) + "s" }}
+              />
+            ))}
           </div>
         </section>
       </main>
