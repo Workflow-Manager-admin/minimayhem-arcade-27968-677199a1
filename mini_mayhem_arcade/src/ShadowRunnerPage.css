@@ -131,7 +131,18 @@
   transform: scale(0.92, 1.14) translateY(-2px);
   filter: drop-shadow(0 7px 18px #aaaef747) brightness(1.085);
 }
+.shadowrunner-runner:active,
+.shadowrunner-runner:focus-visible {
+  outline: 3px solid #c5fdff;
+  z-index: 2;
+}
 
+/* Make sure transitions are never stuck */
+.shadowrunner-runner {
+  transition-property: filter, opacity, transform, scale;
+  transition-duration: 0.11s, 0.17s, 0.25s, 0.25s;
+  transition-timing-function: ease-in, cubic-bezier(.47,.23,.31,.87), cubic-bezier(.68,.01,.29,1.1), cubic-bezier(.56,.09,.35,1.25);
+}
 
 /* --- HUD BAR --- */
 .shadowrunner-hud {
