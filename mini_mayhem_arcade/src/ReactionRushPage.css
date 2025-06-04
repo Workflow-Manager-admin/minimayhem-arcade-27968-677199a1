@@ -1,0 +1,291 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,800|Inter:400,700&display=swap');
+
+.rrush-root {
+  min-height: 100vh;
+  background: linear-gradient(124deg, #c2e9fb 65%, #a1c4fd 100%);
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 62px;
+}
+[data-theme="dark"] .rrush-root {
+  background: linear-gradient(126deg, #1a1a1a 65%, #232526 100%);
+}
+
+/* Background shapes - vibrant, floating */
+.rrush-bg-shape1, .rrush-bg-shape2 {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(58px);
+  border-radius: 50%;
+  opacity: 0.59;
+  animation: rrush-float 16s infinite alternate;
+}
+.rrush-bg-shape1 {
+  width: 420px; height: 370px;
+  background: radial-gradient(circle at 60% 41%, #68adc4 84%, #e1dbfe66 100%);
+  left: -124px; top: 19vh;
+  animation-duration: 18s;
+}
+.rrush-bg-shape2 {
+  width: 265px; height: 265px;
+  background: radial-gradient(circle at 47% 70%, #fff6b7 96%, #ffd7d766 100%);
+  right: -49px; top: 59vh;
+}
+@keyframes rrush-float {
+  0% { transform: translateY(0) scale(1);}
+  100% { transform: translateY(-33px) scale(1.07);}
+}
+
+.rrush-main-content {
+  z-index: 1;
+  background: rgba(255,255,255,0.93);
+  border-radius: 22px;
+  box-shadow: 0 9px 34px #6bbdfc28, 0 1px 22px #68adc428;
+  padding: 47px 23px 24px 23px;
+  max-width: 420px;
+  width: 96vw;
+  margin: 31px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+[data-theme="dark"] .rrush-main-content {
+  background: rgba(36,39,61,0.94);
+  box-shadow: 0 11px 34px #21213a28, 0 1px 15px #23252644;
+}
+.rrush-header {
+  text-align: center;
+  margin-bottom: 22px;
+  width: 100%;
+}
+.rrush-title {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: 2.02rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #68adc4;
+  margin: 0 0 7px 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  justify-content: center;
+  line-height: 1.14;
+}
+[data-theme="dark"] .rrush-title { color: #68adc4; }
+.rrush-icon {
+  font-size: 1.54em;
+}
+.rrush-desc {
+  font-size: 1.12rem;
+  font-weight: 550;
+  color: #4f46e5be;
+  max-width: 370px;
+  margin: 0 auto 3px auto;
+  line-height: 1.40;
+}
+[data-theme="dark"] .rrush-desc { color: #eceafdcc; }
+
+.rrush-game-zone {
+  margin-top: 18px;
+  margin-bottom: 23px;
+  width: 99%;
+  min-height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  box-shadow: 0 4px 19px #4f46e527;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 1.37rem;
+  cursor: pointer;
+  transition: background 0.21s, box-shadow 0.22s, border 0.17s;
+  border: 3.2px solid #68adc4;
+  outline: none;
+  user-select: none;
+  min-height: 179px;
+  min-width: 218px;
+  max-width: 100%;
+}
+.rrush-game-zone:focus-visible {
+  outline: 2.5px solid #3730a3;
+  outline-offset: 2px;
+}
+
+.rrush-game-zone.zone-init {
+  background: linear-gradient(115deg, #e1dbfe 75%, #68adc4 100%);
+  border-color: #68adc4;
+  color: #211f32;
+}
+.rrush-game-zone.zone-waiting {
+  background: linear-gradient(120deg, #edeefc 80%, #b4bef9 99%);
+  border-color: #4f46e567;
+  color: #374151;
+}
+.rrush-game-zone.zone-ready {
+  background: linear-gradient(126deg, #fffa93 60%, #faca15 99%);
+  border-color: #faca15;
+  color: #373512;
+  box-shadow: 0 0 44px 5px #faca1538;
+}
+.rrush-game-zone.zone-result {
+  background: linear-gradient(106deg, #c2e9fb 83%, #FFFFFF 100%);
+  border-color: #68adc4;
+  color: #2b1f70;
+}
+[data-theme="dark"] .rrush-game-zone.zone-init {
+  background: linear-gradient(110deg, #222735 90%, #68adc4 100%);
+  color: #eceafd;
+  border-color: #68adc4;
+}
+[data-theme="dark"] .rrush-game-zone.zone-waiting {
+  background: linear-gradient(100deg, #232526 79%, #35315c 97%);
+  color: #eceafdbb;
+  border-color: #42476987;
+}
+[data-theme="dark"] .rrush-game-zone.zone-ready {
+  background: linear-gradient(120deg, #faca15 92%, #68adc4 108%);
+  color: #211f12;
+  border-color: #faca15;
+  box-shadow: 0 0 48px 10px #faca1570;
+}
+[data-theme="dark"] .rrush-game-zone.zone-result {
+  background: linear-gradient(99deg, #24273db9 89%, #c2e9fb44 110%);
+  color: #aefaff;
+  border-color: #68adc4;
+}
+
+/* Center stack layout for game zone dialog */
+.rrush-center-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.rrush-main-msg {
+  font-size: 1.58em;
+  font-weight: 900;
+  margin-bottom: 7px;
+  color: #4f46e5;
+  text-shadow: 0 2px 8px #68adc429;
+}
+[data-theme="dark"] .rrush-main-msg {
+  color: #eceafd;
+}
+.rrush-main-msg.now {
+  color: #faca15;
+  text-shadow: 0 0 24px #faca1591;
+}
+.rrush-main-msg.result-title {
+  margin-bottom: 7px;
+}
+.rrush-tip {
+  font-size: 1.13rem;
+  color: #516188cc;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+.rrush-tip.small {
+  font-size: .97rem; opacity: .74;
+}
+[data-theme="dark"] .rrush-tip {
+  color: #eceafdbc;
+}
+.rrush-btn {
+  background: #68adc4;
+  color: #fff;
+  border: none;
+  border-radius: 11px;
+  padding: 10px 42px;
+  font-size: 1.13rem;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-weight: 800;
+  cursor: pointer;
+  margin: 10px 0 6px 0;
+  box-shadow: 0 2px 15px #68adc436;
+  transition: background 0.16s, transform 0.11s;
+  letter-spacing: .06em;
+}
+.rrush-btn:focus-visible, .rrush-btn:hover {
+  background: #3730a3;
+  color: #fff;
+  transform: scale(1.036);
+}
+
+.rrush-result {
+  font-size: 2.11em;
+  font-weight: 900;
+  letter-spacing: .02em;
+  margin-bottom: 6px;
+  color: #4f46e5;
+  text-shadow: 0 2px 14px #4f46e562;
+}
+.rrush-ms {
+  color: #68adc4;
+}
+.rrush-bad {
+  color: #cf4747;
+  font-weight: 800;
+}
+
+.rrush-lastscore {
+  margin-top: 5px;
+  color: #584fc9;
+  font-size: 1.1em;
+  font-weight: 640;
+  opacity: 0.84;
+}
+[data-theme="dark"] .rrush-lastscore {
+  color: #aafaff;
+}
+.rrush-lastscore .val {
+  font-weight: 900;
+  color: #68adc4;
+  margin-left: 2px;
+}
+[data-theme="dark"] .rrush-lastscore .val {
+  color: #fff6b7;
+}
+
+.rrush-footer-row {
+  width: 100%;
+  text-align: right;
+  margin-top: 17px;
+}
+.rrush-nav-btn {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  font-size: 1.05em;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 3px 6px 0;
+  margin: 0;
+  text-decoration: underline;
+  transition: color 0.13s;
+}
+.rrush-nav-btn:hover, .rrush-nav-btn:focus-visible {
+  color: #3730a3;
+}
+
+/* Responsive settings */
+@media (max-width: 600px) {
+  .rrush-main-content {
+    padding: 17vw 3vw 8vw 3vw;
+    min-width: unset;
+  }
+  .rrush-title { font-size: 1.25rem; }
+  .rrush-game-zone { font-size: 1.08rem; min-height: 112px;}
+  .rrush-header { margin-bottom: 13px; }
+}
+@media (max-width: 400px) {
+  .rrush-title { font-size: 0.97rem; }
+  .rrush-main-msg, .rrush-result { font-size: 1.08em;}
+}
