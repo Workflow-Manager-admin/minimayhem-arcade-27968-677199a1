@@ -14,6 +14,7 @@ import ScoreboardPage from './ScoreboardPage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AboutPrivacyPage from './AboutPrivacyPage.jsx';
 import HelpPage from './HelpPage.jsx'; // Help Page route integration
+import ContactPage from './ContactPage.jsx'; // Contact Page import
 
 /**
  * PUBLIC_INTERFACE
@@ -44,6 +45,8 @@ function App() {
             <Route path="/about-privacy" element={<AboutPrivacyPage />} />
             {/* Add help page to routing */}
             <Route path="/help" element={<HelpPage />} />
+            {/* Add contact page route */}
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
       </div>
