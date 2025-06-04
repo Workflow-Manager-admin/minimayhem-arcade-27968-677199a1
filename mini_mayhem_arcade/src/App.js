@@ -3,6 +3,7 @@ import './App.css';
 import Navbar from './Navbar';
 import LandingPage from './LandingPage';
 import GamesPage from './GamesPage';
+import MemoryGamePage from './MemoryGamePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -22,6 +23,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/games" element={<GamesPage />} />
+            <Route path="/games/memory" element={<MemoryGamePage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
         </main>
