@@ -12,16 +12,16 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
  * - Obstacles (moving!), and food that disappears if not eaten in time
  * - Arcade scoring logic and high score/last score persist via localStorage
  */
-const BOARD_CELLS = 20; // SQUARE board; grid will always be BOARD_CELLS x BOARD_CELLS
-const CELL_SIZE = 20; // px per cell on main board, ensures board area = integer multiple
+const BOARD_CELLS = 20; // Square grid: always BOARD_CELLS x BOARD_CELLS
+const CELL_SIZE = 20;   // px per cell, ensures grid always fits perfectly: 400x400 px
 
 const INITIAL_SNAKE = [
   { x: Math.floor(BOARD_CELLS / 2), y: Math.floor(BOARD_CELLS / 2) },
   { x: Math.floor(BOARD_CELLS / 2) - 1, y: Math.floor(BOARD_CELLS / 2) },
-  { x: Math.floor(BOARD_CELLS / 2) - 2, y: Math.floor(BOARD_CELLS / 2) },
+  { x: Math.floor(BOARD_CELLS / 2) - 2, y: Math.floor(BOARD_CELLS / 2) }
 ];
 const INITIAL_DIRECTION = { x: 1, y: 0 }; // right
-const GAME_SPEED_NORMAL = 110;  // ms per frame: fixed interval in 100-120ms range for smoothness
+const GAME_SPEED_NORMAL = 110;  // ms per frame: fixed in 100-120ms range for smoothness
 const GAME_SPEED_FAST = 70;
 const FOOD_APPEAR_TIME = 6000;  // ms, how long special food lasts
 const BOMB_CHANCE = 0.11;       // Chance each food spawn
@@ -33,43 +33,49 @@ const OBSTACLE_MOVE_INTERVAL = 700; // ms
 const LOCALSTORAGE_BEST_KEY = "snake-bestscore";
 const LOCALSTORAGE_LAST_KEY = "snake-lastscore";
 
-const CELL_SIZE = 27; // px per cell on main board
-
 const FOOD_TYPES = [
   {
     type: "classic",
-    display: (frame) => <span className="food-emoji" role="img" aria-label="Food" style={{
-      filter: frame % 2 === 0 ? "drop-shadow(0 0 10px #fbff66)" : "drop-shadow(0 0 16px #dffe00)",
-      animation: "glowFood 1s infinite alternate"
-    }}>🍏</span>,
+    display: (frame) => (
+      <span className="food-emoji" role="img" aria-label="Food" style={{
+        filter: frame % 2 === 0 ? "drop-shadow(0 0 10px #fbff66)" : "drop-shadow(0 0 16px #dffe00)",
+        animation: "glowFood 1s infinite alternate"
+      }}>🍏</span>
+    ),
     score: 2,
     color: "#fbff66"
   },
   {
     type: "speedup",
-    display: (frame) => <span className="food-emoji" role="img" aria-label="Speed Boost" style={{
-      filter: frame % 2 === 0 ? "drop-shadow(0 0 10px #00ffe5)" : "drop-shadow(0 0 17px #13d1b3)",
-      animation: "spinFood 0.8s infinite linear"
-    }}>⚡</span>,
+    display: (frame) => (
+      <span className="food-emoji" role="img" aria-label="Speed Boost" style={{
+        filter: frame % 2 === 0 ? "drop-shadow(0 0 10px #00ffe5)" : "drop-shadow(0 0 17px #13d1b3)",
+        animation: "spinFood 0.8s infinite linear"
+      }}>⚡</span>
+    ),
     score: 5,
     color: "#38fbca"
   },
   {
     type: "bomb",
-    display: (frame) => <span className="food-emoji" role="img" aria-label="Bomb" style={{
-      filter: frame % 2 === 0 ? "drop-shadow(0 0 12px #ff1745)" : "drop-shadow(0 0 19px #e7242a)",
-      animation: "glowBomb 1s infinite alternate"
-    }}>💣</span>,
+    display: (frame) => (
+      <span className="food-emoji" role="img" aria-label="Bomb" style={{
+        filter: frame % 2 === 0 ? "drop-shadow(0 0 12px #ff1745)" : "drop-shadow(0 0 19px #e7242a)",
+        animation: "glowBomb 1s infinite alternate"
+      }}>💣</span>
+    ),
     score: 0,
     color: "#e7242a"
   },
   {
-    type: "fake", // Looks like apple, acts as bomb
-    display: (frame) => <span className="food-emoji" role="img" aria-label="Fake Food" style={{
-      filter: frame % 2 === 0 ? "drop-shadow(0 0 12px #e060a8)" : "drop-shadow(0 0 19px #a605c7)",
-      opacity: 0.98 - 0.17 * (frame % 2),
-      animation: "shakeFakeFood 0.63s infinite"
-    }}>🍎</span>,
+    type: "fake",
+    display: (frame) => (
+      <span className="food-emoji" role="img" aria-label="Fake Food" style={{
+        filter: frame % 2 === 0 ? "drop-shadow(0 0 12px #e060a8)" : "drop-shadow(0 0 19px #a605c7)",
+        opacity: 0.98 - 0.17 * (frame % 2),
+        animation: "shakeFakeFood 0.63s infinite"
+      }}>🍎</span>
+    ),
     score: 0,
     color: "#de35cf"
   }
@@ -115,7 +121,7 @@ function cellEq(a, b) {
   return a.x === b.x && a.y === b.y;
 }
 
-// Snake movement, edge wrap
+// Snake movement, edge wrap (not used for strict wall collision)
 function nextHead(head, direction) {
   return {
     x: (head.x + direction.x + BOARD_CELLS) % BOARD_CELLS,
@@ -134,9 +140,8 @@ function reverseDir(dir) {
 
 // --- Main SNAKE component ---
 function SnakeGamePage() {
-  // Food timers state/ref - must be placed before all fns referencing setFoodTimers & foodTimers
+  // Food timers state/ref
   const [foodTimers, setFoodTimers] = useState({});
-  
   // State
   const [snake, setSnake] = useState([...INITIAL_SNAKE]);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
@@ -179,7 +184,7 @@ function SnakeGamePage() {
     return () => clearInterval(anim);
   }, [gameState]);
 
-  // --- KEY HANDLER WITH NO-REVERSAL RULE ---
+  // --- KEY HANDLER: NO-REVERSAL
   useEffect(() => {
     const handler = (e) => {
       if (
@@ -198,12 +203,9 @@ function SnakeGamePage() {
       if ([ "ArrowRight", "d", "D"].includes(e.key)) nextDir = { x: 1, y: 0 };
 
       if (nextDir) {
-        // Core fix: Ignore direct reversal (unless length==1)
         setPendingDir(curr => {
           let currDir = reverse ? reverseDir(direction) : direction;
-          // Disallow reversing directly (unless just one segment)
           if (snake.length > 1 && isOpposite(currDir, nextDir)) {
-            // ignore
             return curr;
           }
           return nextDir;
@@ -225,25 +227,23 @@ function SnakeGamePage() {
   function gameLoop() {
     setSnake(prevSnake => {
       let curDir = reverse ? reverseDir(pendingDir) : pendingDir;
-      // Disallow direct-reverse movement
       if (isOpposite(curDir, direction) && prevSnake.length > 1 && !reverse) {
         curDir = direction;
       }
-
       setDirection(curDir);
 
-      // Next head, with edge wrapping (change for strict border: remove '% ...')
+      // Compute next head position
       let head = {
         x: prevSnake[0].x + curDir.x,
         y: prevSnake[0].y + curDir.y
       };
 
-      // --- BORDER CHECK (ends game if out of bounds) ---
+      // --- BORDER CHECK (game over if out of bounds) ---
       if (
         head.x < 0 ||
-        head.x >= BOARD_SIZE ||
+        head.x >= BOARD_CELLS ||
         head.y < 0 ||
-        head.y >= BOARD_SIZE
+        head.y >= BOARD_CELLS
       ) {
         triggerGameOver("You hit the wall!");
         return prevSnake;
@@ -297,11 +297,6 @@ function SnakeGamePage() {
     cleanupOldFood();
   }
 
-  // Turn handler
-  function turnToDir(newDir) {
-    return reverse ? reverseDir(newDir) : newDir;
-  }
-
   // --- MOVING OBSTACLES ---
   function moveObstacles() {
     setObstacles(prevObs => {
@@ -318,8 +313,8 @@ function SnakeGamePage() {
             y: o.y + dir.y
           };
           if (
-            npos.x >= 0 && npos.x < BOARD_SIZE &&
-            npos.y >= 0 && npos.y < BOARD_SIZE &&
+            npos.x >= 0 && npos.x < BOARD_CELLS &&
+            npos.y >= 0 && npos.y < BOARD_CELLS &&
             !snake.some(s => cellEq(s, npos)) &&
             !prevObs.some((ob, oi) => oi !== idx && cellEq(ob, npos)) &&
             !food.some(f => cellEq(f.cell, npos))
@@ -513,7 +508,11 @@ function SnakeGamePage() {
 
   // --- RENDER ---
   return (
-    <div className="snake-root" style={{ minHeight: "100vh", fontFamily: "'Montserrat', 'Inter', Arial, sans-serif", background: "linear-gradient(120deg, #13d1b3 0%, #3b34bd 100%)" }}>
+    <div className="snake-root" style={{
+      minHeight: "100vh",
+      fontFamily: "'Montserrat', 'Inter', Arial, sans-serif",
+      background: "linear-gradient(120deg, #13d1b3 0%, #3b34bd 100%)"
+    }}>
       <SnakeArcadeCSS />
       <main className="snakegame-area" style={{
         margin: "0 auto",
@@ -521,11 +520,15 @@ function SnakeGamePage() {
         paddingTop: 88
       }}>
         <header className="snakegame-header" style={{
-          textAlign: "center", marginBottom: 18, fontWeight: 900, fontSize: "2.15rem", color: "#fbff66", textShadow: "0 4px 24px #047bb2cc"
+          textAlign: "center",
+          marginBottom: 18,
+          fontWeight: 900,
+          fontSize: "2.15rem",
+          color: "#fbff66",
+          textShadow: "0 4px 24px #047bb2cc"
         }}>
-          <span role="img" aria-label="Snake">🟢</span> Snake Game 
+          <span role="img" aria-label="Snake">🟢</span> Snake Game
         </header>
-
         <SnakeStatsBar
           score={score}
           best={bestScore}
@@ -553,10 +556,9 @@ function SnakeGamePage() {
             className="snake-board"
             aria-label="Snake game board"
           >
-            {/* Render Board */}
+            {/* Render Board - only key cells mutate for performance */}
             {(() => {
               let boardArr = [];
-              // Only re-render visible/changed cells; React diff optimization via unique keys
               for (let y = 0; y < BOARD_CELLS; y++) {
                 for (let x = 0; x < BOARD_CELLS; x++) {
                   const idx = y * BOARD_CELLS + x;
@@ -591,9 +593,7 @@ function SnakeGamePage() {
                         }} />
                       </div>
                     );
-                  }
-                  // Food
-                  else if (food.some(f => f.cell.x === x && f.cell.y === y)) {
+                  } else if (food.some(f => f.cell.x === x && f.cell.y === y)) {
                     const f = food.find(ff => ff.cell.x === x && ff.cell.y === y);
                     const typeObj = getFoodType(f.type);
                     boardArr.push(
@@ -601,16 +601,13 @@ function SnakeGamePage() {
                         {typeObj.display(frame)}
                       </div>
                     );
-                  }
-                  // Obstacles
-                  else if (obstacles.some(o => o.x === x && o.y === y)) {
+                  } else if (obstacles.some(o => o.x === x && o.y === y)) {
                     boardArr.push(
                       <div key={`o${idx}`} className="cell obstacle">
                         {renderObstacleCell(frame)}
                       </div>
                     );
-                  }
-                  else {
+                  } else {
                     boardArr.push(
                       <div key={`bg${idx}`}
                         className="cell bg"
