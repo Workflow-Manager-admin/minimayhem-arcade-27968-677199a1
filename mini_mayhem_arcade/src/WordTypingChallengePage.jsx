@@ -2,443 +2,475 @@ import React, { useEffect, useRef, useState } from "react";
 import "./WordTypingChallengePage.css";
 import { useNavigate } from "react-router-dom";
 
+// ======== SENTENCE BANK ========
+const SENTENCES = [
+  "Brightly colored parrots squawked loudly in the rainforest.",
+  "The mysterious door creaked open in the moonlit hallway.",
+  "To master typing, practice with speed but also precision.",
+  "She solved the puzzle using only her sharp intuition.",
+  "Friendly robots danced and beeped at the science fair.",
+  "A drizzle sparkled on the glass as morning arrived.",
+  "Jumping monkeys startled the explorers near the river.",
+  "Reading often strengthens vocabulary and sharpens the mind.",
+  "Majestic mountains peaked above the swirling, misty clouds.",
+  "The quickest foxes dart under silent, starry skies.",
+];
+
+// Settings
+const ROUND_COUNT = 5;
+const INITIAL_TIMER = 15; // seconds per sentence
+const STORAGE_PREFIX = "mmarcade-wordtyping-";
+const THEME_KEY = "mmarcade-theme";
+
+// Score breakdown
+const BASE_SCORE = 100;
+const PERFECT_BONUS = 100;
+const FAST_BONUS = 60;
+const TYPOS_PENALTY = 30;
+// Scoreboard keys
+const BEST_SCORE_KEY = STORAGE_PREFIX + "bestscore";
+const BEST_STREAK_KEY = STORAGE_PREFIX + "beststreak";
+
+function getTheme() {
+  if (typeof window === "undefined") return "light";
+  const theme =
+    window.localStorage.getItem(THEME_KEY) ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  return theme;
+}
+
 // PUBLIC_INTERFACE
 /**
- * WordTypingChallengePage: Dynamic typing game with randomized sentences,
- * scoring, timer, live feedback, localStorage scoreboard, animations, and theme support.
+ * Word Typing Challenge: multi-round, random-sentence typing game.
+ * - Timed rounds. Final score = composite (speed, typos, perfects).
+ * - Error-highlighting, animated feedback, accessible by keyboard and screen reader.
+ * - Scoreboard with localStorage bests, streaks, and a theme switch.
  */
-const SENTENCES = [
-  "The fox jumped over seven lazy dogs in the bright sun.",
-  "Coding challenges help improve your JavaScript skills quickly.",
-  "Typing fast and accurately is a valuable digital age talent.",
-  "MiniMayhem Arcade has fun games for everyone to enjoy.",
-  "Remember to save your best score and keep practicing daily!",
-  "She sells seashells by the seashore with radiant enthusiasm.",
-  "A wizard's job is to vex chumps quickly in fog.",
-  "Grumpy wizards make toxic brew for the evil queen and jack.",
-  "Sphinx of black quartz, judge my vow with zeal.",
-  "Pack my box with five dozen liquor jugs for the win."
-];
-const ROUND_LENGTH = 5; // Sentences per game
-const TIME_LIMIT = 60; // seconds
-
-const LS_KEY = "mmarcade-wordtyping-best";
-function getBestScore() {
-  if (typeof window === "undefined") return { score: 0, wpm: 0, acc: 0 };
-  try {
-    const val = window.localStorage.getItem(LS_KEY);
-    if (val) {
-      const parsed = JSON.parse(val);
-      if (
-        typeof parsed.score === "number" &&
-        typeof parsed.wpm === "number" &&
-        typeof parsed.acc === "number"
-      ) {
-        return parsed;
-      }
-    }
-  } catch {}
-  return { score: 0, wpm: 0, acc: 0 };
-}
-function saveBestScore(score, wpm, acc) {
-  if (typeof window === "undefined") return;
-  const prev = getBestScore();
-  // Best = highest score (or, if tied, best wpm, then best accuracy)
-  const isBetter =
-    score > prev.score ||
-    (score === prev.score && wpm > prev.wpm) ||
-    (score === prev.score && wpm === prev.wpm && acc > prev.acc);
-  if (isBetter) {
-    window.localStorage.setItem(
-      LS_KEY,
-      JSON.stringify({ score, wpm, acc })
-    );
-  }
-}
-
-// Helper: pick N random unique items from array
-function pickRandom(arr, n) {
-  const src = arr.slice();
-  const res = [];
-  for (let i = 0; i < n && src.length; ++i) {
-    const idx = Math.floor(Math.random() * src.length);
-    res.push(src[idx]);
-    src.splice(idx, 1);
-  }
-  return res;
-}
-
-// Helper: get current theme
-function getCurrentTheme() {
-  if (typeof window === "undefined") return "light";
-  return document.documentElement.getAttribute("data-theme") || "light";
-}
-
-function formatTime(sec) {
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m}:${s < 10 ? "0" : ""}${s}`;
-}
-
-function ratingMessage(score, acc, wpm) {
-  if (score === ROUND_LENGTH && acc > 0.96 && wpm > 55) 
-    return "Typing Ace! 🌟 All correct, blazing fast!";
-  if (score === ROUND_LENGTH && acc > 0.92)
-    return "🏆 100% Completion – Top accuracy!";
-  if (score >= ROUND_LENGTH - 1 && wpm > 47)
-    return "Great effort, awesome speed!";
-  if (wpm > 35 && acc > 0.8)
-    return "Solid speed – keep honing your skills!";
-  if (score < 2)
-    return "Keep practicing for higher scores!";
-  return "Well done! Challenge yourself again!";
-}
-
-// PUBLIC_INTERFACE
 function WordTypingChallengePage() {
+  const [theme, setTheme] = useState(getTheme());
+  const [playing, setPlaying] = useState(false);
+  const [sentences, setSentences] = useState([]);
   const [round, setRound] = useState(0);
-  const [totalScore, setTotalScore] = useState(0);
-  const [timer, setTimer] = useState(TIME_LIMIT);
-  const [gameState, setGameState] = useState("idle"); // idle | running | finished
-  const [sentenceList, setSentenceList] = useState([]);
-  const [currentSentence, setCurrentSentence] = useState("");
+  const [timer, setTimer] = useState(INITIAL_TIMER);
   const [userInput, setUserInput] = useState("");
-  const [feedback, setFeedback] = useState([]);
-  const [inputError, setInputError] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [theme, setTheme] = useState(getCurrentTheme());
+  const [feedback, setFeedback] = useState(null); // e.g. { status: "perfect", msg }
+  const [score, setScore] = useState(0);
+  const [typoCount, setTypoCount] = useState(0);
+  const [perfectStreak, setPerfectStreak] = useState(0);
+  const [roundScores, setRoundScores] = useState([]);
+  const [totalPerfect, setTotalPerfect] = useState(0);
 
-  const [bestScore, setBestScore] = useState(getBestScore());
-  const inputRef = useRef();
+  // For local bests/streak
+  const [bestScore, setBestScore] = useState(
+    Number(window.localStorage.getItem(BEST_SCORE_KEY)) || 0
+  );
+  const [bestStreak, setBestStreak] = useState(
+    Number(window.localStorage.getItem(BEST_STREAK_KEY)) || 0
+  );
+
+  const [scoreboardOpen, setScoreboardOpen] = useState(false);
+
+  const [tooltip, setTooltip] = useState("");
+  const [gameOver, setGameOver] = useState(false);
+
   const timerRef = useRef();
+  const inputRef = useRef();
   const navigate = useNavigate();
 
-  // Update theme for live css transitions
+  // Focus management: always focus input on new round
   useEffect(() => {
-    function handleThemeChange() {
-      setTheme(getCurrentTheme());
+    if (playing && inputRef.current) inputRef.current.focus();
+  }, [round, playing]);
+
+  // Timer handling per round
+  useEffect(() => {
+    if (!playing || gameOver) return;
+    if (timer <= 0) {
+      handleTimeout();
+      return;
     }
-    window.addEventListener("storage", handleThemeChange);
-    return () => window.removeEventListener("storage", handleThemeChange);
-  }, []);
-  
-  // Setup sentences when new game starts
-  function initializeGame() {
-    const randomized = pickRandom(SENTENCES, ROUND_LENGTH);
-    setSentenceList(randomized);
+    timerRef.current = setTimeout(() => setTimer(timer - 1), 1000);
+    return () => clearTimeout(timerRef.current);
+    // eslint-disable-next-line
+  }, [timer, playing, gameOver]);
+
+  // Theme application
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    window.localStorage.setItem(THEME_KEY, theme);
+  }, [theme]);
+
+  // New game init
+  function startGame() {
+    // Fresh unique random sentences
+    let available = [...SENTENCES].sort(() => Math.random() - 0.5);
+    if (available.length >= ROUND_COUNT) {
+      available = available.slice(0, ROUND_COUNT);
+    }
+    setSentences(available);
     setRound(0);
-    setTotalScore(0);
+    setScore(0);
+    setFeedback(null);
+    setTimer(INITIAL_TIMER);
     setUserInput("");
-    setCurrentSentence(randomized[0]);
-    setFeedback([]);
-    setInputError(false);
-    setGameState("running");
-    setStartTime(Date.now());
-    setEndTime(null);
-    setModalOpen(false);
-    setTimer(TIME_LIMIT);
-    setTimeout(() => { inputRef.current && inputRef.current.focus(); }, 60);
+    setTypoCount(0);
+    setPerfectStreak(0);
+    setRoundScores([]);
+    setTotalPerfect(0);
+    setGameOver(false);
+    setTooltip("");
+    setPlaying(true);
   }
 
-  // Timer (countdown, high precision, independent of typing speed)
-  useEffect(() => {
-    if (gameState !== "running") return;
-    timerRef.current = setInterval(() => {
-      setTimer((t) => {
-        if (t <= 1) {
-          clearInterval(timerRef.current);
-          setTimer(0);
-          setGameState("finished");
-          setEndTime(Date.now());
-          setTimeout(() => setModalOpen(true), 650);
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timerRef.current);
-  }, [gameState]);
+  function handleInputChange(e) {
+    let val = e.target.value;
+    // Do not allow input longer than sentence
+    if (val.length > currentSentence().length) return;
+    setUserInput(val);
 
-  // Live feedback for each char while typing
-  useEffect(() => {
-    if (!currentSentence) return;
-    const arr = [];
-    for (let i = 0; i < currentSentence.length; ++i) {
-      if (userInput[i] == null) {
-        arr.push("pending");
-      } else if (userInput[i] === currentSentence[i]) {
-        arr.push("good");
-      } else {
-        arr.push("wrong");
+    // Optional: Live preview typo highlight (accessible variant)
+    if (val.length > 0) {
+      let caret = val.length - 1;
+      if (val[caret] !== currentSentence()[caret]) {
+        setTooltip("Typo detected!");
+        setTimeout(() => setTooltip(""), 900);
       }
     }
-    setFeedback(arr);
-  }, [userInput, currentSentence]);
+  }
 
-  // Keyboard support: Enter submits
   function handleKeyDown(e) {
-    if (e.key === "Enter" && gameState === "running") {
+    // Enter: check/submit
+    if (e.key === "Enter" && playing && !gameOver) {
       handleSubmit();
-      e.preventDefault();
     }
   }
 
-  // Typing input handler
-  function handleChange(e) {
-    if (gameState !== "running") return;
-    setUserInput(e.target.value);
-    setInputError(false);
+  function currentSentence() {
+    return sentences[round] || "";
   }
 
   function handleSubmit() {
-    if (gameState !== "running") return;
-    // judge current input: score, accuracy
-    const correct = userInput.trim() === currentSentence.trim();
-    let scoreAdd = 0;
-    if (correct) scoreAdd = 1;
-    setTotalScore((s) => s + scoreAdd);
+    if (gameOver || !playing) return;
 
-    if (!correct) setInputError(true);
+    const toType = currentSentence();
+    const trimmed = userInput.trimEnd();
+    const timeUsed = INITIAL_TIMER - timer;
+    let typos = 0;
+    for (let i = 0; i < toType.length; ++i) {
+      if ((trimmed[i] || "") !== (toType[i] || "")) typos++;
+    }
+    setTypoCount(typos);
 
-    // If last round, finish
-    if (round === ROUND_LENGTH - 1 || timer <= 0) {
-      setGameState("finished");
-      setEndTime(Date.now());
-      setTimeout(() => setModalOpen(true), 650);
-      // Save best score if improved
-      const summary = computeStats(sentenceList, userInput, round + 1, startTime, Date.now(), totalScore + scoreAdd);
-      saveBestScore(summary.score, summary.wpm, summary.acc);
-      setBestScore(getBestScore());
-      return;
+    let roundScore = BASE_SCORE;
+    let isPerfect = false, isHighSpeed = false;
+    let feedbackMsg = "";
+
+    // Scoring
+    if (typos === 0 && trimmed.length === toType.length && timeUsed > 0) {
+      roundScore += PERFECT_BONUS;
+      isPerfect = true;
+      feedbackMsg = "Perfect! No typos – bonus!";
+    } else if (typos > 0 && trimmed.length === toType.length) {
+      roundScore -= TYPOS_PENALTY * typos;
+      feedbackMsg = `Typos (${typos}) detected.`;
+    } else if (trimmed.length < toType.length) {
+      feedbackMsg = "Incomplete – more to type!";
+      roundScore -= 40;
     }
 
-    // Next round
+    // Fast bonus: finished in < half the time and <=1 typo
+    if (timeUsed <= INITIAL_TIMER / 2 && typos < 2 && trimmed.length === toType.length) {
+      roundScore += FAST_BONUS;
+      isHighSpeed = true;
+      if (!isPerfect) feedbackMsg += " Speed bonus!";
+    }
+
+    // Clamp to nonnegative
+    roundScore = Math.max(roundScore, 0);
+
+    setScore((prev) => prev + roundScore);
+    setRoundScores((prev) => [...prev, { round: round + 1, score: roundScore, typos, time: timeUsed, perfect: isPerfect, highspeed: isHighSpeed }]);
+    if (isPerfect) {
+      setPerfectStreak((s) => s + 1);
+      setTotalPerfect((s) => s + 1);
+      setFeedback({ status: "perfect", msg: feedbackMsg });
+    } else if (isHighSpeed) {
+      setPerfectStreak(0);
+      setFeedback({ status: "fast", msg: feedbackMsg });
+    } else if (typos > 0) {
+      setPerfectStreak(0);
+      setFeedback({ status: "typo", msg: feedbackMsg });
+    } else {
+      setPerfectStreak(0);
+      setFeedback({ status: "neutral", msg: feedbackMsg });
+    }
+    setTooltip("");
+
+    // Animate success/error (class on input)
+    triggerInputAnimation(isPerfect ? "perfect" : typos ? "typo" : (isHighSpeed ? "fast" : "neutral"));
+
+    // Next round or finish after short delay
     setTimeout(() => {
-      setRound(r => r + 1);
-      setCurrentSentence(sentenceList[round + 1]);
-      setUserInput("");
-      setFeedback([]);
-      setInputError(false);
-      setTimeout(() => { inputRef.current && inputRef.current.focus(); }, 40);
-    }, correct ? 250 : 800);
-  }
-
-  function handleRestart() {
-    initializeGame();
-  }
-
-  function handleBack() {
-    navigate("/games");
-  }
-
-  // End-of-game stats
-  function computeStats(sentenceArr, lastInput, n, start, end, scoreOverride = null) {
-    const totalChars = sentenceArr.slice(0, n).join("").length;
-    let charsTyped = 0;
-    let correctChars = 0;
-    for (let i = 0; i < n; ++i) {
-      const target = sentenceArr[i];
-      const input = i === n - 1 ? lastInput : ""; // Only the last input typed (per round) is kept
-      charsTyped += input.length;
-      for (let j = 0; j < target.length && j < input.length; ++j) {
-        if (target[j] === input[j]) correctChars++;
+      if (round < sentences.length - 1) {
+        setRound((r) => r + 1);
+        setUserInput("");
+        setTimer(INITIAL_TIMER);
+        setTypoCount(0);
+        setFeedback(null);
+      } else {
+        finishGame();
       }
-    }
-    // Actually, we consider all input lengths
-    // Reset for this, as we track correct full sentences completed in totalScore
-    const timeSec = Math.max(1, (end - start) / 1000);
-    const wpm = Math.round((charsTyped / 5) / (timeSec / 60));
-    // Accuracy: over total chars attempted
-    const acc = charsTyped === 0 ? 1 : correctChars / charsTyped;
-    const score = scoreOverride == null ? totalScore : scoreOverride;
-    return { wpm, acc, score, charsTyped, timeSec };
+    }, 870);
   }
 
-  // When modal opens, persist best score
-  useEffect(() => {
-    if (!modalOpen) return;
-    const sum = computeStats(sentenceList, userInput, round + 1, startTime, endTime, totalScore);
-    saveBestScore(sum.score, sum.wpm, sum.acc);
-    setBestScore(getBestScore());
-    // eslint-disable-next-line
-  }, [modalOpen]);
-
-  // Anim trigger on round change
-  useEffect(() => {
-    const node = document.querySelector(".wtc-sentence");
-    if (node) {
-      node.classList.remove("wtc-fade-in");
-      void node.offsetWidth; // trigger reflow
-      node.classList.add("wtc-fade-in");
-    }
-  }, [currentSentence]);
-
-  // UI
-  return (
-    <div className={`wtc-root${theme === "dark" ? " dark" : ""}`}>
-      <div className="wtc-bg1"></div>
-      <div className="wtc-bg2"></div>
-      <main className="wtc-main-card" tabIndex={-1}>
-        <header className="wtc-header">
-          <h2 className="wtc-title">
-            <span className="wtc-emoji" aria-hidden="true">✍️</span> Word Typing Challenge
-          </h2>
-          <p className="wtc-instr">
-            Type the sentences fast and accurately. You have <b>{ROUND_LENGTH}</b> challenges and <b>{TIME_LIMIT}</b> seconds total!
-          </p>
-        </header>
-
-        {/* Timer and Scoreboard */}
-        <div className="wtc-topbar-row">
-          <div className="wtc-pill time" aria-label="Time left">
-            <span className="label">Time</span>
-            <span className="value">{formatTime(timer)}</span>
-          </div>
-          <div className="wtc-pill score" aria-label="Score">
-            <span className="label">Score</span>
-            <span className="value">{totalScore}</span>
-          </div>
-          <div className="wtc-pill round" aria-label="Sentence number">
-            <span className="label">Round</span>
-            <span className="value">{round + 1}/{ROUND_LENGTH}</span>
-          </div>
-        </div>
-
-        {/* Animated sentence display */}
-        <div className="wtc-sentence-zone">
-          <div className="wtc-sentence" aria-label="Current typing challenge" tabIndex={0}>
-            {[...currentSentence].map((char, i) =>
-              <span key={i} className={"wtc-char " +
-                (feedback[i] === "good" ? "good" :
-                  feedback[i] === "wrong" ? "wrong" : "pending")
-              }>{char}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Typing input + controls */}
-        <div className="wtc-input-row">
-          <input
-            ref={inputRef}
-            className={`wtc-input${inputError ? " error" : ""}`}
-            type="text"
-            maxLength={currentSentence.length}
-            value={userInput}
-            onChange={handleChange}
-            onKeyDown={handleKeyDown}
-            spellCheck={false}
-            disabled={gameState !== "running"}
-            placeholder={gameState === "idle" ? "Press Start to play!" : ""}
-            aria-label="Type the sentence here"
-            autoFocus={gameState === "running"}
-          />
-          <button
-            className="wtc-btn submit"
-            onClick={handleSubmit}
-            disabled={userInput.length === 0 || gameState !== "running"}
-          >Submit</button>
-        </div>
-
-        {/* Guidance or error */}
-        <div className="wtc-feedback" aria-live="polite">
-          {inputError ? (
-            <span className="wtc-error-msg">Incorrect, try again!</span>
-          ) : gameState === "idle" ? (
-            <>Get ready! Click <b>Start</b> for a fresh challenge.</>
-          ) : (
-            <>&nbsp;</>
-          )}
-        </div>
-
-        {/* Controls */}
-        <div className="wtc-actions-row">
-          {gameState === "idle" && (
-            <button className="wtc-btn start" onClick={initializeGame} tabIndex={0}>
-              Start
-            </button>
-          )}
-          {(gameState === "finished" || modalOpen) && (
-            <button className="wtc-btn playagain" onClick={handleRestart} tabIndex={0}>
-              <span aria-hidden="true">↺</span> Play Again
-            </button>
-          )}
-          <button className="wtc-btn back" onClick={handleBack} tabIndex={0}>
-            ← Back to Games
-          </button>
-        </div>
-
-        {/* Modal: End of game stats */}
-        {modalOpen && (
-          <ResultModal
-            open={modalOpen}
-            sentenceArr={sentenceList}
-            n={round + 1}
-            start={startTime}
-            end={endTime ?? Date.now()}
-            score={totalScore}
-            best={bestScore}
-            onReplay={handleRestart}
-            onClose={() => setModalOpen(false)}
-            userInput={userInput}
-          />
-        )}
-      </main>
-    </div>
-  );
-}
-
-// Modal result overlay
-function ResultModal({ open, sentenceArr, n, start, end, score, best, onReplay, onClose, userInput }) {
-  // Compute WPM, accuracy, etc.
-  const totalChars = sentenceArr.slice(0, n).join("").length;
-  let charsTyped = 0, correctChars = 0;
-  for (let i = 0; i < n; ++i) {
-    const target = sentenceArr[i];
-    const input = i === n - 1 ? userInput : ""; // Only last input captured
-    charsTyped += input.length;
-    for (let j = 0; j < target.length && j < input.length; ++j) {
-      if (target[j] === input[j]) correctChars++;
-    }
+  function handleTimeout() {
+    // User ran out of time: mark as fail
+    setFeedback({ status: "timeout", msg: "⏰ Time's up! Try again next round." });
+    setPerfectStreak(0);
+    setTypoCount(currentSentence().length);
+    setRoundScores((prev) => [
+      ...prev,
+      { round: round + 1, score: 0, typos: currentSentence().length, time: INITIAL_TIMER, perfect: false, highspeed: false, timeout: true }
+    ]);
+    triggerInputAnimation("timeout");
+    setTimeout(() => {
+      if (round < sentences.length - 1) {
+        setRound((r) => r + 1);
+        setUserInput("");
+        setTimer(INITIAL_TIMER);
+        setTypoCount(0);
+        setFeedback(null);
+      } else {
+        finishGame();
+      }
+    }, 940);
   }
-  const timeSec = Math.max(1, (end - start) / 1000);
-  const wpm = Math.round((charsTyped / 5) / (timeSec / 60));
-  const acc = charsTyped === 0 ? 1 : correctChars / charsTyped;
 
-  return (
-    <div className={`wtc-modal-backdrop${open ? " open" : ""}`}>
-      <div className="wtc-modal-content" role="dialog" aria-modal="true">
-        <div className="wtc-modal-title">
-          <span role="img" aria-label="trophy" className="wtc-modal-trophy">🏆</span> Finished!
-        </div>
-        <div className="wtc-modal-stats">
-          <div className="wtc-modal-pill">
-            <span className="label">Score</span>
-            <span className="value">{score}</span>
-          </div>
-          <div className="wtc-modal-pill">
-            <span className="label">WPM</span>
-            <span className="value">{wpm}</span>
-          </div>
-          <div className="wtc-modal-pill">
-            <span className="label">Accuracy</span>
-            <span className="value">{Math.round(acc * 1000) / 10}%</span>
-          </div>
-        </div>
-        <div className="wtc-modal-rating">{ratingMessage(score, acc, wpm)}</div>
-        <div className="wtc-modal-best-row">
-          <span className="wtc-modal-best-label">Your Best:</span>
-          <span className="wtc-modal-best-score">
-            {typeof best.score === "number" && best.score > 0
-              ? `${best.score} pts, ${best.wpm} WPM, ${Math.round(best.acc * 1000) / 10}%`
-              : "No score yet"}
-          </span>
-        </div>
-        <button className="wtc-btn playagain" onClick={onReplay} autoFocus>
-          <span aria-hidden="true">↺</span> Replay
-        </button>
-        <button className="wtc-btn modal-close" onClick={onClose}>Close</button>
+  // Animation trigger (add/remove input style classes)
+  function triggerInputAnimation(type) {
+    if (!inputRef.current) return;
+    const el = inputRef.current;
+    el.classList.remove("wttype-perfect", "wttype-fast", "wttype-typo", "wttype-timeout");
+    if (type === "perfect") el.classList.add("wttype-perfect");
+    if (type === "typo") el.classList.add("wttype-typo");
+    if (type === "fast") el.classList.add("wttype-fast");
+    if (type === "timeout") el.classList.add("wttype-timeout");
+    setTimeout(() => {
+      el.classList.remove("wttype-perfect", "wttype-fast", "wttype-typo", "wttype-timeout");
+    }, 750);
+  }
+
+  // ================= SCORE/LOCAL STORAGE ================
+  function finishGame() {
+    setGameOver(true);
+    setPlaying(false);
+
+    // Persist best score/streak if improved
+    const prevScore = Number(window.localStorage.getItem(BEST_SCORE_KEY)) || 0;
+    if (score > prevScore) {
+      window.localStorage.setItem(BEST_SCORE_KEY, score);
+      setBestScore(score);
+    }
+    if (perfectStreak > bestStreak) {
+      window.localStorage.setItem(BEST_STREAK_KEY, perfectStreak);
+      setBestStreak(perfectStreak);
+    }
+    setScoreboardOpen(true);
+  }
+
+  function fmtTime(secs) {
+    return secs + "s";
+  }
+
+  function handleThemeToggle() {
+    setTheme(t => t === "dark" ? "light" : "dark");
+  }
+
+  // ========== Rendering functions ==========
+
+  // Highlight errors in sentence display
+  function renderSentenceBox() {
+    const text = currentSentence();
+    const typed = userInput;
+    let parts = [];
+    for (let i = 0; i < text.length; ++i) {
+      const correct = typed[i] === text[i];
+      let isCaret = typed.length === i;
+      parts.push(
+        <span
+          key={i}
+          className={
+            correct
+              ? "wttyped-correct"
+              : i < typed.length
+              ? "wttyped-wrong"
+              : "wttyped-rest"
+          }
+        >
+          {text[i]}
+          {isCaret && <span className="wttyped-caret" aria-hidden="true"></span>}
+        </span>
+      );
+    }
+    return <div className="wttype-sentence-field" aria-label="Target sentence for typing">{parts}</div>;
+  }
+
+  function renderFeedback() {
+    if (!feedback) return null;
+    let className = "wttype-feedback";
+    if (feedback.status === "perfect") className += " perfect";
+    else if (feedback.status === "typo") className += " typo";
+    else if (feedback.status === "fast") className += " fast";
+    else if (feedback.status === "timeout") className += " timeout";
+    return (
+      <div className={className} role="status" aria-live="assertive">
+        {feedback.msg}
       </div>
+    );
+  }
+
+  function renderScoreboardModal() {
+    if (!scoreboardOpen) return null;
+    return (
+      <div className="wttype-modal-backdrop open">
+        <div className="wttype-modal-content" tabIndex={-1} role="dialog" aria-modal="true">
+          <span className="wttype-modal-icon" aria-hidden="true">🏁</span>
+          <h3 className="wttype-modal-title">Round Results</h3>
+          <div className="wttype-modal-finalscore">
+            Score: <span className="score">{score}</span>
+          </div>
+          <div className="wttype-modal-results">
+            <ul>
+              {roundScores.map((r, i) => (
+                <li key={i}>
+                  <b>#{i+1}:</b> {r.timeout ? <i className="timeout">timeout</i> : r.typos === 0 ? "Perfect ✅" : `${r.typos} typo${r.typos>1?"s":""}`}
+                  {" · "}
+                  <span>+{r.score}</span>
+                  {r.highspeed && !r.perfect && <span className="bonus">⏩</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="wttype-record-row">
+            <span className="label">Best Score:</span>{" "}
+            <span className="wttype-bestscore">{Math.max(score, bestScore)}</span>
+            {" | "}
+            <span className="label">Perfect Streak:</span>{" "}
+            <span className="wttype-beststreak">{Math.max(perfectStreak, bestStreak)}</span>
+          </div>
+          <button
+            className="wttype-btn wttype-playagain-btn"
+            onClick={() => {
+              setScoreboardOpen(false);
+              setGameOver(false);
+              startGame();
+            }}
+            autoFocus
+          >
+            Play Again
+          </button>
+          <button className="wttype-btn wttype-goback-btn" onClick={() => navigate("/games")}>← Back to Games</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Main render
+  return (
+    <div className="wttype-root">
+      {/* BG Decorations */}
+      <div className="wttype-blur1"></div>
+      <div className="wttype-blur2"></div>
+      {/* Modal for results/scoreboard */}
+      {renderScoreboardModal()}
+      <main className="wttype-card">
+        <header className="wttype-header">
+          <h2 className="wttype-title"><span aria-hidden="true">📑</span> Word Typing Challenge</h2>
+          <div className="wttype-theme-row">
+            <button
+              className="wttype-theme-toggle"
+              aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+              tabIndex={0}
+              onClick={handleThemeToggle}
+            >
+              {theme === "dark"
+                ? <span aria-hidden="true">🌙</span>
+                : <span aria-hidden="true">☀️</span>
+              }
+              <span className="theme-label">{theme === "dark" ? "Dark" : "Light"} mode</span>
+            </button>
+          </div>
+        </header>
+        <section className="wttype-mainzone" aria-label="Word Typing Challenge Panel">
+          {!playing && !gameOver && (
+            <div className="wttype-welcome">
+              <h3>How fast and perfect can you type?</h3>
+              <ul className="wttype-rules">
+                <li>Type {ROUND_COUNT} randomized sentences as quickly and accurately as you can.</li>
+                <li>Each round: <b>{INITIAL_TIMER}s</b> to finish. Bonus for perfection, speed, and streaks.</li>
+                <li>Errors are <mark>highlighted</mark>; fast finish = bonus!</li>
+                <li>Best scores and streaks are saved.<br/>Try to beat your <b>personal record</b>!</li>
+                <li>Theme toggle top right (☀️/🌙), full keyboard and screen reader support.</li>
+              </ul>
+              <button className="wttype-btn wttype-start-btn" onClick={startGame} tabIndex={0}>
+                Start Challenge
+              </button>
+              <button className="wttype-btn wttype-goback-btn" onClick={() => navigate("/games")}>← Back to Games</button>
+              <div className="wttype-bestboard">
+                <strong>Best Score:</strong> <span>{bestScore}</span>{" | "}
+                <strong>Perfect Streak:</strong> <span>{bestStreak}</span>
+              </div>
+            </div>
+          )}
+          {playing && (
+            <>
+              <div className="wttype-statrow">
+                <span className="wttype-pill round"><span className="sr-only">Round</span>🏁 {round+1}/{ROUND_COUNT}</span>
+                <span className="wttype-pill timer" aria-label="Seconds left">⏰ {timer}s</span>
+                <span className="wttype-pill score"><span className="sr-only">Score</span>🏆 {score}</span>
+                <span className="wttype-pill streak" title="Perfect streak">🔥 {perfectStreak}</span>
+              </div>
+              <div className="wttype-sentence-zone">
+                {renderSentenceBox()}
+              </div>
+              <input
+                ref={inputRef}
+                className="wttype-input"
+                type="text"
+                value={userInput}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                autoFocus
+                disabled={gameOver}
+                maxLength={currentSentence().length}
+                aria-label="Type the sentence here"
+                spellCheck="false"
+              />
+              {tooltip && <div className="wttype-tooltip" role="alert">{tooltip}</div>}
+              {renderFeedback()}
+              <div className="wttype-btns-row">
+                <button
+                  className="wttype-btn wttype-submit-btn"
+                  onClick={handleSubmit}
+                  tabIndex={0}
+                  disabled={userInput.length === 0 || gameOver}
+                  aria-label="Submit this round"
+                >Submit</button>
+                <button
+                  className="wttype-btn wttype-giveup-btn"
+                  onClick={finishGame}
+                  tabIndex={0}
+                  disabled={gameOver}
+                >Finish Now</button>
+                <button className="wttype-btn wttype-goback-btn" onClick={() => navigate("/games")}>← Exit</button>
+              </div>
+            </>
+          )}
+        </section>
+        <footer className="wttype-footer">
+          <strong>Word Typing Challenge</strong> · Scores and history are saved to your device.
+        </footer>
+      </main>
     </div>
   );
 }
