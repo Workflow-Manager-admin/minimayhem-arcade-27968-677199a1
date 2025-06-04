@@ -69,8 +69,7 @@ const FEATURED_GAME = {
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Now includes Sliding Tile Puzzle best steps/time.
- * Adds Snake game with best and last run scores from localStorage.
+ * Only includes supported games (no Snake).
  */
 function getLocalHighScores() {
   let memoryGameScore = null;
@@ -163,7 +162,7 @@ function getLocalHighScores() {
     ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
-  // Score snapshot returning only non-Snake game scores
+  // Score snapshot returning only the currently supported game scores
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
