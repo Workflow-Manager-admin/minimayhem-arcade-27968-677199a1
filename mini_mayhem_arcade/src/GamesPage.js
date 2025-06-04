@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-// Updated GAMES array: Sliding Tile Puzzle replaces Random Fun/Word Ladder
+/* --- GAMES array: add Snake Game (HARD) with /games/snake routing --- */
 const GAMES = [
   {
     name: "Memory Game",
@@ -39,6 +39,14 @@ const GAMES = [
     tag: "Skill",
     color: "#4F46E5",
     playPath: "/games/typing"
+  },
+  {
+    name: "Snake (Hard)",
+    icon: "🐍",
+    tagline: "Guide the snake, eat food, and avoid your own tail! Try the advanced challenge with fast speeds & special bonuses.",
+    tag: "Hard",
+    color: "#4f873e",
+    playPath: "/games/snake"
   },
   {
     name: "Sudoku",
