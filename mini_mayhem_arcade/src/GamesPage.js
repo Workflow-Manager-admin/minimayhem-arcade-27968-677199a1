@@ -40,6 +40,14 @@ const GAMES = [
     playPath: "/games/typing"
   },
   {
+    name: "Emoji Reaction",
+    icon: "😀",
+    tagline: "Test reaction with random emojis! Click only when the target shows up. Fastest wins!",
+    tag: "New",
+    color: "#ff9100",
+    playPath: "/games/emoji-reaction"
+  },
+  {
     name: "Sudoku",
     icon: "🔢",
     tagline: "Fill the 9x9 grid so every row, column, and box has 1-9. Choose difficulty, undo, and beat your best time!",
