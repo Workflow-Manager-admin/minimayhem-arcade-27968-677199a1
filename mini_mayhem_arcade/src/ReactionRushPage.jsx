@@ -185,6 +185,17 @@ function ReactionRushPage() {
                       : <span className="rrush-ms">{formatMs(reactionTime)}</span>
                     }
                   </div>
+                  {/* PERFORMANCE MESSAGE */}
+                  {!tooSoon && typeof reactionTime === "number" && (
+                    <div className="rrush-tip" style={{ marginBottom: "8px" }}>
+                      {reactionTime < 150
+                        ? "Lightning Reflexes!"
+                        : reactionTime <= 300
+                          ? "Good!"
+                          : "Too Slow!"
+                      }
+                    </div>
+                  )}
                   <button className="rrush-btn" tabIndex={0}>Play Again</button>
                   {lastScore !== null && !tooSoon && (
                     <div className="rrush-lastscore">
