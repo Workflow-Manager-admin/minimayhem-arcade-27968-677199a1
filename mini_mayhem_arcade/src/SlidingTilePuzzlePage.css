@@ -1,289 +1,399 @@
-.slidetile-root {
-  min-height: 100vh;
-  background: linear-gradient(123deg, #c2e9fb 25%, #a1c4fd 100%);
-  font-family: 'Montserrat', 'Inter', Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 62px;
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
+
+/* --- Theme Variable Setup for Sliding Tile Puzzle --- */
+:root {
+  --stp-bg: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  --stp-puzzle-bg: rgba(255,255,255,0.94);
+  --stp-puzzle-border: 2.5px solid #b4bef9;
+  --stp-title: #4f46e5;
+  --stp-tile-bg: #68adc4;
+  --stp-tile-color: #fff;
+  --stp-tile-shadow: 0 4px 18px #68adc455, 0 1.5px 6px #4f46e518;
+  --stp-tile-shadow-hover: 0 8px 32px #68adc478;
+  --stp-blank-bg: #e7eef9;
+  --stp-btn-bg: #4f46e5;
+  --stp-btn-text: #fff;
+  --stp-btn-bg-hover: #3730a3;
+  --stp-btn-shadow: 0 3px 12px #4f46e522;
+  --stp-moves-bg: #eceefd;
+  --stp-moves-text: #353488;
+  --stp-timer-bg: #fff6b7;
+  --stp-timer-text: #687b43;
+  --stp-tip-bg: #e6f1faee;
+  --stp-tip-text: #355b8f;
+  --stp-transition: background 0.42s cubic-bezier(.57,.4,.55,1), color 0.38s cubic-bezier(.31,.7,.73,.95), box-shadow 0.27s;
 }
 
-.slidetile-main {
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 18px;
-  box-shadow: 0 10px 38px #c2e9fb60, 0 4px 20px #4f46e518;
-  padding: 40px 32px 32px 32px;
-  margin-top: 44px;
-  width: 440px;
-  max-width: 99vw;
+[data-theme="dark"] {
+  --stp-bg: linear-gradient(129deg, #232526 0%, #1a1a1a 100%);
+  --stp-puzzle-bg: rgba(36,39,61,0.98);
+  --stp-puzzle-border: 2.5px solid #22224c;
+  --stp-title: #68adc4;
+  --stp-tile-bg: #232a3d;
+  --stp-tile-color: #68adc4;
+  --stp-tile-shadow: 0 4px 18px #21283d77, 0 2px 8px #1c294299;
+  --stp-tile-shadow-hover: 0 12px 34px #151d35cc;
+  --stp-blank-bg: #232526;
+  --stp-btn-bg: #68adc4;
+  --stp-btn-text: #15132a;
+  --stp-btn-bg-hover: #3b435e;
+  --stp-btn-shadow: 0 3px 12px #68adc433;
+  --stp-moves-bg: #21263f;
+  --stp-moves-text: #aefcff;
+  --stp-timer-bg: #2c2e59;
+  --stp-timer-text: #f8eea7;
+  --stp-tip-bg: #151727ec;
+  --stp-tip-text: #b9e7fc;
+}
+
+/* --- Page — Full BG --- */
+.stp-root {
+  min-height: 100vh;
+  padding-top: 90px;
+  padding-bottom: 32px;
+  background: var(--stp-bg);
+  font-family: 'Montserrat', 'Inter', Arial, sans-serif;
+  color: var(--stp-title);
+  transition: var(--stp-transition);
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-[data-theme="dark"] .slidetile-main {
-  background: rgba(30, 31, 44, 0.94);
-  box-shadow: 0 9px 30px #a1c4fd27, 0 1.8px 14px #23263d28;
+  box-sizing: border-box;
 }
 
-.slidetile-header {
-  width: 100%;
+/* --- Puzzle Area --- */
+.stp-main-card {
+  margin: 0 auto;
+  margin-top: 18px;
+  border-radius: 22px;
+  background: var(--stp-puzzle-bg);
+  border: var(--stp-puzzle-border);
+  box-shadow: 0 7px 25px #68adc428, 0 1.5px 10px #4f46e519;
+  max-width: 430px;
+  width: 96vw;
+  padding: 36px 26px 29px 26px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  margin-bottom: 16px;
+  align-items: center;
+  transition: var(--stp-transition);
 }
 
-.slidetile-title {
+.stp-title-row {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 18px;
+}
+
+.stp-title {
+  font-size: 2.38rem;
   font-family: inherit;
-  font-size: 2.15rem;
   font-weight: 900;
-  color: #68adc4;
-  margin-bottom: 10px;
+  letter-spacing: -1.3px;
+  color: var(--stp-title);
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
-}
-.slidetile-emoji {
-  font-size: 1.28em;
-  margin-right: 5px;
+  line-height: 1.13;
 }
 
-.slidetile-controls-row {
-  width: 100%;
+/* --- Moves/Timer Bar --- */
+.stp-bar {
   display: flex;
-  align-items: center;
   gap: 13px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-
-.slidetile-size-label {
-  font-size: 1.02em;
-  font-weight: 700;
-  color: #375dc2;
-  margin-right: 11px;
-  display: flex;
   align-items: center;
-  gap: 6px;
+  margin-bottom: 10px;
+  width: 100%;
+  flex-wrap: wrap;
 }
-.slidetile-size-selector {
-  font-size: 1.05em;
-  border-radius: 7px;
-  border: 1.5px solid #68adc4;
-  padding: 3px 7px;
-  margin-left: 5px;
-  background: #dbf2f8;
-  color: #375dc2;
-  font-weight: 700;
-  outline: none;
-  transition: border .13s;
-}
-.slidetile-size-selector:focus-visible {
-  border: 2.2px solid #ffb84c;
-}
-
-.slidetile-timer-pill, .slidetile-movectr {
-  background: #eceffd;
-  color: #353488;
-  border-radius: 24px;
-  font-family: inherit;
-  font-weight: 700;
-  padding: 4px 13px 4px 12px;
-  font-size: 1.07rem;
-  display: flex; align-items: center; gap: 7px;
-  box-shadow: 0 2px 6px #68adc423;
-  margin-right: 6px;
-}
-[data-theme="dark"] .slidetile-timer-pill,
-[data-theme="dark"] .slidetile-movectr {
-  background: #24273d;
-  color: #a0c8f8;
-}
-.pill-caption {
-  opacity: 0.67;
-  font-size: .89em;
-  margin-right: 7px;
-}
-.pill-value {
-  font-size: 1.08em;
+.stp-moves-pill, .stp-timer-pill {
+  background: var(--stp-moves-bg);
+  color: var(--stp-moves-text);
+  border-radius: 19px;
+  padding: 6px 16px;
+  font-size: 1.05rem;
   font-weight: 900;
+  min-width: 72px;
+  text-align: center;
+  letter-spacing: 0.02em;
+  box-shadow: 0 1px 5px #68adc419;
 }
-.moves-label {
-  font-size: 1em;
-  color: #375dc2;
-  opacity: 0.69;
-  font-weight: 600;
+.stp-timer-pill {
+  background: var(--stp-timer-bg);
+  color: var(--stp-timer-text);
 }
-.moves-value {
-  font-weight: 900;
-  color: #3a3ad0;
-  font-size: 1.15em;
-}
-
-.btn.restart-btn, .btn.undo-btn {
-  background: #ffb84c;
-  color: #fff;
-  font-weight: 700;
-  border-radius: 10px;
-  margin-left: 5px;
-  padding: 7px 15px 7px 12px;
-  font-size: 1.06em;
-  transition: background 0.16s, color 0.12s;
-  border: none;
-  box-shadow: 0 2px 8px #ffb84c22;
-  cursor: pointer;
-  outline: none;
-}
-.btn.restart-btn:focus-visible,
-.btn.undo-btn:focus-visible,
-.btn.undo-btn:hover,
-.btn.restart-btn:hover {
-  background: #ffda9e;
-  color: #375dc2;
+@media (max-width: 430px) {
+  .stp-bar { flex-direction: column; gap: 8px; }
+  .stp-moves-pill, .stp-timer-pill { min-width: unset; width: 90vw; }
 }
 
-.btn.undo-btn {
-  background: #68adc4;
-  color: #fff;
-  font-weight: 700;
-  padding: 7px 15px 7px 12px;
-  margin-left: 11px;
-  box-shadow: 0 2px 8px #68adc433;
-}
-.btn.undo-btn:disabled {
-  background: #b7e9fa;
-  color: #d4dedf;
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-.btn.undo-btn[disabled], .btn.undo-btn[aria-disabled="true"] {
-  pointer-events: none;
-}
-
-/* ----- CRITICAL: TILE GRID CONTAINER AND TILES ----- */
-.slidetile-board {
-  margin: 0 auto 12px auto;
+/* --- Sliding GRID --- */
+.stp-puzzle-grid {
   display: grid;
-  gap: 9px;
-  background: #eceffd;
-  border-radius: 17px;
-  box-shadow: 0 0 12px #a1c4fd71;
-  user-select: none;
-  outline: none;
-  will-change: filter;
-  place-items: center;
-
-  /* Fixed, fully responsive container: max 400x400px, max 90vw, always square */
-  width: min(400px, 90vw);
-  height: min(400px, 90vw);
-  min-width: 0;
-  min-height: 0;
+  background: #f8fbff;
+  border-radius: 13px;
+  margin-top: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 17px #68adc419, 0 2px 19px #4f46e53b;
+  aspect-ratio: 1/1;
+  width: 294px; /* default 4x4: each tile fits well */
+  max-width: 90vw;
+  overflow: hidden;
+  gap: 8px;
+  transition: box-shadow 0.32s, background 0.19s;
+  position: relative;
 }
-[data-theme="dark"] .slidetile-board {
-  background: #181a28;
+[data-theme="dark"] .stp-puzzle-grid {
+  background: #181b2c;
+  box-shadow: 0 8px 27px #0f121df0, 0 1.5px 7px #353b6e3c;
 }
 
-/* Remove all grid4/grid5/grid6 classes */
-.tile {
-  background: linear-gradient(120deg, #68adc4 82%, #4f46e5 100%);
-  color: #fff;
-  font-size: 2.12rem;
-  font-family: inherit;
-  font-weight: bold;
+/* Grid size responsive (for 3x3, 4x4, 5x5 etc) */
+.stp-puzzle-grid[data-size="3"] { grid-template-columns: repeat(3, 1fr); }
+.stp-puzzle-grid[data-size="4"] { grid-template-columns: repeat(4, 1fr); }
+.stp-puzzle-grid[data-size="5"] { grid-template-columns: repeat(5, 1fr); }
+.stp-puzzle-grid[data-size="6"] { grid-template-columns: repeat(6, 1fr); }
+.stp-puzzle-grid[data-size="3"], .stp-puzzle-grid[data-size="4"], .stp-puzzle-grid[data-size="5"], .stp-puzzle-grid[data-size="6"] {
+  /* All grid configs should stay square */
+  aspect-ratio: 1/1;
+}
+
+/* --- Tile Styles --- */
+.stp-tile {
+  background: var(--stp-tile-bg);
+  color: var(--stp-tile-color);
   border: none;
-  border-radius: 15px;
-  box-shadow: 0 3px 12px #c2e9fb2a, 0 1.5px 4px #68adc42a;
+  border-radius: 13px;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 1.45rem;
+  box-shadow: var(--stp-tile-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
-  margin: 0;
   cursor: pointer;
+  user-select: none;
   outline: none;
-  transition: background .17s, color .18s, filter 0.14s;
-  filter: brightness(0.99);
-
-  /* Make tile fill its grid cell and always stay square */
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 1 / 1;
+  transition: var(--stp-transition);
+  will-change: transform;
   min-width: 0;
   min-height: 0;
+  filter: brightness(1.01);
+  z-index: 1;
 }
-.tile:focus-visible, .tile:hover {
-  background: linear-gradient(120deg, #ffb84c 70%, #68adc4 100%);
-  color: #3730a3;
-  filter: brightness(1.08);
+
+.stp-tile:hover, .stp-tile:focus-visible {
+  background: linear-gradient(90deg, #70c4e9 74%, #4f46e5 99%);
+  color: #fff;
+  box-shadow: var(--stp-tile-shadow-hover);
+  filter: brightness(1.12);
+  transform: scale(1.06);
 }
-.tile.empty {
-  background: none;
+
+[data-theme="dark"] .stp-tile {
+  background: var(--stp-tile-bg);
+  color: var(--stp-tile-color);
+  box-shadow: var(--stp-tile-shadow);
+}
+[data-theme="dark"] .stp-tile:hover,
+[data-theme="dark"] .stp-tile:focus-visible {
+  background: linear-gradient(90deg, #313966 78%, #68adc4 100%);
+  color: #aefcff;
+  filter: brightness(1.17);
+}
+
+/* --- Animation, Accessibility --- */
+.stp-tile:active {
+  filter: brightness(0.95) saturate(1.14);
+  transform: scale(0.98);
+  transition: filter 0.16s, transform 0.14s;
+}
+
+/* --- "Blank" Tile (empty spot for sliding) --- */
+.stp-blank {
+  background: var(--stp-blank-bg);
   box-shadow: none;
+  border-radius: 13px;
+  opacity: 0.37;
+  pointer-events: none !important;
   cursor: default;
+  transition: background 0.35s, opacity 0.3s;
+}
+
+/* --- Controls: Buttons & Actions --- */
+.stp-btn-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 13px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.stp-btn {
+  font-family: inherit;
+  font-size: 1.07rem;
+  font-weight: 700;
+  border-radius: 10px;
+  background: var(--stp-btn-bg);
+  color: var(--stp-btn-text);
+  border: none;
+  padding: 7px 19px 7px 16px;
+  margin: 0 2px;
+  box-shadow: var(--stp-btn-shadow);
+  cursor: pointer;
+  transition: var(--stp-transition);
   outline: none;
+  min-width: 97px;
+  letter-spacing: 0.01em;
+}
+.stp-btn:hover,
+.stp-btn:focus-visible {
+  background: var(--stp-btn-bg-hover);
+  color: #fff;
 }
 
-/* Reduce tile font-size on small screens for clean fit */
-@media (max-width: 450px) {
-  .tile { font-size: 1.12rem; }
+/* --- Puzzle Mode & Grid Size Picker --- */
+.stp-picker-bar {
+  width: 100%;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
-
-/* Responsive container styling */
-@media (max-width: 520px) {
-  .slidetile-main { padding: 2vw 2vw; }
-  .slidetile-board {
-    width: 98vw !important;
-    height: 98vw !important;
-    min-width: unset;
-    min-height: unset;
-  }
-  .tile { font-size: 1.15em; }
-  .slidetile-controls-row { gap: 6px; flex-wrap: wrap; }
-}
-
-/* Win/instruction area styling */
-.slidetile-tip {
-  margin-top: 19px;
-  color: #406499;
-  background: #eefeebd9;
-  font-weight: 800;
-  border-radius: 9px;
-  font-size: 1.12rem;
-  padding: 8px 18px 9px 18px;
-  text-align: center;
-  box-shadow: 0 2px 10px #a1c4fd28;
-  opacity: 0.92;
-  min-height: 33px;
-  line-height: 1.42;
-}
-[data-theme="dark"] .slidetile-tip {
-  background: #24273de0;
-  color: #eca1;
-}
-.slidetile-tip.win {
-  background: #baf7bcf2;
-  color: #386e12;
-  font-size: 1.19rem;
-  box-shadow: 0 5px 18px #80e95a3a;
-  animation: popwin 1s;
-}
-.best-row {
-  font-size: 1.01em;
-  margin-top: 2px;
-  color: #375dc2;
-  display: block;
-}
-.try-harder-tip {
-  color: #68adc4;
-  display: block;
-  margin-top: 2px;
+.stp-picker-label {
+  color: var(--stp-title);
   font-weight: 700;
 }
-
-@keyframes popwin {
-  0% { transform: scale(.95); opacity: 0;}
-  70% { transform: scale(1.1);}
-  80% { transform: scale(0.97);}
-  95% { transform: scale(1.04);}
-  100% { transform: scale(1); opacity: 1;}
+.stp-size-btn, .stp-mode-btn {
+  background: none;
+  color: var(--stp-title);
+  border: 1.7px solid var(--stp-btn-bg);
+  border-radius: 8px;
+  padding: 4.5px 14px;
+  margin: 0 3px;
+  font-size: 1.01em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, color 0.17s, border-color 0.22s;
 }
+.stp-size-btn.active, .stp-mode-btn.active {
+  background: var(--stp-btn-bg);
+  color: var(--stp-btn-text);
+  border-color: var(--stp-btn-bg);
+}
+.stp-size-btn:hover, .stp-mode-btn:hover {
+  background: var(--stp-btn-bg-hover);
+  color: #fff;
+  border-color: var(--stp-btn-bg-hover);
+}
+
+/* --- Instructions & Tip --- */
+.stp-tip {
+  margin-top: 14px;
+  background: var(--stp-tip-bg);
+  color: var(--stp-tip-text);
+  border-radius: 10px;
+  font-size: 1.09rem;
+  font-weight: 700;
+  padding: 7px 18px;
+  opacity: 0.93;
+  box-shadow: 0 2px 8px #68adc436;
+  max-width: 410px;
+  width: 100%;
+  text-align: center;
+}
+[data-theme="dark"] .stp-tip {
+  opacity: 0.96;
+}
+.stp-tip strong { color: var(--stp-btn-bg); }
+
+/* --- Win Modal & Animation --- */
+.stp-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(41,51,97,0.33);
+  z-index: 9000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: opacity 0.31s;
+  opacity: 0;
+  pointer-events: none;
+}
+.stp-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.stp-modal-content {
+  background: linear-gradient(117deg, #b4bef9de 70%, #e1dbfed9 100%);
+  color: #3730a3;
+  box-shadow: 0 14px 44px #68adc439, 0px 8px 22px #24273D44;
+  padding: 33px 30px 27px 30px;
+  border-radius: 19px;
+  margin-top: 95px;
+  max-width: 340px;
+  min-width: 230px;
+  text-align: center;
+  position: relative;
+  animation: stp-pop 0.25s cubic-bezier(.55,.84,.19,1.02);
+}
+@keyframes stp-pop {
+  from { opacity: 0; transform: scale(0.83); }
+  to { opacity: 1; transform: scale(1); }
+}
+[data-theme="dark"] .stp-modal-content {
+  background: linear-gradient(118deg, #24273ddb 78%, #68adc4d2 100%);
+  color: #fff;
+}
+.stp-modal-title {
+  font-size: 1.32rem;
+  font-weight: 900;
+  color: var(--stp-title);
+  margin-bottom: 11px;
+}
+[data-theme="dark"] .stp-modal-title { color: #e7fafe; }
+.stp-modal-stats {
+  display: flex;
+  gap: 13px;
+  justify-content: center;
+  margin: 16px 0 13px 0;
+}
+.stp-modal-pill {
+  background: #eceffd;
+  color: #3730a3;
+  border-radius: 15px;
+  font-weight: 800;
+  font-size: 1.06rem;
+  padding: 7px 19px 6px 14px;
+  min-width: 59px;
+}
+[data-theme="dark"] .stp-modal-pill {
+  background: #2c2e59;
+  color: #aefcff;
+}
+
+/* --- Accessibility: Focus Styles --- */
+.stp-tile:focus-visible,
+.stp-btn:focus-visible,
+.stp-size-btn:focus-visible,
+.stp-mode-btn:focus-visible {
+  outline: 2.5px solid var(--stp-btn-bg-hover);
+  outline-offset: 2px;
+  z-index: 2;
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .stp-main-card, .stp-modal-content { padding: 13vw 3vw 10vw 3vw; }
+  .stp-title { font-size: 1.45rem; }
+  .stp-puzzle-grid { width: 97vw; gap: 2vw; }
+}
+
+/* --- Hide scrollbars for puzzle grid --- */
+.stp-puzzle-grid::-webkit-scrollbar { display: none; }
+.stp-puzzle-grid { -ms-overflow-style: none; scrollbar-width: none; }
+
