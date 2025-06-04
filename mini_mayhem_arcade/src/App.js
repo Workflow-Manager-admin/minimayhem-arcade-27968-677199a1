@@ -13,6 +13,7 @@ import BlockGamePage from './BlockGamePage.jsx';
 import ScoreboardPage from './ScoreboardPage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AboutPrivacyPage from './AboutPrivacyPage.jsx';
+import HelpPage from './HelpPage.jsx'; // Help Page route integration
 
 /**
  * PUBLIC_INTERFACE
@@ -41,7 +42,8 @@ function App() {
             <Route path="/scoreboard" element={<ScoreboardPage />} />
             {/* About & Privacy page routed to /about-privacy */}
             <Route path="/about-privacy" element={<AboutPrivacyPage />} />
-            {/* Optionally, add more routes like scoreboard/help in future */}
+            {/* Add help page to routing */}
+            <Route path="/help" element={<HelpPage />} />
           </Routes>
         </main>
       </div>
