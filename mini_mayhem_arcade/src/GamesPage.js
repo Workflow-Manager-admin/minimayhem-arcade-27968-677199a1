@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
+// Demo data for five mini-games, Quick Math replaced by Ice Slide Puzzle
 const GAMES = [
   {
     name: "Memory Game",
@@ -55,6 +56,18 @@ const GAMES = [
   }
 ];
 
+// Example featured game (could pick randomly per day in a real app)
+const FEATURED_GAME = {
+  name: "Reaction Speed",
+  icon: "⚡",
+  desc: "Test your reflexes! Hit the play button when the screen flashes – every millisecond counts. Be the fastest among friends.",
+  action: "/games/reaction"
+};
+
+/**
+ * Get local high scores for display in scoreboard widget.
+ * Include Ice Slide Puzzle score from localStorage (iceSlideScore).
+ */
 function getLocalHighScores() {
   let memoryGameScore = null;
   let reactionGameScore = null;
