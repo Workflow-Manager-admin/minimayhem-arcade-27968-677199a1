@@ -40,7 +40,15 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
-  // Typing Challenge removed for Shadow Runner integration
+  // Shadow Runner Game Card (new addition)
+  {
+    name: "Shadow Runner",
+    icon: "🏃‍♂️‍➡️",
+    tagline: "Dash, jump, and dodge obstacles—run as far as you can in this endless runner adventure!",
+    tag: "Arcade",
+    color: "#4f46e5",
+    playPath: "/games/shadow-runner"
+  },
   {
     name: "Sudoku",
     icon: "🔢",
