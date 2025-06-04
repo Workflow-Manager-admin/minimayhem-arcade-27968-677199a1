@@ -44,16 +44,16 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
-  // --- Word Typing Challenge Card Added Below ---
+  // --- Word Typing Challenge Card ---
   {
     name: "Word Typing Challenge",
-    icon: "✍️",
-    tagline: "Type given words & sentences quickly and accurately! Fast fingers win.",
-    tag: "Typing",
+    icon: "📝",
+    tagline: "Type as many words as you can—speed and accuracy matter! Great for practicing typing.",
+    tag: "New!",
     color: "#fb6379",
     playPath: "/games/typing-challenge"
   },
-  // --- Light Beam Puzzle Card Added Below ---
+  // --- Light Beam Puzzle Card ---
   {
     name: "Light Beam Puzzle",
     icon: "🔦",
