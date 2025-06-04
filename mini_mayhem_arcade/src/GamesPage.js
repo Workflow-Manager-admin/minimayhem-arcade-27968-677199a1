@@ -44,7 +44,15 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
-  // Light Beam Puzzle integration slot (to be added)
+  // --- Light Beam Puzzle Card Added Below ---
+  {
+    name: "Light Beam Puzzle",
+    icon: "🔦",
+    tagline: "Bend the light! Rotate mirrors to guide a laser beam to the receiver. Animated glow, logic, & reflection fun.",
+    tag: "NEW",
+    color: "#4fd8ff",
+    playPath: "/games/light-beam"
+  },
   {
     name: "Sudoku",
     icon: "🔢",
