@@ -599,8 +599,16 @@ function PlayerSprite({ x, y, height, faded, slide, jump, theme, cloneNbr }) {
   const bodyH = height;
   const baseColor = theme === "dark" ? "#40e9e2" : "#4f46e5";
   const cloneAlpha = faded ? Math.max(0.21, 1 - (cloneNbr+1)*0.36) : 1;
+
+  // Visual state separation: jump takes precedence, else slide, else run
+  let spriteState = "";
+  if (jump) spriteState = "jump";
+  else if (slide) spriteState = "slide";
+  else spriteState = "run";
+  const spriteClass = `shadowrunner-runner${faded ? " shadow" : ""} ${spriteState}`;
+
   return (
-    <g className={`shadowrunner-runner${faded ? " shadow" : ""}${slide ? " slide" : ""}${jump ? " jump" : ""}`}>
+    <g className={spriteClass.trim()}>
       {/* Legs */}
       <rect x={x + 17} y={y + bodyH - 7} width="4" height="14" rx="2" fill={baseColor} opacity={cloneAlpha * 0.46} />
       <rect x={x + 11} y={y + bodyH - 4} width="4" height="11" rx="2" fill={baseColor} opacity={cloneAlpha * 0.23} />
