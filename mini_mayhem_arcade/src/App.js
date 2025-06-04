@@ -10,6 +10,7 @@ import QuickMathPage from './QuickMathPage.jsx';
 import SudokuGamePage from './SudokuGamePage.jsx';
 import SlidingTilePuzzlePage from './SlidingTilePuzzlePage.jsx';
 import BlockGamePage from './BlockGamePage.jsx';
+import ScoreboardPage from './ScoreboardPage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -36,6 +37,7 @@ function App() {
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
+            <Route path="/scoreboard" element={<ScoreboardPage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
         </main>
