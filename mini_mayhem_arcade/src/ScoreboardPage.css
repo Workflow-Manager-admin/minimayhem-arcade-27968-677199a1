@@ -1,231 +1,279 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,800&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
 
+/* === Root and Utilities === */
 :root {
-  --sb-bg: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
-  --sb-bg-dark: linear-gradient(128deg, #232526 0%, #1A1A1A 100%);
-  --sb-card-bg: rgba(255,255,255, 0.97);
-  --sb-card-bg-dark: rgba(24,28,44,0.96);
-  --sb-card-shadow: 0 4px 28px #68adc419;
-  --sb-card-border: 1.3px solid rgba(90,100,140,0.13);
-  --sb-card-radius: 20px;
-  --sb-title-font: 'Montserrat', 'Inter', 'Arial', sans-serif;
-  --sb-accent: #68adc4;
-  --sb-card-accent: #4f46e5;
-  --sb-heading-size: 2.6rem;
-  --sb-label: #4f46e5;
-  --sb-card-padding: 28px 16px 17px 16px;
-  --sb-btn-red: #ff5559;
-  --sb-btn-gray: #bfbfbf;
+  --scoreboard-light-bg: #fff;
+  --scoreboard-light-shadow: 0 4px 20px 0 #22283113;
+  --scoreboard-light-border: #ddd;
+  --scoreboard-title-light: #222831;
+  --scoreboard-score-light: #555;
+  --scoreboard-h1-light: #ff5722;
+  --scoreboard-h2-light: #3f51b5;
+  --scoreboard-reset-light: #e57373;
+  --scoreboard-reset-hover-light: #d32f2f;
 }
 
 [data-theme="dark"] {
-  --sb-bg: var(--sb-bg-dark);
-  --sb-card-bg: var(--sb-card-bg-dark);
+  --scoreboard-dark-bg: #121212;
+  --scoreboard-card-dark-bg: #1e1e2f;
+  --scoreboard-card-alt-dark-bg: #24283b;
+  --scoreboard-dark-shadow: 0 6px 30px 0 #fff2;
+  --scoreboard-dark-border: #3a3a3a;
+  --scoreboard-title-dark: #fff;
+  --scoreboard-title-dark-accent: #00ffc3;
+  --scoreboard-score-dark: #b0bec5;
+  --scoreboard-h1-dark: #ff9800;
+  --scoreboard-h2-dark: #03dac6;
+  --scoreboard-h3-dark: #cddc39;
+  --scoreboard-reset-dark: #c62828;
+  --scoreboard-reset-hover-dark: #ff4444;
 }
 
 .scoreboard-root {
   min-height: 100vh;
-  background: var(--sb-bg);
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 88px;
+  padding-top: 96px;
+  padding-bottom: 48px;
+  background: var(--scoreboard-light-bg);
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  color: var(--scoreboard-title-light);
+  transition: background 0.35s cubic-bezier(.44,.05,.66,.91), color 0.28s;
+}
+
+[data-theme="dark"] .scoreboard-root {
+  background: var(--scoreboard-dark-bg);
+  color: var(--scoreboard-title-dark);
+  transition: background 0.35s cubic-bezier(.44,.05,.66,.91), color 0.28s;
 }
 
 .scoreboard-container {
-  width: 100%;
-  max-width: 1024px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 0 24px 42px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  padding: 0 24px;
 }
 
 .scoreboard-heading {
-  font-size: var(--sb-heading-size);
-  font-family: var(--sb-title-font);
+  font-size: 3rem;
   font-weight: 900;
-  color: var(--sb-accent);
+  color: var(--scoreboard-h1-light);
+  margin: 0 0 22px 0;
+  letter-spacing: -2px;
   text-align: center;
-  letter-spacing: -1.2px;
-  margin: 0 0 11px 0;
-  line-height: 1.13;
-  text-shadow: 0 6px 36px #68adc449;
-  display: flex;
-  align-items: center;
-  gap: 0.7em;
-  justify-content: center;
+  transition: color 0.35s;
 }
 
-.scoreboard-subhead {
-  font-size: 1.09rem;
-  color: #21223a;
-  text-align: center;
-  font-family: var(--sb-title-font);
-  margin-bottom: 37px;
-  opacity: 0.72;
+[data-theme="dark"] .scoreboard-heading {
+  color: var(--scoreboard-h1-dark);
+  text-shadow: 0 4px 16px #ff980022;
 }
 
-[data-theme="dark"] .scoreboard-subhead { color: #b4bef9; opacity: 0.81; }
+.scoreboard-subheading {
+  font-size: 1.27rem;
+  color: var(--scoreboard-h2-light);
+  font-weight: 500;
+  margin-bottom: 36px;
+  text-align: center;
+  letter-spacing: -0.3px;
+  transition: color 0.34s;
+}
 
-.scoreboard-grid {
+[data-theme="dark"] .scoreboard-subheading {
+  color: var(--scoreboard-h2-dark);
+}
+
+.scoreboard-cards-grid {
+  margin: 0 auto 45px auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, auto);
-  gap: 34px 25px;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 31px;
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto 39px auto;
-  padding: 0;
-  justify-items: center;
+  transition: gap 0.23s;
 }
 
-@media (max-width: 900px) {
-  .scoreboard-grid { grid-template-columns: repeat(2, 1fr); gap: 23px 8px; }
-  .scoreboard-container { padding: 0 6px 24px 6px; }
-}
-@media (max-width: 600px) {
-  .scoreboard-grid { grid-template-columns: 1fr; }
-  .scorecard { min-width: 92vw; }
-  .scoreboard-heading { font-size: 1.7rem; }
-}
-@media (max-width: 420px) {
-  .scoreboard-heading { font-size: 1.20rem; }
-}
-
-.scorecard {
-  background: var(--sb-card-bg);
-  border: var(--sb-card-border);
-  border-radius: var(--sb-card-radius);
-  box-shadow: var(--sb-card-shadow);
-  min-width: 240px;
-  max-width: 320px;
-  width: 100%;
-  min-height: 186px;
-  padding: var(--sb-card-padding);
+.scoreboard-card {
+  background: var(--scoreboard-light-bg);
+  border: 1.3px solid var(--scoreboard-light-border);
+  border-radius: 17px;
+  box-shadow: var(--scoreboard-light-shadow);
+  padding: 28px 19px 23px 19px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  transition: box-shadow 0.17s, transform 0.16s, background 0.19s;
-  font-family: var(--sb-title-font);
+  align-items: center;
+  transition: 
+    box-shadow 0.22s cubic-bezier(.25,.73,.53,1.08),
+    transform 0.16s cubic-bezier(.28,.56,.46,1.19),
+    background 0.32s,
+    border 0.16s,
+    color 0.32s;
+  min-height: 165px;
+  cursor: pointer;
   position: relative;
   z-index: 1;
-  animation: fadeInSbCard 0.62s;
-}
-@keyframes fadeInSbCard {
-  from { opacity: 0; transform: translateY(44px) scale(.98);}
-  to   { opacity: 1; transform: none;}
 }
 
-.scorecard-header {
-  display: flex;
-  align-items: center;
-  font-size: 1.23rem;
+.scoreboard-card:hover, .scoreboard-card:focus-visible {
+  transform: translateY(-7px) scale(1.032);
+  box-shadow: 0 13px 38px 0 #ff57223c;
+  background: linear-gradient(119deg, #fff 87%, #faf9ff 100%);
+  border-color: #bbb;
+  transition: box-shadow 0.19s, background 0.22s, border 0.15s, transform 0.15s;
+}
+
+[data-theme="dark"] .scoreboard-card {
+  background: var(--scoreboard-card-dark-bg);
+  border: 1.4px solid var(--scoreboard-dark-border);
+  box-shadow: var(--scoreboard-dark-shadow);
+  color: var(--scoreboard-title-dark);
+  transition: background 0.32s, border 0.19s, color 0.22s, box-shadow 0.18s;
+}
+
+[data-theme="dark"] .scoreboard-card:hover, 
+[data-theme="dark"] .scoreboard-card:focus-visible {
+  background: linear-gradient(117deg, var(--scoreboard-card-dark-bg) 80%, var(--scoreboard-card-alt-dark-bg) 100%);
+  box-shadow: 0 19px 50px #fff5, 0 3px 14px #000c;
+  border-color: #4a4a5a;
+  transition: box-shadow 0.23s, background 0.23s, border 0.15s, color 0.16s;
+}
+
+.scoreboard-card-title {
+  font-size: 1.22rem;
   font-weight: 800;
-  margin-bottom: 9px;
-  gap: 0.4em;
-  color: var(--sb-card-accent);
-}
-
-.scorecard-emoji {
-  font-size: 2.1rem;
-  margin-right: 0.13em;
-  filter: drop-shadow(0 4px 22px #68adc429);
-  user-select: none;
-}
-
-.scorecard-name {
-  font-family: var(--sb-title-font);
-  font-weight: 900;
-  letter-spacing: .03em;
-}
-
-/* Card rows */
-.scorecard-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  font-size: 1.03rem;
-  margin-bottom: 6px;
-  align-items: center;
-}
-
-.scorecard-label {
-  color: var(--sb-label);
-  font-weight: 700;
-  font-size: 1em;
-  width: 33%;
-  min-width: 73px;
   letter-spacing: 0.01em;
-  text-align: left;
-}
-.scorecard-best, .scorecard-recent, .scorecard-date {
-  font-weight: 800;
-  color: #20214b;
-  font-size: 1.05em;
-  text-align: right;
-  flex: 1 1 auto;
-  opacity: 0.93;
-}
-[data-theme="dark"] .scorecard-best,
-[data-theme="dark"] .scorecard-recent,
-[data-theme="dark"] .scorecard-date {
-  color: #eceafd;
-  opacity: 0.98;
-}
-.scorecard-recent {
-  white-space: pre-line;
-}
-.scorecard-date {
-  font-size: .98em;
-  opacity: 0.71;
+  color: var(--scoreboard-title-light);
+  margin-bottom: 12px;
+  transition: color 0.27s;
+  text-align: center;
 }
 
-/* RESET BUTTON ROW */
-.scoreboard-reset-row {
-  margin-top: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.scoreboard-reset-btn {
-  margin-top: 6px;
-  font-family: var(--sb-title-font);
-  padding: 13px 29px;
-  font-size: 1.15rem;
-  font-weight: 800;
-  border-radius: 1.3em;
-  border: none;
-  background: linear-gradient(90deg, var(--sb-btn-gray) 60%, var(--sb-btn-red) 110%);
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 4px 17px #f553553d;
-  transition: background 0.18s, filter 0.12s, box-shadow 0.16s;
-  outline: none;
-  margin-bottom: 2px;
-}
-.scoreboard-reset-btn.confirm {
-  background: linear-gradient(90deg, var(--sb-btn-red) 80%, #ce1141 110%);
-  filter: brightness(0.95) saturate(122%);
+[data-theme="dark"] .scoreboard-card-title {
+  color: var(--scoreboard-title-dark);
+  text-shadow: 0 1px 12px #00ffc333, 0 1px 2px #222a;
 }
 
-.scoreboard-reset-btn:focus-visible,
-.scoreboard-reset-btn:hover {
-  filter: brightness(1.08);
-  box-shadow: 0 7px 24px #ff555944;
+/* If using a special/accent color for some titles, add class below as needed */
+.scoreboard-card-title.accent {
+  color: #ff5722;
+  transition: color 0.23s;
+}
+[data-theme="dark"] .scoreboard-card-title.accent {
+  color: var(--scoreboard-title-dark-accent);
+  text-shadow: 0 3px 19px #00ffc360;
 }
 
-.scoreboard-reset-caption {
-  font-size: 0.99em;
-  color: #b12727;
-  opacity: 0.65;
-  margin-top: 4px;
+.scoreboard-card-score {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--scoreboard-score-light);
+  margin-top: 0;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+  text-align: center;
+  transition: color 0.3s;
+}
+
+[data-theme="dark"] .scoreboard-card-score {
+  color: var(--scoreboard-score-dark);
+  text-shadow: 0 2px 6px #00ffc21c;
+}
+
+.scoreboard-h-variant {
+  font-size: 1.02rem;
   font-weight: 600;
+  margin: 0 0 13px 0;
+  color: var(--scoreboard-h2-light);
+  letter-spacing: 0.01em;
+  transition: color 0.25s;
+}
+[data-theme="dark"] .scoreboard-h-variant {
+  color: var(--scoreboard-h2-dark);
 }
 
-/* Accessibility: keyboard focus */
-.scorecard:focus-visible, .scoreboard-reset-btn:focus-visible {
-  outline: 2px solid var(--sb-card-accent);
+/* === Reset Button === */
+.scoreboard-reset-btn {
+  margin: 0 auto;
+  display: block;
+  background: var(--scoreboard-reset-light);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 32px;
+  font-size: 1.09rem;
+  font-weight: 700;
+  font-family: inherit;
+  letter-spacing: 0.07em;
+  box-shadow: 0 3px 17px #e5737357;
+  cursor: pointer;
+  transition: background 0.19s, box-shadow 0.18s, color 0.16s, transform 0.14s;
+  margin-top: 32px;
+}
+
+.scoreboard-reset-btn:hover, .scoreboard-reset-btn:focus-visible {
+  background: var(--scoreboard-reset-hover-light);
+  color: #fff;
+  box-shadow: 0 7px 23px #e573738b;
+  transform: translateY(-2.5px) scale(1.03);
+}
+
+[data-theme="dark"] .scoreboard-reset-btn {
+  background: var(--scoreboard-reset-dark);
+  color: #fff;
+  box-shadow: 0 4px 16px #c628288a;
+  transition: background 0.19s, box-shadow 0.18s, color 0.16s, transform 0.14s;
+}
+
+[data-theme="dark"] .scoreboard-reset-btn:hover,
+[data-theme="dark"] .scoreboard-reset-btn:focus-visible {
+  background: var(--scoreboard-reset-hover-dark);
+  color: #fff;
+  box-shadow: 0 10px 31px #ff444444;
+}
+
+.scoreboard-list-section {
+  margin: 36px 0 0 0;
+}
+
+.scoreboard-section-header {
+  font-size: 1.15rem;
+  color: var(--scoreboard-h2-light);
+  font-weight: 700;
+  text-align: left;
+  margin-bottom: 12px;
+  letter-spacing: 0.03em;
+  transition: color 0.22s;
+}
+[data-theme="dark"] .scoreboard-section-header {
+  color: var(--scoreboard-h3-dark);
+}
+
+/* === Miscellaneous and Responsive === */
+@media (max-width: 900px) {
+  .scoreboard-container { padding: 0 7px; }
+  .scoreboard-cards-grid { gap: 12px 6px; }
+  .scoreboard-heading { font-size: 2.1rem; }
+}
+
+@media (max-width: 600px) {
+  .scoreboard-cards-grid { grid-template-columns: 1fr; }
+  .scoreboard-root { padding-top: 76px; }
+  .scoreboard-heading { font-size: 1.5rem; margin-bottom: 12px; }
+  .scoreboard-subheading { font-size: 1.02rem; }
+}
+
+/* Focused accessibility - visible blue outline for cards/buttons */
+.scoreboard-card:focus-visible, .scoreboard-reset-btn:focus-visible {
+  outline: 2.5px solid #3f51b5;
   outline-offset: 2px;
+}
+[data-theme="dark"] .scoreboard-card:focus-visible, 
+[data-theme="dark"] .scoreboard-reset-btn:focus-visible {
+  outline: 2.5px solid #03dac6;
+  outline-offset: 2px;
+}
+
+/* Smooth overall transitions for color, background, border, and shadow */
+.scoreboard-root, .scoreboard-card, .scoreboard-reset-btn, .scoreboard-heading, .scoreboard-section-header, .scoreboard-h-variant {
+  transition: background 0.36s cubic-bezier(.42,.82,.33,.92), 
+              color 0.25s, 
+              box-shadow 0.2s,
+              border 0.19s,
+              transform 0.14s;
 }
