@@ -128,8 +128,8 @@ function getLocalHighScores() {
     // Display best score for Word Typing Challenge from "mmarcade-word-typing-bestscore"
     try {
       const typingChallengeRaw = window.localStorage.getItem("mmarcade-word-typing-bestscore");
-      if (typingChallengeRaw !== null && !isNaN(parseInt(typingChallengeRaw, 10))) {
-        typingWordChallengeBest = parseInt(typingChallengeRaw, 10);
+      if (typingChallengeRaw !== null && !isNaN(Number(typingChallengeRaw))) {
+        typingWordChallengeBest = Number(typingChallengeRaw);
       }
     } catch (e) { }
     try {
