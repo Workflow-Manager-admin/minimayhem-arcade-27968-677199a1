@@ -132,6 +132,9 @@ function reverseDir(dir) {
 
 // --- Main SNAKE component ---
 function SnakeGamePage() {
+  // Food timers state/ref - must be placed before all fns referencing setFoodTimers & foodTimers
+  const [foodTimers, setFoodTimers] = useState({});
+  
   // State
   const [snake, setSnake] = useState([...INITIAL_SNAKE]);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
@@ -144,7 +147,6 @@ function SnakeGamePage() {
   const [frame, setFrame] = useState(0);
   const [reverse, setReverse] = useState(false);
   const [message, setMessage] = useState("");
-  const [foodTimers, setFoodTimers] = useState({});
   const [bestScore, setBestScore] = useState(getStoredScore(LOCALSTORAGE_BEST_KEY) || 0);
   const [lastScore, setLastScore] = useState(getStoredScore(LOCALSTORAGE_LAST_KEY) || 0);
 
@@ -554,7 +556,9 @@ function SnakeGamePage() {
                           fontSize: "1.45em",
                           filter: "drop-shadow(0 0 14px #38fbca)",
                           fontWeight: 800
-                        }}>🟢</span>
+                        }}>
+                          🟢
+                        </span>
                       </div>
                     );
                   } else if (sIdx > 0) {
