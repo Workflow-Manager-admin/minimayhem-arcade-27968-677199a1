@@ -40,14 +40,7 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
-  {
-    name: "Typing Challenge",
-    icon: "⌨️",
-    tagline: "Type words quickly and accurately. Boost your typing power!",
-    tag: "Skill",
-    color: "#4F46E5",
-    playPath: "/games/typing"
-  },
+  // Typing Challenge removed for Shadow Runner integration
   {
     name: "Sudoku",
     icon: "🔢",
@@ -165,13 +158,6 @@ function getLocalHighScores() {
     reactionDisplay = "No score yet";
   }
 
-  let typingDisplay;
-  if (typeof typingBestWpm === "number" && !isNaN(typingBestWpm)) {
-    typingDisplay = typingBestWpm;
-  } else {
-    typingDisplay = "No score yet";
-  }
-
   let sudokuDisplay;
   if (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime)) {
     const m = Math.floor(sudokuBestTime / 60);
@@ -185,12 +171,11 @@ function getLocalHighScores() {
     ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
-  // Score snapshot returns Block Game (first), plus all supported games in order shown on dashboard
+  // Score snapshot omits Typing Challenge (will later add Shadow Runner if needed)
   return [
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
-    { game: "Typing Challenge", score: typingDisplay },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
     { game: "Sudoku", score: sudokuDisplay }
   ];
