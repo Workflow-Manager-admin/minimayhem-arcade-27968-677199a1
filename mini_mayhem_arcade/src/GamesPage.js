@@ -40,12 +40,12 @@ const GAMES = [
     playPath: "/games/typing"
   },
   {
-    name: "Emoji Reaction",
-    icon: "😀",
-    tagline: "Test reaction with random emojis! Click only when the target shows up. Fastest wins!",
-    tag: "New",
-    color: "#ff9100",
-    playPath: "/games/emoji-reaction"
+    name: "Word Ladder",
+    icon: "🔗",
+    tagline: "Transform words step by step. Change only one letter per move to reach the target!",
+    tag: "Hard",
+    color: "#68adc4",
+    playPath: "/games/word-ladder"
   },
   {
     name: "Sudoku",
@@ -65,10 +65,10 @@ const GAMES = [
 
 // Example featured game (could pick randomly per day in a real app)
 const FEATURED_GAME = {
-  name: "Reaction Speed",
-  icon: "⚡",
-  desc: "Test your reflexes! Hit the play button when the screen flashes – every millisecond counts. Be the fastest among friends.",
-  action: "/games/reaction"
+  name: "Word Ladder",
+  icon: "🔗",
+  desc: "The ultimate word transformation challenge! Change one letter at a time to go from TABLE to CHAIR – every move must be a real word. Can you find the smartest path?",
+  action: "/games/word-ladder"
 };
 
 /**
