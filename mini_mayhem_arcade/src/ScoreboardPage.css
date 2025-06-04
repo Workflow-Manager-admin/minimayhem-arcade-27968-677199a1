@@ -65,7 +65,35 @@
   }
 }
 
-/* --- Card Grid --- */
+/* --- Custom 3x2 Card Grid Layout --- */
+.scoreboard-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 28px;
+  justify-items: center;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 39px;
+  margin-bottom: 35px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 850px) {
+  .scoreboard-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .scoreboard-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Card Grid Wrapper as fallback for other layouts --- */
 .sb-card-grid-wrap {
   width: 100%;
   max-width: 1215px;
@@ -73,22 +101,7 @@
   padding: 0 14px;
 }
 
-.sb-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 34px 27px;
-  justify-items: center;
-  margin: 0 auto 0 auto;
-  justify-content: center;
-}
-@media (max-width: 800px) {
-  .sb-card-grid {
-    grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
-    gap: 18px 7px;
-  }
-}
-
-/* --- Score Card --- */
+/* --- Card Styles (unchanged) --- */
 .sb-card {
   background: var(--sb-card-bg);
   border: var(--sb-card-border);
@@ -301,6 +314,7 @@
   background: #19192a;
 }
 
+/* Existing responsiveness for .sb-card-grid as fallback for other usages */
 @media (max-width: 650px) {
   .sb-card-grid { grid-template-columns: repeat(auto-fit, minmax(98vw, 1fr)); gap: 18px 6px;}
   .sb-card { padding: 18px 4vw 17px 4vw; min-width: unset; max-width: 99vw;}
