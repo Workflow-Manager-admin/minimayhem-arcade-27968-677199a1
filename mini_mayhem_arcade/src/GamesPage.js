@@ -14,7 +14,6 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-// Demo data for five mini-games
 const GAMES = [
   {
     name: "Memory Game",
@@ -41,12 +40,12 @@ const GAMES = [
     playPath: "/games/typing"
   },
   {
-    name: "Quick Math",
-    icon: "➗",
-    tagline: "Rapid math questions. Think and answer before time runs out!",
-    tag: "Math",
-    color: "#48C78E",
-    playPath: "/games/quick-math"
+    name: "Ice Slide Puzzle",
+    icon: "🧊",
+    tagline: "Slide across icy tiles to reach the target 🎯! Careful: you can't stop until you hit a wall.",
+    tag: "Puzzle",
+    color: "#68adc4",
+    playPath: "/games/ice-slide"
   },
   {
     name: "Random Fun",
