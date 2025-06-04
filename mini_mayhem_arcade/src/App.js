@@ -1,23 +1,21 @@
 import React from 'react';
 import './App.css';
 import Navbar from './Navbar';
+import LandingPage from './LandingPage';
 
+/**
+ * PUBLIC_INTERFACE
+ * App component is the main container for the MiniMayhem Arcade app.
+ * Displays the Navbar and the main content.
+ * If using no router, show LandingPage by default as home.
+ */
 function App() {
   return (
     <div className="app">
       <Navbar />
-
+      {/* Render the new LandingPage as default content */}
       <main>
-        <div className="container" style={{paddingTop: "100px"}}>
-          <div className="hero">
-            <div className="subtitle">AI Workflow Manager Template</div>
-            <h1 className="title">mini_mayhem_arcade</h1>
-            <div className="description">
-              Start building your application.
-            </div>
-            <button className="btn btn-large">Button</button>
-          </div>
-        </div>
+        <LandingPage />
       </main>
     </div>
   );
