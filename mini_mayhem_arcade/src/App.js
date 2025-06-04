@@ -16,8 +16,6 @@ import AboutPrivacyPage from './AboutPrivacyPage.jsx';
 import HelpPage from './HelpPage.jsx'; // Help Page route integration
 import ContactPage from './ContactPage.jsx'; // Contact Page import
 import ComingSoon from './ComingSoon.jsx';
-import ShadowRunnerPage from './ShadowRunnerPage.jsx';
-
 /**
  * PUBLIC_INTERFACE
  * App component is the main container for the MiniMayhem Arcade app.
@@ -42,11 +40,8 @@ function App() {
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
-            {/* Shadow Runner: Route to the real game page */}
-            <Route
-              path="/games/shadow-runner"
-              element={<ShadowRunnerPage />}
-            />
+            {/* Light Beam Puzzle: Route to new game (to be integrated) */}
+            {/* <Route path="/games/light-beam" element={<LightBeamPuzzlePage />} /> */}
             <Route path="/scoreboard" element={<ScoreboardPage />} />
             {/* About & Privacy page routed to /about-privacy */}
             <Route path="/about-privacy" element={<AboutPrivacyPage />} />
