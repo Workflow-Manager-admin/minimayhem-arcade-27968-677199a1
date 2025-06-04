@@ -91,6 +91,7 @@ function getLocalHighScores() {
   let sudokuBestTime = null;
   let slidingBestMoves = null;
   let slidingBestTime = null;
+  let lightBeamBestScore = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -136,6 +137,13 @@ function getLocalHighScores() {
         }
       }
     } catch (e) {}
+    // Light Beam Puzzle: best score (lower is better, e.g., # moves or time)
+    try {
+      const lightScoreRaw = window.localStorage.getItem("mmarcade-lightbeam-bestscore");
+      if (lightScoreRaw && !isNaN(parseInt(lightScoreRaw, 10))) {
+        lightBeamBestScore = parseInt(lightScoreRaw, 10);
+      }
+    } catch (e) { }
   }
 
   let blockDisplay = (typeof blockHighScore === "number" && !isNaN(blockHighScore))
@@ -157,6 +165,11 @@ function getLocalHighScores() {
       : reactionGameScore + " ms")
     : "No score yet";
 
+  let lightBeamDisplay =
+    typeof lightBeamBestScore === "number" && !isNaN(lightBeamBestScore)
+      ? `${lightBeamBestScore} best` // simple label, can update to "moves", "time", etc if game definition finalizes
+      : "No win yet";
+
   let sudokuDisplay = (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime))
     ? (() => {
         const m = Math.floor(sudokuBestTime / 60);
@@ -175,6 +188,7 @@ function getLocalHighScores() {
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
+    { game: "Light Beam Puzzle", score: lightBeamDisplay },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
     { game: "Sudoku", score: sudokuDisplay }
   ];
