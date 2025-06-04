@@ -192,7 +192,9 @@ function getLocalHighScores() {
   ];
 }
 
-// PUBLIC_INTERFACE
+/*
+ * Update all Shadow Runner navigation to use <Link to='/games/shadow-runner'>.
+ */
 function GamesPage() {
   // Animation: fade in grid on mount
   const gridRef = useRef();
@@ -201,11 +203,25 @@ function GamesPage() {
       gridRef.current.classList.add("fade-in");
     }
   }, []);
+
+  // Helper to always enforce /games/shadow-runner for Shadow Runner
+  function getShadowRunnerSafePlayPath(game) {
+    if (game.name === "Shadow Runner") return "/games/shadow-runner";
+    return game.playPath || `/games/${slugify(game.name)}`;
+  }
+
+  // Also, FeaturedGameBanner needs special handling if Shadow Runner is featured in future.
   return (
     <div className="games-page-root">
       <main className="games-main-content">
         {FEATURE_GAME_ENABLED && (
-          <FeaturedGameBanner game={FEATURED_GAME} />
+          <FeaturedGameBanner
+            game={
+              FEATURED_GAME && FEATURED_GAME.name === "Shadow Runner"
+                ? { ...FEATURED_GAME, action: "/games/shadow-runner" }
+                : FEATURED_GAME
+            }
+          />
         )}
 
         <section className="games-page-header" aria-label="Games arcade title">
@@ -225,7 +241,10 @@ function GamesPage() {
           <h2 className="sr-only" id="games-gallery-title">Available Mini-Games</h2>
           <div className="games-card-grid" ref={gridRef}>
             {GAMES.map((g, i) => {
-              let playPath = g.playPath || `/games/${slugify(g.name)}`;
+              let playPath =
+                g.name === "Shadow Runner"
+                  ? "/games/shadow-runner"
+                  : g.playPath || `/games/${slugify(g.name)}`;
               return (
                 <GameCard
                   key={g.name}
