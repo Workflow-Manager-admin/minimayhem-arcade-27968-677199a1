@@ -67,7 +67,10 @@ const GAMES = [
   }
 ];
 
-// Make Sliding Tile Puzzle the featured game
+/*
+ * Update: If Shadow Runner is the featured game, always use correct SPA link.
+ * Here, keeping default as Sliding Tile Puzzle as per existing logic.
+ */
 const FEATURED_GAME = {
   name: "Sliding Tile Puzzle",
   icon: "🔲",
