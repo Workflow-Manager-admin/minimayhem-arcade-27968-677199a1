@@ -8,13 +8,13 @@ import { Link } from "react-router-dom";
  * GamesPage: Arcade dashboard featuring mini-game cards, featured game, and score snapshot.
  * - Responsive grid, smooth fadeIn animation, light/dark theme support.
  * - Cards include icon, title, desc, 'Play Now', and optional tag.
- * - Can enable/disable featured/score widgets via flags below.
+ * - Featured and score widgets can be toggled via flags.
  */
 
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-/* --- GAMES array: Only current, active games remain. Snake references removed. --- */
+/* --- GAMES array: Updated to include Block Game, with no Snake. --- */
 const GAMES = [
   {
     name: "Block Game",
@@ -77,7 +77,7 @@ const FEATURED_GAME = {
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Supports new Block Game and removes Snake logic.
+ * Supports Block Game (no Snake logic).
  */
 function getLocalHighScores() {
   let blockHighScore = null;
@@ -91,7 +91,6 @@ function getLocalHighScores() {
   if (typeof window !== "undefined") {
     try {
       const blockScoreRaw = window.localStorage.getItem("mmarcade-blockgame-bestscore");
-      // Could also check "blockGameHighScore" for legacy, but we'll use "mmarcade-blockgame-bestscore"
       if (blockScoreRaw !== null && !isNaN(parseInt(blockScoreRaw, 10))) {
         blockHighScore = parseInt(blockScoreRaw, 10);
       }
@@ -106,6 +105,7 @@ function getLocalHighScores() {
       }
     } catch (e) { }
     try {
+      // Reaction game local storage key name - use "reactionGameScore"
       const reactScoreRaw = window.localStorage.getItem("reactionGameScore");
       if (reactScoreRaw !== null && !isNaN(parseInt(reactScoreRaw, 10))) {
         reactionGameScore = parseInt(reactScoreRaw, 10);
@@ -185,7 +185,7 @@ function getLocalHighScores() {
     ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
-  // Score snapshot returns Block Game (new), plus all supported games in order shown on dashboard
+  // Score snapshot returns Block Game (first), plus all supported games in order shown on dashboard
   return [
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
