@@ -177,11 +177,12 @@ function getLocalHighScores() {
     typingDisplay = "No score yet";
   }
 
-  let snakeDisplay = (typeof snakeBestScore === "number" && !isNaN(snakeBestScore))
-    ? `Best: ${snakeBestScore}`
+  // --- Snake Game Score Displays ---
+  let snakeDisplayBest = (typeof snakeBestScore === "number" && !isNaN(snakeBestScore))
+    ? `${snakeBestScore}`
     : "No best yet";
-  let snakeRecentDisplay = (typeof snakeLastScore === "number" && !isNaN(snakeLastScore))
-    ? `Last: ${snakeLastScore}`
+  let snakeDisplayLast = (typeof snakeLastScore === "number" && !isNaN(snakeLastScore))
+    ? `${snakeLastScore}`
     : "No recent run";
 
   let sudokuDisplay;
@@ -197,13 +198,13 @@ function getLocalHighScores() {
     ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
-  // Now return with Snake included as two rows:
+  // Score snapshot with best & last for Snake
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
-    { game: "Snake (Hard) – Best", score: snakeDisplay },
-    { game: "Snake (Hard) – Last Run", score: snakeRecentDisplay },
+    { game: "Snake – Best", score: snakeDisplayBest },
+    { game: "Snake – Last Run", score: snakeDisplayLast },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
     { game: "Sudoku", score: sudokuDisplay }
   ];
