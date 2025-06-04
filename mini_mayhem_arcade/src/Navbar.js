@@ -238,45 +238,87 @@ function SettingsDropdown({ open, onClose }) {
 
 /**
  * PUBLIC_INTERFACE
- * Theme Toggle (sun/moon icon, theme label, compact for dropdown)
- * @param {theme: string, setTheme: fn}
+ * Theme Toggle Switch (slider with animated sun/moon, track, thumb).
+ * - Visually attractive toggle switch with animated icons.
+ * - Fully accessible (label, focus, keyboard, aria-pressed).
+ * - Smooth color/position transitions and "arcade"/modern style.
  */
 function ThemeToggle({ theme, setTheme }) {
   const isDark = theme === "dark";
+
+  // Accessibility: handle Space/Enter as toggle
+  function handleKeyDown(e) {
+    if (e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      setTheme(isDark ? "light" : "dark");
+    }
+  }
+
   return (
-    <button
-      className="theme-toggle"
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      tabIndex={0}
-    >
-      {isDark ? (
-        <span className="theme-toggle-icon" aria-hidden="true">
-          {/* Moon icon */}
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-            <path d="M21 12.62A9 9 0 1 1 11.38 3a1 1 0 0 1 .96 1.23 7.001 7.001 0 0 0 7.43 8.46 1 1 0 0 1 1.23.96z" />
-          </svg>
+    <div className="arcade-toggle-switch-wrapper">
+      <label
+        className="arcade-toggle-switch"
+        tabIndex={0}
+        aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+        aria-checked={isDark}
+        role="switch"
+        onKeyDown={handleKeyDown}
+      >
+        <input
+          className="arcade-toggle-input"
+          type="checkbox"
+          checked={isDark}
+          onChange={() => setTheme(isDark ? "light" : "dark")}
+          tabIndex={-1}
+          aria-hidden="true"
+        />
+        {/* Track */}
+        <span className="arcade-toggle-track">
+          {/* Animated icon thumb */}
+          <span
+            className="arcade-toggle-thumb"
+            aria-hidden="true"
+          >
+            {isDark ? (
+              // Animated Moon
+              <span className="arcade-moon-icon">
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+                  <circle cx="13" cy="13" r="10" fill="#3749A4">
+                    <animate attributeName="fill" values="#3749A4;#FFE066;#3749A4" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <path
+                    d="M20 14.5c-.89.5-2.08.5-3.1-.1A6.5 6.5 0 0 1 11.6 7.1c.6-1.02.6-2.21.1-3.1a8 8 0 1 0 8.3 10.5z"
+                    fill="#222"
+                  >
+                    <animate attributeName="fill" values="#222;#463b9e;#222" dur="2s" repeatCount="indefinite"/>
+                  </path>
+                </svg>
+              </span>
+            ) : (
+              // Sun icon with rays
+              <span className="arcade-sun-icon">
+                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+                  <circle cx="13" cy="13" r="8" fill="#FFE066">
+                    <animate attributeName="fill" values="#FFE066;#FFD447;#FFE066" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <g stroke="#FFD447" strokeWidth="2" strokeLinecap="round">
+                    <line x1="13" y1="2.2" x2="13" y2="5.0"/>
+                    <line x1="13" y1="21" x2="13" y2="23.8"/>
+                    <line x1="4.2" y1="4.2" x2="6.1" y2="6.1"/>
+                    <line x1="19.9" y1="19.9" x2="17.8" y2="17.8"/>
+                    <line x1="2.2" y1="13" x2="5.0" y2="13"/>
+                    <line x1="21" y1="13" x2="23.8" y2="13"/>
+                    <line x1="4.2" y1="21.8" x2="6.1" y2="19.9"/>
+                    <line x1="19.9" y1="6.1" x2="17.8" y2="4.2"/>
+                  </g>
+                </svg>
+              </span>
+            )}
+          </span>
         </span>
-      ) : (
-        <span className="theme-toggle-icon" aria-hidden="true">
-          {/* Sun icon */}
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-            <circle cx="12" cy="12" r="5" />
-            <g>
-              <line x1="12" y1="1.2" x2="12" y2="3.0" stroke="currentColor" strokeWidth="2" />
-              <line x1="12" y1="21.0" x2="12" y2="22.8" stroke="currentColor" strokeWidth="2" />
-              <line x1="4.21" y1="4.21" x2="5.64" y2="5.64" stroke="currentColor" strokeWidth="2" />
-              <line x1="18.36" y1="18.36" x2="19.79" y2="19.79" stroke="currentColor" strokeWidth="2" />
-              <line x1="1.2" y1="12" x2="3.0" y2="12" stroke="currentColor" strokeWidth="2" />
-              <line x1="21.0" y1="12" x2="22.8" y2="12" stroke="currentColor" strokeWidth="2" />
-              <line x1="4.21" y1="19.79" x2="5.64" y2="18.36" stroke="currentColor" strokeWidth="2" />
-              <line x1="18.36" y1="5.64" x2="19.79" y2="4.21" stroke="currentColor" strokeWidth="2" />
-            </g>
-          </svg>
-        </span>
-      )}
-      <span className="theme-toggle-label">{isDark ? "Dark" : "Light"} mode</span>
-    </button>
+        <span className="arcade-toggle-label">{isDark ? "Dark" : "Light"} mode</span>
+      </label>
+    </div>
   );
 }
 
