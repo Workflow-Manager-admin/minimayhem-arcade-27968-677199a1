@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-/* --- GAMES array: add Snake Game (HARD) with /games/snake routing --- */
+/* --- GAMES array: Snake Game REMOVED; only current, active games remain --- */
 const GAMES = [
   {
     name: "Memory Game",
@@ -39,15 +39,6 @@ const GAMES = [
     tag: "Skill",
     color: "#4F46E5",
     playPath: "/games/typing"
-  },
-  // --- Insert Snake Game Card Here ---
-  {
-    name: "Snake",
-    icon: "🐍",
-    tagline: "Classic arcade action! Guide the snake to eat food, avoid walls and your own tail. See how long you can survive and break your best score.",
-    tag: "Arcade",
-    color: "#23c738",
-    playPath: "/games/snake"
   },
   {
     name: "Sudoku",
