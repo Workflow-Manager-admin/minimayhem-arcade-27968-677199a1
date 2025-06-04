@@ -516,7 +516,9 @@ function SnakeGamePage() {
     <div className="snake-root" style={{ minHeight: "100vh", fontFamily: "'Montserrat', 'Inter', Arial, sans-serif", background: "linear-gradient(120deg, #13d1b3 0%, #3b34bd 100%)" }}>
       <SnakeArcadeCSS />
       <main className="snakegame-area" style={{
-        margin: "0 auto", maxWidth: BOARD_SIZE * CELL_SIZE + 60, paddingTop: 88
+        margin: "0 auto",
+        maxWidth: BOARD_CELLS * CELL_SIZE + 60,
+        paddingTop: 88
       }}>
         <header className="snakegame-header" style={{
           textAlign: "center", marginBottom: 18, fontWeight: 900, fontSize: "2.15rem", color: "#fbff66", textShadow: "0 4px 24px #047bb2cc"
@@ -535,32 +537,34 @@ function SnakeGamePage() {
           padding: 22,
           borderRadius: 19,
           boxShadow: "0 7px 30px #0bbfcf28",
-          width: BOARD_SIZE * CELL_SIZE,
+          width: BOARD_CELLS * CELL_SIZE,
           margin: "0 auto"
         }}>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: `repeat(${BOARD_SIZE}, ${CELL_SIZE}px)`,
-            gridTemplateRows: `repeat(${BOARD_SIZE}, ${CELL_SIZE}px)`,
-            gap: 1,
-            position: "relative",
-            boxShadow: "0 4px 27px #9acae6bb"
-          }} tabIndex={0} className="snake-board"
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${BOARD_CELLS}, ${CELL_SIZE}px)`,
+              gridTemplateRows: `repeat(${BOARD_CELLS}, ${CELL_SIZE}px)`,
+              gap: 1,
+              position: "relative",
+              boxShadow: "0 4px 27px #9acae6bb"
+            }}
+            tabIndex={0}
+            className="snake-board"
             aria-label="Snake game board"
           >
             {/* Render Board */}
             {(() => {
               let boardArr = [];
-              for (let y = 0; y < BOARD_SIZE; y++) {
-                for (let x = 0; x < BOARD_SIZE; x++) {
-                  const idx = y * BOARD_SIZE + x;
+              // Only re-render visible/changed cells; React diff optimization via unique keys
+              for (let y = 0; y < BOARD_CELLS; y++) {
+                for (let x = 0; x < BOARD_CELLS; x++) {
+                  const idx = y * BOARD_CELLS + x;
                   const sIdx = snake.findIndex(se => se.x === x && se.y === y);
                   if (sIdx === 0) {
                     // Head
                     boardArr.push(
-                      <div key={idx}
-                        className="cell snake-head"
-                        style={{ animation: "glowHead .85s infinite alternate" }}>
+                      <div key={`h${idx}`} className="cell snake-head" style={{ animation: "glowHead .85s infinite alternate" }}>
                         <span role="img" aria-label="Snake Head" style={{
                           fontSize: "1.45em",
                           filter: "drop-shadow(0 0 14px #38fbca)",
@@ -573,7 +577,7 @@ function SnakeGamePage() {
                   } else if (sIdx > 0) {
                     // Body
                     boardArr.push(
-                      <div key={idx}
+                      <div key={`b${idx}`}
                         className="cell snake-body"
                         style={{
                           background: (frame + x + y) % 2 === 0 ? "#38fbca" : "#11b59a",
@@ -593,7 +597,7 @@ function SnakeGamePage() {
                     const f = food.find(ff => ff.cell.x === x && ff.cell.y === y);
                     const typeObj = getFoodType(f.type);
                     boardArr.push(
-                      <div key={idx} className={`cell food-cell ${f.type}`}>
+                      <div key={`f${idx}`} className={`cell food-cell ${f.type}`}>
                         {typeObj.display(frame)}
                       </div>
                     );
@@ -601,14 +605,14 @@ function SnakeGamePage() {
                   // Obstacles
                   else if (obstacles.some(o => o.x === x && o.y === y)) {
                     boardArr.push(
-                      <div key={idx} className="cell obstacle">
+                      <div key={`o${idx}`} className="cell obstacle">
                         {renderObstacleCell(frame)}
                       </div>
                     );
                   }
                   else {
                     boardArr.push(
-                      <div key={idx}
+                      <div key={`bg${idx}`}
                         className="cell bg"
                         style={{
                           background: ((x + y) % 2 === 0) ? "#232348" : "#2e2977",
