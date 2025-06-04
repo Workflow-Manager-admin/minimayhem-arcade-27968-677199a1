@@ -1,382 +1,335 @@
 @import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
-
-/* ---- Main Layout ---- */
-.blockgame-root {
-  position: relative;
-  min-height: 100vh;
-  font-family: 'Montserrat', 'Inter', 'Roboto', sans-serif;
-  background: linear-gradient(120deg,#14142b 0%, #0b1b2e 100%);
-  display: flex; flex-direction: column; align-items: center;
-  overflow-x: hidden;
+:root {
+  --bkg-main-dark: #101929;
+  --bkg-main-light: #f9fafd;
+  --bkg-grid-bg: rgba(25,30,51,0.97);
+  --bkg-grid-bg-light: #f9fafd;
+  --bkg-cell-border: #3730a3;
+  --bkg-cell-border-light: #d6e6fd;
+  --bkg-piece-panel: #232f55f2;
+  --bkg-piece-panel-light: #f6fbff;
+  --bkg-tip-bar: #292f52cc;
+  --bkg-tip-bar-light: #e8f7feef;
+  --bkg-title-glow: #00ffd088;
 }
 [data-theme="dark"] .blockgame-root {
-  background: linear-gradient(120deg, #1a193b 0%, #0b0a20 100%);
+  background: linear-gradient(129deg, #16264a 0%, #15132a 100%);
+  color: #f4f8ff;
 }
-
-/* Glowy blurred backdrop shapes for energy - use neon colors */
-.blockgame-blur1, .blockgame-blur2 {
-  position: absolute; pointer-events: none; z-index: 0;
-  border-radius: 50%;
-  filter: blur(52px);
-  opacity: 0.44;
-  animation: blockblur-float 17s infinite alternate cubic-bezier(.99,.11,.73,1.37);
-}
-.blockgame-blur1 {
-  width: 410px; height: 410px;
-  left: -90px; top: 14vh;
-  background: radial-gradient(circle, #68fff7 0%, #ffb0dc 84%, #0000 100%);
-}
-.blockgame-blur2 {
-  width: 340px; height: 340px;
-  right: -110px; top: 62vh;
-  background: radial-gradient(circle, #85a8fd 0%, #16ffc7 74%, #0000 100%);
-}
-@keyframes blockblur-float {
-  0% { transform: translateY(0) scale(1);}
-  100% { transform: translateY(-27px) scale(1.065);}
-}
-
-/* ---- Main Card/zone ---- */
-.blockgame-main-card {
-  z-index: 2; position: relative;
-  margin: 65px auto 0 auto;
-  background: rgba(20, 20, 36, 0.98);
-  border-radius: 22px;
-  box-shadow: 0 16px 55px #16ffc720, 0 1px 38px #85a8fd3a;
-  padding: 32px 19px 23px 19px;
-  max-width: 500px; width: 95vw;
+.blockgame-root {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-[data-theme="dark"] .blockgame-main-card {
-  background: rgba(28, 30, 49, 0.98);
-  box-shadow: 0 14px 55px #16ffc728, 0 1px 30px #1a1f3f38;
+  background: linear-gradient(120deg, #d5f3fe 0% 60%, #f8eaff 100%);
+  font-family: 'Montserrat', 'Inter', 'Arial', sans-serif;
 }
 
-/* ---- Header and Title ---- */
 .blockgame-header {
-  width: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; 
-  margin-bottom: 8px;
-  gap: 13px 9px;
+  margin: 0 auto 16px auto;
+  width: 95vw; 
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-top: 70px;
 }
 .blockgame-title {
-  font-size: 2rem;
+  font-size: 2.3rem;
   font-weight: 900;
-  color: #62fff9;
-  letter-spacing: -1.2px;
-  margin: 0;
-  display: flex; gap: 9px; align-items: center;
-  font-family: 'Montserrat', 'Inter', sans-serif;
-  text-shadow: 0 2px 19px #16ffc7a0;
-}
-.blockgame-emoji {
-  font-size: 1.44em;
-  filter: drop-shadow(0 7px 15px #85a8fd44);
-}
-
-/* ---- Score/status pills ---- */
-.blockgame-pills {
+  color: var(--bkg-title-glow);
+  letter-spacing: -1px;
+  margin: 0 0 5px 0;
+  text-shadow: 0 6px 34px #00ffd088, 0 1px 2px #3730a3a2;
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
-  width: 100%;
-  justify-content: center;
-  margin-bottom: 0;
-  flex-wrap: wrap;
 }
-.blockgame-pill {
-  background: #101f29;
+[data-theme="dark"] .blockgame-title {
+  color: #68adc4;
+  text-shadow: 0 4px 18px #00ffd033, 0 2px 9px #0e212f99;
+}
+.bkg-back-btn {
+  font-size: 1rem;
+  background: #68adc4;
   color: #fff;
-  border-radius: 2em;
-  font-size: 0.97rem;
-  font-weight: 700;
-  padding: 7px 20px 7px 14px;
-  box-shadow: 0 2px 8px #68fff732;
-  display: flex; gap: 7px; align-items: center;
-  font-family: 'Montserrat', 'Inter', sans-serif;
-  letter-spacing: 0.05em;
-}
-.blockgame-pill .pill-label {opacity: 0.62; font-size: .96em;}
-.blockgame-pill .pill-value { font-size: 1.14em; font-weight: 900;}
-.blockgame-pill.accent {
-  background: linear-gradient(90deg, #12fff3 67%, #285bfc 100%);
-  color: #1a153a;
-  box-shadow: 0 5px 22px #12fff374;
-}
-[data-theme="dark"] .blockgame-pill { background: #161e2e; color: #7ffffc;}
-[data-theme="dark"] .blockgame-pill.accent { color: #111; }
-
-/* ---- Board ---- */
-.blockgame-board-zone {
-  margin: 16px 0 0 0;
-}
-.blockgame-board {
-  background: rgba(18, 22, 42, 0.91);
+  border: none;
   border-radius: 13px;
-  box-shadow: 0 9px 45px #16ffc71b, 0 1px 12px #85a8fd17;
-  display: grid;
-  grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: repeat(10, 1fr);
-  gap: 3.4px;
-  width: min(404px, 87vw);
-  aspect-ratio: 1/1;
-  margin: 0 auto;
-  padding: 7px;
-}
-.blockgame-board.board-over {
-  filter: grayscale(0.26) blur(0.2px) brightness(0.65);
-}
-.blockgame-cell {
-  background: #131a26;
-  border-radius: 6px;
-  transition: background 0.13s, box-shadow 0.22s;
-  min-width: 0; min-height: 0;
-  height: 100%; width: 100%;
-  border: none; outline: none;
-  box-shadow: 0 2px 8px #68fff72a;
+  padding: 7px 18px;
+  margin-bottom: 6px;
+  margin-right: auto;
+  align-self: flex-start;
+  font-weight: bold;
   cursor: pointer;
+  transition: background 0.16s, color 0.15s;
+  box-shadow: 0 4px 14px #68adc424;
+}
+.bkg-back-btn:hover, .bkg-back-btn:focus-visible {
+  background: #3730a3;
+  color: #00ffd0;
+}
+.bkg-pill-row {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  margin: 0 0 2px 0;
+}
+.bkg-pill {
+  background: #f8fffa;
+  color: #121233;
+  border-radius: 19px;
+  padding: 6px 17px;
+  display: flex;
+  align-items: center;
+  font-weight: 800;
+  font-size: 1.09em;
+  gap: 4px;
+  box-shadow: 0 2px 10px #68adc448;
+  border: 1.2px solid #68adc413;
+  font-family: inherit;
+  letter-spacing: 0.1px;
+}
+[data-theme="dark"] .bkg-pill {
+  background: #222438;
+  color: #00ffd0;
+  border: 1.2px solid #68adc44b;
+}
+.bkg-pill.accent {
+  background: #00ffd0e0;
+  color: #191929;
+  text-shadow: none;
+}
+.bkg-pill-label { opacity: 0.67; margin-right: 5px;}
+.bkg-pill-val { font-weight: 900; color: #3736e5;}
+[data-theme="dark"] .bkg-pill-val { color: #ffe07a;}
+
+/* Restart button */
+.bkg-restart-btn {
+  background: #ffe07a;
+  color: #181e2a;
+  font-weight: 700;
+  border-radius: 11px;
+  padding: 6px 15px 6px 13px;
+  border: none;
+  font-size: 0.98em;
+  cursor: pointer;
+  margin-left: 8px;
+  box-shadow: 0 2px 14px #ffe07a38;
+  transition: background 0.16s, color 0.11s;
+}
+.bkg-restart-btn.big {
+  font-size: 1.15em;
+  padding: 13px 30px;
+  border-radius: 15px;
+  margin: 14px 10px 10px 10px;
+}
+.bkg-restart-btn:hover, .bkg-restart-btn:focus-visible {
+  background: #f7ee69;
+  color: #00008b;
+}
+/* Main area */
+.blockgame-main {
+  margin: 0 auto;
+  width: 100vw;
+  max-width: 830px;
+  padding-bottom: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+/* 10x10 grid design */
+.blockgame-grid {
+  background: var(--bkg-grid-bg);
+  border-radius: 14px;
+  margin: 0 auto 22px auto;
+  padding: 17px;
+  box-shadow: 0 8px 38px #00ffd011, 0 2px 14px #68adc417;
+  display: grid;
+  gap: 3.7px;
+  width: min(410px, 98vw);
+  aspect-ratio: 1 / 1;
   position: relative;
   z-index: 1;
-  will-change: background, box-shadow, transform;
+  border: 2.5px solid #68adc4cc;
+  transition: background 0.22s;
 }
-.blockgame-cell.filled {
-  background: var(--blockgame-cell-color, #68fff7) !important;
-  box-shadow: 0 3px 20px #12fff339;
-  animation: blockdrop 0.19s;
-  transition: background 0.18s cubic-bezier(.61,.38,.44,1.01), box-shadow 0.18s;
+[data-theme="dark"] .blockgame-grid {
+  background: #181c2e;
+  border: 2.2px solid #00ffd077;
+  box-shadow: 0 8px 44px #00ffd044, 0 2px 10px #68adc432;
 }
-@keyframes blockdrop {
-  from { transform: scale(.9) translateY(-9px);}
-  to { transform: none;}
+.bg-cell {
+  background: #121928;
+  border-radius: 5.2px;
+  min-width: 0;
+  min-height: 0;
+  border: 1.15px solid #354fa399;
+  opacity: 1;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 0.5px 2px #00ffd034;
+  transition: background 0.15s, box-shadow 0.16s;
 }
-.blockgame-cell.preview {
-  box-shadow: 0 1px 17px #f8ae2c66, 0 0 7px #ffd84d55;
-  background: #ffd84d44 !important;
-  z-index: 3;
+[data-theme="dark"] .bg-cell {
+  background: #161d30;
+  border: 1.18px solid #29295089;
+  box-shadow: 0 1px 7px #00ffd022;
 }
-.blockgame-cell.over {
-  filter: brightness(0.67) blur(0.3px);
+.bg-cell.filled {
+  box-shadow: 0 0 14px 2.5px #ffd7333a, 0 1px 5px #00ffd032 inset;
+  border: 1.8px solid #fff7;
 }
-.blockgame-cell:focus-visible {
-  outline: 2.5px solid #285bfc;
-  outline-offset: -1px;
+.bg-cell.ghost {
+  box-shadow: 0 0 10px 2px #00ffd055, 0 0 4px #fff7 inset;
+  opacity: 0.77;
+  border: 2px dashed #00ffd077;
 }
-
-@media (max-width: 530px) {
-  .blockgame-board { width: 98vw; }
-}
-
-/* ---- Block Palette ---- */
-.blockgame-shapes-row {
+/* Piece "hand" panel */
+.blockgame-pieces {
   display: flex;
+  gap: 25px;
   justify-content: center;
   align-items: flex-end;
-  gap: 18px;
-  margin: 32px 0 8px 0;
-  width: 100%;
+  margin: 18px 0 10px 0;
+  background: var(--bkg-piece-panel);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 18px #68adc46c;
 }
-.blockgame-shape-picker {
-  background: #131c23;
-  border-radius: 17px;
-  box-shadow: 0 3px 16px #12fff322, 0 1px 9px #68fff74b;
-  padding: 13px 20px 14px 20px;
-  min-width: 54px; min-height: 54px;
-  cursor: pointer;
-  transition: box-shadow 0.18s, transform 0.16s, background 0.15s;
-  border: 2.5px solid transparent;
-  user-select: none;
-  display: flex; flex-direction: column; align-items: center;
-  position: relative;
-  outline: none;
-}
-.blockgame-shape-picker.selected {
-  border-color: #12fff3;
-  box-shadow: 0 8px 33px #85a8fd55;
-  background: #213974;
-  transition: border 0.13s;
-}
-.blockgame-shape-picker.unusable {
-  opacity: 0.42;
-  cursor: not-allowed;
-  filter: blur(0.6px);
+[data-theme="dark"] .blockgame-pieces {
+  background: #06182aee;
 }
 
-.blockgame-shape-label {
-  color: #ffd84d;
-  font-weight: 800;
-  font-size: 1rem;
-  margin-top: 7px;
-  text-shadow: 0 1px 7px #ffd84d77;
-  opacity: 0.71;
-  letter-spacing: 0.9px;
-}
-
-/* ---- Shapes Preview (in palette) ---- */
-.blockgame-shape-preview {
-  display: inline-grid;
-  grid-gap: 2.7px;
-  grid-template-columns: repeat(5, 15px);
-  grid-template-rows: repeat(5, 15px);
-  align-items: center; justify-content: center;
-  min-width: 45px; min-height: 45px;
-  margin: 0;
-}
-.blockgame-shape-cell, .blockgame-shape-empty {
-  width: 15px; height: 15px;
-  border-radius: 4px;
-  display: inline-block;
-  transition: background 0.14s;
-}
-.blockgame-shape-cell {
-  background: #68fff7;
-  box-shadow: 0 0 7px #68fff7b2;
-  border: 1.2px solid #fff8;
-}
-.blockgame-shape-empty {
-  background: transparent;
-}
-.blockgame-shape-picker.selected .blockgame-shape-cell {
-  filter: brightness(1.16) drop-shadow(0 0 11px #68fff784);
-}
-
-/* ---- Instructions ---- */
-.blockgame-instructions {
-  color: #b2fcff;
-  font-size: 1.03em;
-  text-align: center;
-  margin-top: 14px;
-  font-weight: 500;
-  letter-spacing: .01em;
-  background: #21397422;
-  padding: 7px 14px 6px 14px;
-  border-radius: 9px;
-  opacity: 0.89;
-}
-.blockgame-tip {
-  color: #ffd84d;
-  font-size: .98em;
-  opacity: 0.78;
-  letter-spacing: 0.09em;
-}
-
-/* ---- Buttons ---- */
-.blockgame-btn {
-  font-family: inherit;
-  background: #16ffc7;
-  color: #1b005d;
+.bkg-piece {
   border: none;
-  border-radius: 11px;
-  padding: 7px 19px;
-  font-size: 1.07rem;
-  font-weight: 700;
+  background: transparent;
+  border-radius: 14px;
+  box-shadow: none;
   cursor: pointer;
-  transition: background 0.18s, box-shadow 0.19s, color 0.17s;
-  margin-left: 0.4em;
-  box-shadow: 0 2px 12px #16ffc732;
-  letter-spacing: 0.04em;
+  padding: 0;
+  transition: box-shadow 0.13s, border 0.12s, background 0.15s;
+  outline: none;
+  margin-bottom: 5px;
 }
-.blockgame-btn.s {
-  padding: 6px 14px;
-  font-size: .98rem;
-}
-.blockgame-btn:hover, .blockgame-btn:focus-visible {
-  background: #285bfc;
-  color: #fff;
-}
-
-.blockgame-btn:focus-visible {
-  outline: 2.5px solid #285bfc;
+.bkg-piece.selected {
+  background: #18194838;
+  border: 2px solid #00ffd0cc;
+  box-shadow: 0 4px 34px #ffe07a21;
+  outline: 3px solid #ffe07a;
   outline-offset: 2px;
+  z-index: 2;
+}
+.bkg-piece.used {
+  opacity: 0.39 !important;
+  filter: grayscale(0.4) brightness(1.12);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.bkg-mini-cell {
+  width: 87%;
+  height: 87%;
+  margin: 4%;
+  background: transparent;
+  border-radius: 6px;
+  box-shadow: none;
+  transition: background 0.14s;
+  display: inline-block;
+}
+.bkg-mini-cell.filled {
+  border-radius: 8px;
+  box-shadow: 0 0 12px #00ffd044, 0 2px 12px #ffe07a60;
 }
 
+.bkg-tip-row {
+  background: var(--bkg-tip-bar);
+  color: #ffe07a;
+  padding: 10px 16px 6px 16px;
+  margin: 20px 0 0 0;
+  border-radius: 8px;
+  font-size: 1.02em;
+  width: 95vw; max-width: 650px;
+  text-align: center;
+  font-weight: 500;
+  box-shadow: 0 1px 8px #ffe07a21;
+  opacity: 0.86;
+  z-index: 1;
+}
+[data-theme="dark"] .bkg-tip-row {
+  background: #232233ef;
+  color: #00ffd0;
+  box-shadow: 0 2px 8px #00ffd055;
+}
 
-/* ---- Modal Styles ---- */
-.blockgame-modal-backdrop {
+/* Overlay/Game Over Modal */
+.blockgame-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(33, 61, 101, 0.32);
-  z-index: 55;
+  background: #29273d4e;
+  z-index: 100;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  font-family: 'Montserrat', 'Inter', sans-serif;
-  pointer-events: all;
-  animation: bgfadein 0.24s;
 }
-@keyframes bgfadein { from { opacity: 0;} to { opacity: 1;} }
-
-.blockgame-modal-content {
-  position: relative;
-  background: linear-gradient(117deg, #12fff3cc 80%, #285bfcf1 100%);
-  color: #1a153a;
-  box-shadow: 0 21px 75px #16ffc756, 0px 5px 19px #0a1f43ab;
-  padding: 38px 32px 28px 32px;
-  border-radius: 22px;
-  margin-top: 78px;
-  min-width: 266px;
+.blockgame-modal {
+  background: linear-gradient(120deg, #eafde7e8 70%, #e0eefffa 100%);
+  color: #232233;
+  border-radius: 23px;
+  box-shadow: 0 18px 70px #00ffd060, 0 2px 12px #24273D46;
+  padding: 43px 42px 34px 42px;
+  min-width: 250px; max-width: 380px;
   text-align: center;
-  z-index: 99;
-  animation: modalscale 0.25s cubic-bezier(.67,.66,.55,1.17);
+  margin-top: 110px;
+  animation: scaleModalBkg 0.34s cubic-bezier(.67,.53,.22,1.09);
 }
-@keyframes modalscale {
-  from { transform: scale(.91) translateY(25px); opacity: 0;}
-  to { transform: none; opacity: 1;}
+@keyframes scaleModalBkg {
+  from { transform: scale(0.88) translateY(19px); opacity: 0;}
+  to { transform: scale(1) translateY(0); opacity: 1;}
+}
+[data-theme="dark"] .blockgame-modal {
+  background: linear-gradient(113deg, #24273dbf 87%, #3730a3ee 120%);
+  color: #e1fafb;
+}
+.bkg-modal-emoji {
+  font-size: 2.7rem;
+  margin-bottom: 9px;
+  text-shadow: 0 4px 22px #ffd70088;
+}
+.bkg-modal-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  color: #00ffd0;
+}
+.bkg-modal-score, .bkg-modal-best {
+  font-size: 1.1rem;
+  color: #3730a3;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+[data-theme="dark"] .bkg-modal-score, [data-theme="dark"] .bkg-modal-best {
+  color: #ffe07a;
 }
 
-.blockgame-modal-trophy {
-  font-size: 2.44rem;
-  margin-bottom: 7px;
-  filter: drop-shadow(0 2px 21px #ffd84d88);
+/* Responsive layout tweaks */
+@media (max-width: 990px) {
+  .blockgame-header, .blockgame-tip-row { max-width: 97vw; }
 }
-.blockgame-modal-title {
-  font-size: 1.24rem;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  margin-bottom: 17px;
-  color: #285bfc;
+@media (max-width: 700px) {
+  .blockgame-header { padding-top: 54px;}
+  .blockgame-title { font-size: 1.51rem;}
+  .blockgame-main { max-width: 98vw;}
+  .blockgame-pieces { gap: 13px; padding: 9px 4px;}
 }
-.blockgame-modal-score-row {
-  font-size: 1.09rem;
-  color: #1a153a;
-  font-weight: 800;
-  margin: 7px 0 8px 0;
-}
-.blockgame-modal-label { color: #ffd84d; margin-right: 5px;}
-.blockgame-modal-value {
-  color: #285bfc;
-  font-weight: 900;
-}
-.blockgame-modal-btn {
-  min-width: 107px;
-  margin: 21px 8px 4px 8px;
-  font-size: 1.11em;
-  border-radius: 13px;
-  background: #ffd84d;
-  color: #273759;
-  font-weight: 900;
-  box-shadow: 0 2px 9px #ffd84d38;
-}
-.blockgame-modal-btn:hover, .blockgame-modal-btn:focus-visible {
-  background: #285bfc;
-  color: #fff;
+@media (max-width: 480px) {
+  .blockgame-grid { padding: 3vw; }
+  .blockgame-pieces { gap: 5px; }
+  .bkg-piece { width: 56px !important; height: 56px !important;}
 }
 
-/* ---- Responsive ---- */
-@media (max-width: 600px) {
-  .blockgame-main-card { padding-left: 2vw; padding-right: 2vw; }
-  .blockgame-modal-content { padding: 7vw 3vw 12vw 3vw; }
-}
-@media (max-width: 440px) {
-  .blockgame-title { font-size: 1.1rem; }
-  .blockgame-emoji { font-size: 1.05rem; }
-}
-
-/* --- Accessibility: visually indicate focus --- */
-.blockgame-shape-picker:focus-visible,
-.blockgame-btn:focus-visible {
-  outline: 2px solid #ffd84d;
-  outline-offset: 2px;
+/* Focus visual for keyboard nav */
+.bkg-piece:focus-visible, .bkg-restart-btn:focus-visible, .bkg-back-btn:focus-visible {
+  outline: 3px solid #ffe07a;
+  outline-offset: 2.5px;
 }
