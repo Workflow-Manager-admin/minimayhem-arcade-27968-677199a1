@@ -46,7 +46,7 @@
   --stp-tip-text: #b9e7fc;
 }
 
-/* --- Page — Full BG --- */
+/* --- Page Background and Container --- */
 .stp-root {
   min-height: 100vh;
   padding-top: 90px;
@@ -61,7 +61,6 @@
   box-sizing: border-box;
 }
 
-/* --- Puzzle Area --- */
 .stp-main-card {
   margin: 0 auto;
   margin-top: 18px;
@@ -78,6 +77,7 @@
   transition: var(--stp-transition);
 }
 
+/* --- Title, Bar, & Controls --- */
 .stp-title-row {
   width: 100%;
   display: flex;
@@ -100,7 +100,7 @@
   line-height: 1.13;
 }
 
-/* --- Moves/Timer Bar --- */
+/* Info Bar Styles */
 .stp-bar {
   display: flex;
   gap: 13px;
@@ -109,6 +109,7 @@
   width: 100%;
   flex-wrap: wrap;
 }
+
 .stp-moves-pill, .stp-timer-pill {
   background: var(--stp-moves-bg);
   color: var(--stp-moves-text);
@@ -120,17 +121,14 @@
   text-align: center;
   letter-spacing: 0.02em;
   box-shadow: 0 1px 5px #68adc419;
+  display: inline-block;
 }
 .stp-timer-pill {
   background: var(--stp-timer-bg);
   color: var(--stp-timer-text);
 }
-@media (max-width: 430px) {
-  .stp-bar { flex-direction: column; gap: 8px; }
-  .stp-moves-pill, .stp-timer-pill { min-width: unset; width: 90vw; }
-}
 
-/* --- Sliding GRID --- */
+/* Dynamic Grid (responsive, fixed square). All sizing is relative to container/grid! */
 .stp-puzzle-grid {
   display: grid;
   background: #f8fbff;
@@ -139,29 +137,23 @@
   margin-bottom: 18px;
   box-shadow: 0 3px 17px #68adc419, 0 2px 19px #4f46e53b;
   aspect-ratio: 1/1;
-  width: 294px; /* default 4x4: each tile fits well */
-  max-width: 90vw;
+  width: min(400px, 90vw);
   overflow: hidden;
-  gap: 8px;
+  gap: 9px;
   transition: box-shadow 0.32s, background 0.19s;
   position: relative;
 }
+
 [data-theme="dark"] .stp-puzzle-grid {
   background: #181b2c;
   box-shadow: 0 8px 27px #0f121df0, 0 1.5px 7px #353b6e3c;
 }
 
-/* Grid size responsive (for 3x3, 4x4, 5x5 etc) */
-.stp-puzzle-grid[data-size="3"] { grid-template-columns: repeat(3, 1fr); }
-.stp-puzzle-grid[data-size="4"] { grid-template-columns: repeat(4, 1fr); }
-.stp-puzzle-grid[data-size="5"] { grid-template-columns: repeat(5, 1fr); }
-.stp-puzzle-grid[data-size="6"] { grid-template-columns: repeat(6, 1fr); }
-.stp-puzzle-grid[data-size="3"], .stp-puzzle-grid[data-size="4"], .stp-puzzle-grid[data-size="5"], .stp-puzzle-grid[data-size="6"] {
-  /* All grid configs should stay square */
+.stp-puzzle-grid[data-size="3"], .stp-puzzle-grid[data-size="4"],
+.stp-puzzle-grid[data-size="5"], .stp-puzzle-grid[data-size="6"] {
   aspect-ratio: 1/1;
 }
 
-/* --- Tile Styles --- */
 .stp-tile {
   background: var(--stp-tile-bg);
   color: var(--stp-tile-color);
@@ -169,7 +161,7 @@
   border-radius: 13px;
   font-family: inherit;
   font-weight: 900;
-  font-size: 1.45rem;
+  font-size: clamp(1.15rem, 2.4vw, 2.2rem);
   box-shadow: var(--stp-tile-shadow);
   display: flex;
   align-items: center;
@@ -177,10 +169,13 @@
   cursor: pointer;
   user-select: none;
   outline: none;
-  transition: var(--stp-transition);
+  transition: var(--stp-transition), filter 0.17s, transform 0.15s;
   will-change: transform;
   min-width: 0;
   min-height: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1/1;
   filter: brightness(1.01);
   z-index: 1;
 }
@@ -205,32 +200,18 @@
   filter: brightness(1.17);
 }
 
-/* --- Animation, Accessibility --- */
-.stp-tile:active {
-  filter: brightness(0.95) saturate(1.14);
-  transform: scale(0.98);
-  transition: filter 0.16s, transform 0.14s;
-}
-
-/* --- "Blank" Tile (empty spot for sliding) --- */
+/* Blank tile (empty square) */
 .stp-blank {
-  background: var(--stp-blank-bg);
-  box-shadow: none;
+  background: var(--stp-blank-bg) !important;
+  box-shadow: none !important;
   border-radius: 13px;
-  opacity: 0.37;
+  opacity: 0.37 !important;
   pointer-events: none !important;
-  cursor: default;
+  cursor: default !important;
   transition: background 0.35s, opacity 0.3s;
 }
 
-/* --- Controls: Buttons & Actions --- */
-.stp-btn-row {
-  display: flex;
-  gap: 16px;
-  margin-top: 13px;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
-}
+/* Controls (Buttons) */
 .stp-btn {
   font-family: inherit;
   font-size: 1.07rem;
@@ -243,55 +224,43 @@
   margin: 0 2px;
   box-shadow: var(--stp-btn-shadow);
   cursor: pointer;
-  transition: var(--stp-transition);
+  transition: var(--stp-transition), color 0.14s;
   outline: none;
-  min-width: 97px;
+  min-width: 90px;
   letter-spacing: 0.01em;
 }
-.stp-btn:hover,
-.stp-btn:focus-visible {
+.stp-btn:hover, .stp-btn:focus-visible {
   background: var(--stp-btn-bg-hover);
   color: #fff;
 }
 
-/* --- Puzzle Mode & Grid Size Picker --- */
-.stp-picker-bar {
-  width: 100%;
-  margin-bottom: 10px;
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
+/* Grid size controls */
 .stp-picker-label {
   color: var(--stp-title);
   font-weight: 700;
+  margin-right: 6px;
 }
-.stp-size-btn, .stp-mode-btn {
-  background: none;
-  color: var(--stp-title);
-  border: 1.7px solid var(--stp-btn-bg);
+.stp-size-selector {
+  margin-left: 7px;
+  padding: 4px 13px;
   border-radius: 8px;
-  padding: 4.5px 14px;
-  margin: 0 3px;
-  font-size: 1.01em;
+  border: 1.5px solid var(--stp-btn-bg);
+  background: #fff;
+  color: #353488;
   font-weight: 700;
-  cursor: pointer;
-  transition: background 0.18s, color 0.17s, border-color 0.22s;
+  font-size: 0.98em;
+  transition: background 0.15s, color 0.14s, border-color 0.21s;
 }
-.stp-size-btn.active, .stp-mode-btn.active {
-  background: var(--stp-btn-bg);
-  color: var(--stp-btn-text);
-  border-color: var(--stp-btn-bg);
-}
-.stp-size-btn:hover, .stp-mode-btn:hover {
-  background: var(--stp-btn-bg-hover);
-  color: #fff;
+.stp-size-selector:focus, .stp-size-selector:focus-visible {
+  outline: 2px solid var(--stp-btn-bg-hover);
   border-color: var(--stp-btn-bg-hover);
 }
+[data-theme="dark"] .stp-size-selector {
+  background: #21242f;
+  color: #aefcff;
+}
 
-/* --- Instructions & Tip --- */
+/* Tip & Instructions */
 .stp-tip {
   margin-top: 14px;
   background: var(--stp-tip-bg);
@@ -311,89 +280,20 @@
 }
 .stp-tip strong { color: var(--stp-btn-bg); }
 
-/* --- Win Modal & Animation --- */
-.stp-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(41,51,97,0.33);
-  z-index: 9000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  transition: opacity 0.31s;
-  opacity: 0;
-  pointer-events: none;
-}
-.stp-modal-backdrop.open {
-  opacity: 1;
-  pointer-events: auto;
-}
-.stp-modal-content {
-  background: linear-gradient(117deg, #b4bef9de 70%, #e1dbfed9 100%);
-  color: #3730a3;
-  box-shadow: 0 14px 44px #68adc439, 0px 8px 22px #24273D44;
-  padding: 33px 30px 27px 30px;
-  border-radius: 19px;
-  margin-top: 95px;
-  max-width: 340px;
-  min-width: 230px;
-  text-align: center;
-  position: relative;
-  animation: stp-pop 0.25s cubic-bezier(.55,.84,.19,1.02);
-}
-@keyframes stp-pop {
-  from { opacity: 0; transform: scale(0.83); }
-  to { opacity: 1; transform: scale(1); }
-}
-[data-theme="dark"] .stp-modal-content {
-  background: linear-gradient(118deg, #24273ddb 78%, #68adc4d2 100%);
-  color: #fff;
-}
-.stp-modal-title {
-  font-size: 1.32rem;
-  font-weight: 900;
-  color: var(--stp-title);
-  margin-bottom: 11px;
-}
-[data-theme="dark"] .stp-modal-title { color: #e7fafe; }
-.stp-modal-stats {
-  display: flex;
-  gap: 13px;
-  justify-content: center;
-  margin: 16px 0 13px 0;
-}
-.stp-modal-pill {
-  background: #eceffd;
-  color: #3730a3;
-  border-radius: 15px;
-  font-weight: 800;
-  font-size: 1.06rem;
-  padding: 7px 19px 6px 14px;
-  min-width: 59px;
-}
-[data-theme="dark"] .stp-modal-pill {
-  background: #2c2e59;
-  color: #aefcff;
-}
-
-/* --- Accessibility: Focus Styles --- */
+/* Accessibility: Focus Styles */
 .stp-tile:focus-visible,
 .stp-btn:focus-visible,
-.stp-size-btn:focus-visible,
-.stp-mode-btn:focus-visible {
+.stp-size-selector:focus-visible {
   outline: 2.5px solid var(--stp-btn-bg-hover);
   outline-offset: 2px;
   z-index: 2;
 }
 
-/* --- Responsive --- */
 @media (max-width: 600px) {
-  .stp-main-card, .stp-modal-content { padding: 13vw 3vw 10vw 3vw; }
+  .stp-main-card { padding: 13vw 3vw 10vw 3vw; }
   .stp-title { font-size: 1.45rem; }
   .stp-puzzle-grid { width: 97vw; gap: 2vw; }
 }
 
-/* --- Hide scrollbars for puzzle grid --- */
 .stp-puzzle-grid::-webkit-scrollbar { display: none; }
 .stp-puzzle-grid { -ms-overflow-style: none; scrollbar-width: none; }
-
