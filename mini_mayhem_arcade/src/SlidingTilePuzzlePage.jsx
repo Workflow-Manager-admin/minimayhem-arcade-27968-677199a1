@@ -12,6 +12,10 @@ const GRID_SIZES = [4, 5, 6]; // min 4x4, default 5x5
 const STORAGE_BEST_MOVES = "mmarcade-slidingtile-bestmoves";
 const STORAGE_BEST_TIME = "mmarcade-slidingtile-besttime";
 
+/**
+ * PUBLIC_INTERFACE
+ * Generate solved goal state for a nxn board
+ */
 function generateGoal(size) {
   // [1...N*N-1, 0] where 0 is the empty space
   const tiles = [];
@@ -20,10 +24,14 @@ function generateGoal(size) {
   return tiles;
 }
 
-// Shuffle using Fisher-Yates and ensure solvable
+/**
+ * Shuffle a board using Fisher-Yates, and produce a solvable, non-solved configuration.
+ * This shuffling is guaranteed to result in a valid puzzle that can be solved (and isn't already solved).
+ */
 function shuffleBoard(goalTiles, size) {
   let board = goalTiles.slice();
   do {
+    // Fisher-Yates shuffle
     for (let i = board.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [board[i], board[j]] = [board[j], board[i]];
@@ -32,7 +40,12 @@ function shuffleBoard(goalTiles, size) {
   return board;
 }
 
-// Solvability check for N-puzzle, assuming 0 is the blank (bottom-right in solved)
+/**
+ * Returns true if `arr` is solvable.
+ * For even-sized boards: row of blank from bottom influences parity.
+ * For odd-sized boards: parity of inversions must be even.
+ * Assumes `0` is the blank tile.
+ */
 function isSolvable(arr, size) {
   let inv = 0;
   for (let i = 0; i < arr.length; i++) {
@@ -56,6 +69,9 @@ function isSolvable(arr, size) {
   }
 }
 
+/**
+ * Returns true if current tiles match solved order.
+ */
 function isSolved(tiles, size) {
   for (let i = 0; i < size * size - 1; ++i) {
     if (tiles[i] !== i + 1) return false;
@@ -63,6 +79,9 @@ function isSolved(tiles, size) {
   return tiles[tiles.length - 1] === 0;
 }
 
+/**
+ * Format integer seconds as MM:SS
+ */
 function formatTime(s) {
   const m = Math.floor(s / 60);
   const ss = s % 60;
@@ -377,7 +396,7 @@ function SlidingTilePuzzlePage() {
             disabled={!history.length || gameWon}
             onClick={handleUndo}
           >
-            <span aria-hidden="true">⎌</span> Undo
+            <span aria-hidden="true">⌬</span> Undo
           </button>
           <button
             className="btn sliding-restart-btn"
@@ -413,6 +432,7 @@ function SlidingTilePuzzlePage() {
   );
 }
 
+// PUBLIC_INTERFACE
 // Pill-styled info chip
 function Pill({ caption, value, accent }) {
   return (
