@@ -246,7 +246,11 @@ function GamesPage() {
 
 // --- Subcomponents ---
 
-// PUBLIC_INTERFACE
+/**
+ * PUBLIC_INTERFACE
+ * FeaturedGameBanner: Banner for the featured or "game of the day".
+ * Ensures all navigation ("Play Now") is done with <Link> for client-side routing, including Shadow Runner.
+ */
 function FeaturedGameBanner({ game }) {
   return (
     <aside className="featured-game-banner">
@@ -257,25 +261,16 @@ function FeaturedGameBanner({ game }) {
           <div className="featured-title">{game.name}</div>
           <div className="featured-desc">{game.desc}</div>
         </div>
-        {game.action && game.action.startsWith("/")
-          ? (
-            <Link
-              to={game.action}
-              className="featured-play-btn"
-              aria-label={`Play ${game.name}`}
-            >
-              Play Now
-            </Link>
-          ) : (
-            <a
-              href={game.action}
-              className="featured-play-btn"
-              aria-label={`Play ${game.name}`}
-            >
-              Play Now
-            </a>
-          )
-        }
+        {/* Always use Link for client-side navigation */}
+        {game.action && game.action.startsWith("/") ? (
+          <Link
+            to={game.action}
+            className="featured-play-btn"
+            aria-label={`Play ${game.name}`}
+          >
+            Play Now
+          </Link>
+        ) : null}
       </div>
     </aside>
   );
