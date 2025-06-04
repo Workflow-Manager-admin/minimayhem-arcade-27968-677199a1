@@ -70,6 +70,8 @@ const FEATURED_GAME = {
 function getLocalHighScores() {
   // Get Memory Game last score object { moves, time }
   let memoryGameScore = null;
+  let reactionGameScore = null;
+
   if (typeof window !== "undefined") {
     try {
       const memScoreRaw = window.localStorage.getItem("mmarcade-memgame-lastscore");
@@ -85,9 +87,19 @@ function getLocalHighScores() {
     } catch (e) {
       // ignore/invalid
     }
+
+    // Read latest Reaction Rush score from localStorage
+    try {
+      const reactScoreRaw = window.localStorage.getItem("reactionGameScore");
+      if (reactScoreRaw !== null && !isNaN(parseInt(reactScoreRaw, 10))) {
+        reactionGameScore = parseInt(reactScoreRaw, 10);
+      }
+    } catch (e) {
+      // ignore
+    }
   }
 
-  // Format what to show for Memory Game
+  // Format Memory Game score
   let memoryDisplay;
   if (memoryGameScore) {
     // e.g. "23 moves, 1:15"
@@ -99,9 +111,22 @@ function getLocalHighScores() {
     memoryDisplay = "No score yet";
   }
 
+  // Format Reaction Speed (ms) score display
+  let reactionDisplay;
+  if (typeof reactionGameScore === "number" && !isNaN(reactionGameScore)) {
+    if (reactionGameScore > 1200) {
+      reactionDisplay = (reactionGameScore / 1000).toFixed(3) + "s";
+    } else {
+      reactionDisplay = reactionGameScore + " ms";
+    }
+  } else {
+    reactionDisplay = "No score yet";
+  }
+
   // Other games remain placeholder for now
   return [
     { game: "Memory Game", score: memoryDisplay },
+    { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: 41 },
     { game: "Quick Math", score: 34 }
   ];
