@@ -96,6 +96,17 @@ function MemoryGamePage() {
       setTimerActive(false);
       setGameWon(true);
       setTimeout(() => setModalOpen(true), 700);
+
+      // Persist result to localStorage
+      try {
+        if (typeof window !== "undefined") {
+          // Store both moves and time (object)
+          const result = { moves, time: timer };
+          window.localStorage.setItem("mmarcade-memgame-lastscore", JSON.stringify(result));
+        }
+      } catch (e) {
+        // fail silently, best effort
+      }
       updateHighScore();
     }
     // eslint-disable-next-line

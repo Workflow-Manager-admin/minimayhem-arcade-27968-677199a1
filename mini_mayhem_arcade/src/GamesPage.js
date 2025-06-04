@@ -60,11 +60,46 @@ const FEATURED_GAME = {
   action: "/games/reaction"
 };
 
-// Score snapshot widget demo (simulate local high scores)
+/**
+ * Get local high scores for display in scoreboard widget.
+ * For Memory Game, load last score (moves/time) from localStorage if available.
+ * For other games, keep as placeholder/static.
+ */
 function getLocalHighScores() {
-  // Simulate/placeholder: in real app, load from localStorage or API
+  // Get Memory Game last score object { moves, time }
+  let memoryGameScore = null;
+  if (typeof window !== "undefined") {
+    try {
+      const memScoreRaw = window.localStorage.getItem("mmarcade-memgame-lastscore");
+      if (memScoreRaw) {
+        const { moves, time } = JSON.parse(memScoreRaw);
+        if (
+          typeof moves === "number" &&
+          typeof time === "number"
+        ) {
+          memoryGameScore = { moves, time };
+        }
+      }
+    } catch (e) {
+      // ignore/invalid
+    }
+  }
+
+  // Format what to show for Memory Game
+  let memoryDisplay;
+  if (memoryGameScore) {
+    // e.g. "23 moves, 1:15"
+    const m = Math.floor(memoryGameScore.time / 60);
+    const s = memoryGameScore.time % 60;
+    const timeStr = `${m}:${s < 10 ? "0" : ""}${s}`;
+    memoryDisplay = `${memoryGameScore.moves} moves, ${timeStr}`;
+  } else {
+    memoryDisplay = "No score yet";
+  }
+
+  // Other games remain placeholder for now
   return [
-    { game: "Memory Game", score: 19 },
+    { game: "Memory Game", score: memoryDisplay },
     { game: "Typing Challenge", score: 41 },
     { game: "Quick Math", score: 34 }
   ];
