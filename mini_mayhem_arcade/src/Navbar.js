@@ -77,10 +77,10 @@ function Navbar() {
   return (
     <nav className="mmarcade-navbar" ref={navRef}>
       <div className="mmarcade-nav-inner">
-        <a href="/" className="mmarcade-logo" aria-label="MiniMayhem Arcade">
+        <Link to="/" className="mmarcade-logo" aria-label="MiniMayhem Arcade">
           <span className="mmarcade-logo-symbol" aria-hidden="true">🎮</span>
           <span className="mmarcade-logo-text">MiniMayhem Arcade</span>
-        </a>
+        </Link>
 
         {/* Nav links and buttons. Collapse into hamburger on mobile */}
         <div className="mmarcade-nav-actions">
@@ -108,7 +108,9 @@ function Navbar() {
             aria-label="Main menu"
           >
             <li>
-              <a href="/games" className="mmarcade-nav-link" tabIndex={menuOpen || window.innerWidth > 900 ? 0 : -1}>Games</a>
+              <Link to="/games" className="mmarcade-nav-link" tabIndex={menuOpen || window.innerWidth > 900 ? 0 : -1}>
+                Games
+              </Link>
             </li>
             <li>
               <a href="/scoreboard" className="mmarcade-nav-link" tabIndex={menuOpen || window.innerWidth > 900 ? 0 : -1}>Scoreboard</a>
