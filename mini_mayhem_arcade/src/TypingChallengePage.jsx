@@ -1,211 +1,168 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import "./TypingChallengePage.css";
 import { useNavigate } from "react-router-dom";
 
-// Set of sample sentences (about 90-110 chars for fair typing length, clear + varied chars)
-const CHALLENGE_SENTENCES = [
-  "The quick brown fox jumps over the lazy dog, practicing typing skills is fun and rewarding.",
-  "MiniMayhem Arcade brings vibrant games that exercise memory, speed, accuracy, and wit—challenge yourself daily.",
-  "Typing quickly and accurately is a superpower in the modern world; boost your skills for school and work.",
-  "Challenge accepted! See how fast and accurate you can type this sentence without any mistakes or corrections.",
-  "Speed, focus, and practice will make you a typing champion—keep going and watch your words per minute soar!"
-];
+// Fixed challenge sentence for now (may be updated in future)
+const FIXED_SENTENCE = "The quick brown fox jumps over the lazy dog.";
 
-function getRandomSentence() {
-  // Pick a random sentence each visit/round
-  return CHALLENGE_SENTENCES[
-    Math.floor(Math.random() * CHALLENGE_SENTENCES.length)
-  ];
-}
-
-// Calculates WPM (Words Per Minute)
-function calculateWPM(charsTyped, seconds) {
-  // Standard 1 word = 5 chars, avoid 0 division
-  if (seconds === 0) return 0;
-  const words = charsTyped / 5;
-  return Math.round((words / (seconds / 60)) * 100) / 100;
-}
-
-// Calculates accuracy ratio (0 to 1)
-function calculateAccuracy(target, input) {
-  let correct = 0;
-  for (let i = 0; i < input.length; ++i) {
-    if (input[i] === target[i]) correct++;
-  }
-  return target.length === 0 ? 1 : Math.max(0, correct) / target.length;
-}
-
-// Rating message based on WPM & accuracy
-function getResultMessage(wpm, acc) {
-  if (acc < 0.8) return "Keep practicing for better accuracy!";
-  if (wpm >= 70 && acc > 0.98) return "Typing Master! 🚀";
-  if (wpm >= 45 && acc >= 0.95) return "Great Job! 🏆";
-  if (wpm >= 30 && acc >= 0.90) return "Good effort! 👍";
-  if (wpm >= 15 && acc >= 0.80) return "Keep it up!";
-  return "Try again and boost your skills!";
-}
-
-// Store best WPM for Typing Challenge in localStorage
+// Key for best WPM in localStorage
 const LS_BEST_KEY = "mmarcade-typing-bestwpm";
 
-function loadBestWPM() {
-  if (typeof window === "undefined") return null;
-  let best = null;
-  try {
-    const v = window.localStorage.getItem(LS_BEST_KEY);
-    if (v !== null && !isNaN(parseFloat(v)))
-      best = parseFloat(v);
-  } catch {}
-  return best;
-}
-
-function saveBestWPM(wpm) {
-  if (typeof window !== "undefined" && !isNaN(wpm)) {
-    const prev = loadBestWPM();
-    if (!prev || wpm > prev) {
-      window.localStorage.setItem(LS_BEST_KEY, wpm);
-    }
-  }
-}
-
+// PUBLIC_INTERFACE
 /**
- * PUBLIC_INTERFACE
- * TypingChallengePage: Sentence-based typing speed/accuracy challenge.
- * - Start, type the prompt, submit/finish
- * - Shows accuracy, WPM, and saves best WPM locally
- * - Play Again button resets new sentence/challenge
- * - Back to games for navigation
- * - Light/dark theme; visually energetic, per UI plan.
+ * TypingChallengePage: Sentence-based typing challenge with fixed sentence flow.
+ * - Sentence appears prominently, read-only in a non-editable box.
+ * - Typing input below; start button enables input+timer, submit stops both and shows results.
+ * - WPM and accuracy are calculated. Best WPM is stored in localStorage.
+ * - Flow and controls are matched to requirements (no randomization of sentence).
  */
 function TypingChallengePage() {
-  // Game state tracking
-  const [sentence, setSentence] = useState("");
+  // States for game flow
+  const [gameState, setGameState] = useState("idle"); // idle | running | finished
   const [userInput, setUserInput] = useState("");
-  const [started, setStarted] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
-
-  // Derived stats state
-  const [wpm, setWpm] = useState(0);
-  const [accuracy, setAccuracy] = useState(1);
+  const [startTime, setStartTime] = useState(null); // ms
+  const [endTime, setEndTime] = useState(null);     // ms
+  const [wpm, setWpm] = useState(null);
+  const [accuracy, setAccuracy] = useState(null);
   const [resultMsg, setResultMsg] = useState("");
   const [bestWpm, setBestWpm] = useState(loadBestWPM());
-  const [playCount, setPlayCount] = useState(0); // force re-randomization
 
-  const inputRef = useRef(null);
+  const inputRef = useRef();
   const navigate = useNavigate();
 
-  // On mount or play again, generate a new sentence
-  useEffect(() => {
-    setSentence(getRandomSentence());
-    setUserInput("");
-    setStarted(false);
-    setFinished(false);
-    setStartTime(null);
-    setEndTime(null);
-    setWpm(0);
-    setAccuracy(1);
-    setResultMsg("");
-  }, [playCount]);
-
-  // On finish, compute results
-  useEffect(() => {
-    if (finished && startTime && endTime) {
-      // Compute WPM and accuracy
-      const timeSec = Math.max(1, (endTime - startTime) / 1000); // never 0
-      const acc = calculateAccuracy(sentence, userInput);
-      const wpmVal = calculateWPM(userInput.length, timeSec);
-      setAccuracy(acc);
-      setWpm(wpmVal);
-      setResultMsg(getResultMessage(wpmVal, acc));
-      // Save best if improved
-      if (!bestWpm || wpmVal > bestWpm) {
-        saveBestWPM(wpmVal);
-        setBestWpm(wpmVal);
+  // Helper: Load and store best WPM
+  function loadBestWPM() {
+    if (typeof window === "undefined") return null;
+    try {
+      const v = window.localStorage.getItem(LS_BEST_KEY);
+      if (v !== null && !isNaN(parseFloat(v))) {
+        return parseFloat(v);
       }
-    }
-  // eslint-disable-next-line
-  }, [finished, endTime]);
-
-  // Keyboard Enter = Submit if done typing
-  function onKeyDown(e) {
-    if (e.key === "Enter" && !finished) {
-      // Only submit if fully typed the sentence
-      if (userInput.length >= sentence.length) {
-        handleSubmit();
-      }
+    } catch {}
+    return null;
+  }
+  function saveBestWPM(wpmVal) {
+    if (typeof window === "undefined") return;
+    if (isNaN(wpmVal)) return;
+    if (!bestWpm || wpmVal > bestWpm) {
+      window.localStorage.setItem(LS_BEST_KEY, wpmVal);
+      setBestWpm(wpmVal);
     }
   }
 
-  function handleChange(e) {
-    if (finished) return; // lock after finish
-    const val = e.target.value;
-    // Only start timer on first input
-    if (!started && val.length === 1) {
-      setStarted(true);
-      setStartTime(performance.now());
-    }
-    // Limit max length to sentence
-    if (val.length > sentence.length) return;
-    setUserInput(val);
-    // Auto-submit if matches exactly
-    if (val === sentence) {
-      handleSubmit(performance.now());
-    }
-  }
-
+  // Begin a new game session
   function handleStart() {
-    setStarted(false);
+    setGameState("running");
     setUserInput("");
-    setFinished(false);
+    setStartTime(performance.now());
+    setEndTime(null);
+    setWpm(null);
+    setAccuracy(null);
+    setResultMsg("");
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus();
+    }, 30);
+  }
+
+  // Handle typing changes
+  function handleChange(e) {
+    if (gameState !== "running") return;
+    const value = e.target.value;
+
+    // Disallow input if game not running or over sentence length
+    if (value.length > FIXED_SENTENCE.length) return;
+    setUserInput(value);
+
+    // Optional: Auto-submit if exact match (not required by brief, only submit by button)
+  }
+
+  // Submit: stop timer/input, calculate stats, show result
+  function handleSubmit() {
+    if (gameState !== "running") return;
+    const finishTime = performance.now();
+    setGameState("finished");
+    setEndTime(finishTime);
+
+    // WPM and accuracy
+    const seconds = Math.max(1, (finishTime - startTime) / 1000.0);
+    const charsTyped = userInput.length;
+    const words = charsTyped / 5;
+    const wpmVal = Math.round((words / (seconds / 60)) * 100) / 100;
+
+    let correct = 0;
+    for (let i = 0; i < FIXED_SENTENCE.length; ++i) {
+      if (userInput[i] === FIXED_SENTENCE[i]) correct++;
+    }
+    const accuracyVal =
+      FIXED_SENTENCE.length === 0
+        ? 1
+        : Math.max(0, correct) / FIXED_SENTENCE.length;
+
+    setWpm(wpmVal);
+    setAccuracy(accuracyVal);
+
+    // Save best if improved
+    saveBestWPM(wpmVal);
+
+    // Set fun message
+    setResultMsg(getResultMessage(wpmVal, accuracyVal));
+
+    // Blur input for accessibility/discouragement
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
+  }
+
+  // Reset session to play again
+  function handlePlayAgain() {
+    setUserInput("");
+    setGameState("idle");
     setStartTime(null);
     setEndTime(null);
+    setWpm(null);
+    setAccuracy(null);
     setResultMsg("");
-    if (inputRef.current) inputRef.current.focus();
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.value = "";
+    }, 0);
   }
 
-  function handleSubmit(forceTime) {
-    if (finished) return;
-    setFinished(true);
-    // Use provided end time, else now
-    setEndTime(forceTime || performance.now());
-    // Blur input to discourage continued typing
-    if (inputRef.current) inputRef.current.blur();
-  }
-
-  function handlePlayAgain() {
-    setPlayCount((c) => c + 1);
-    if (inputRef.current) setTimeout(() => inputRef.current.focus(), 50);
-  }
-
-  // Visual word-match coloring (character-by-character)
-  function colorizeText(target, input) {
-    return (
-      <span>
-        {target.split("").map((ch, idx) => {
-          let style = {};
-          if (idx < input.length) {
-            style = input[idx] === ch
-              ? { color: "var(--typing-match)" }
-              : { color: "var(--typing-error)", textDecoration: "underline wavy" };
-          }
-          return (
-            <span key={idx} style={style}>{ch}</span>
-          );
-        })}
-      </span>
-    );
+  // Keyboard support ("Enter" submits if running)
+  function onKeyDown(e) {
+    if (gameState === "running" && e.key === "Enter") {
+      handleSubmit();
+    }
   }
 
   // Format accuracy percent
   function fmtAcc(acc) {
-    return Math.round(acc * 1000) / 10 + "%";
+    return acc === null ? "-" : Math.round(acc * 1000) / 10 + "%";
+  }
+
+  // Rating message based on WPM & accuracy
+  function getResultMessage(wpm, acc) {
+    if (acc < 0.8) return "Keep practicing for better accuracy!";
+    if (wpm >= 70 && acc > 0.98) return "Typing Master! 🚀";
+    if (wpm >= 45 && acc >= 0.95) return "Great Job! 🏆";
+    if (wpm >= 30 && acc >= 0.90) return "Good effort! 👍";
+    if (wpm >= 15 && acc >= 0.80) return "Keep it up!";
+    return "Try again and boost your skills!";
+  }
+
+  // Render sentence (read-only) - coloring per char (optional for later)
+  function renderSentenceBox() {
+    return (
+      <div className="typing-sentence-zone" aria-label="Typing challenge sentence, read only">
+        <div className="typing-sentence" style={{ fontWeight: 700 }}>
+          {FIXED_SENTENCE}
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="typing-root">
-      {/* Floating decorative backgrounds */}
+      {/* Decorative backgrounds */}
       <div className="typing-blur1"></div>
       <div className="typing-blur2"></div>
       <main className="typing-main-card">
@@ -214,52 +171,49 @@ function TypingChallengePage() {
             <span className="typing-emoji" aria-hidden="true">⌨️</span> Typing Challenge
           </h2>
           <p className="typing-instructions">
-            Type the sentence below as quickly and accurately as possible.<br/>
+            Type the sentence below as quickly and accurately as possible.<br />
             Your Words Per Minute (WPM) and accuracy will be measured. Good luck!
           </p>
         </header>
-        {/* Sentence area */}
-        <div className="typing-sentence-zone">
-          <div
-            className="typing-sentence"
-            aria-label="Typing challenge sentence"
-          >
-            {colorizeText(sentence, userInput)}
-          </div>
-          {/* Controlled input */}
-          <input
-            ref={inputRef}
-            className="typing-input"
-            type="text"
-            value={userInput}
-            onChange={handleChange}
-            disabled={finished}
-            spellCheck="false"
-            autoFocus
-            maxLength={sentence.length}
-            placeholder="Start typing here..."
-            onKeyDown={onKeyDown}
-            aria-label="Typing input"
-          />
-        </div>
 
-        {/* Controls */}
+        {/* Display fixed sentence */}
+        {renderSentenceBox()}
+
+        {/* Typing input (only enabled after start, until submit) */}
+        <input
+          ref={inputRef}
+          className="typing-input"
+          type="text"
+          disabled={gameState !== "running"}
+          value={userInput}
+          onChange={handleChange}
+          spellCheck="false"
+          maxLength={FIXED_SENTENCE.length}
+          tabIndex={0}
+          aria-label="Typing input"
+          placeholder={gameState === "idle" ? "Press Start to begin" : ""}
+          onKeyDown={onKeyDown}
+          autoFocus={gameState === "running"}
+        />
+
+        {/* Controls: Start/Submit/Play Again */}
         <div className="typing-btn-row">
-          {!started && !finished && (
+          {gameState === "idle" && (
             <button className="typing-btn start" onClick={handleStart} tabIndex={0}>
               Start
             </button>
           )}
-          {started && !finished && (
-            <button className="typing-btn submit"
+          {gameState === "running" && (
+            <button
+              className="typing-btn submit"
               onClick={handleSubmit}
               tabIndex={0}
-              disabled={userInput.length < sentence.length}
+              disabled={userInput.length === 0}
             >
               Submit
             </button>
           )}
-          {finished && (
+          {gameState === "finished" && (
             <button className="typing-btn playagain" onClick={handlePlayAgain} tabIndex={0}>
               <span aria-hidden="true">↺</span> Play Again
             </button>
@@ -268,7 +222,7 @@ function TypingChallengePage() {
 
         {/* Results */}
         <section className="typing-results" aria-live="polite">
-          {finished && (
+          {gameState === "finished" && (
             <>
               <div className="typing-result-main">
                 <span className="tr-label">WPM:</span>
@@ -280,7 +234,7 @@ function TypingChallengePage() {
               <div className="typing-best-row">
                 <span className="tb-label">Your Best WPM:</span>
                 <span className="tb-value">
-                  {bestWpm ? Math.round(bestWpm * 100) / 100 : "-"}
+                  {bestWpm !== null ? Math.round(bestWpm * 100) / 100 : "-"}
                 </span>
               </div>
             </>
