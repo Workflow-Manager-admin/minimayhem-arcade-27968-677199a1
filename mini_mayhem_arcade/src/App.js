@@ -4,6 +4,7 @@ import Navbar from './Navbar';
 import LandingPage from './LandingPage';
 import GamesPage from './GamesPage';
 import MemoryGamePage from './MemoryGamePage.jsx';
+import ReactionRushPage from './ReactionRushPage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/games" element={<GamesPage />} />
             <Route path="/games/memory" element={<MemoryGamePage />} />
+            <Route path="/games/reaction" element={<ReactionRushPage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
         </main>
