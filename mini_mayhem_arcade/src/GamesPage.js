@@ -65,13 +65,13 @@ const FEATURED_GAME = {
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Include Ice Slide Puzzle score from localStorage (iceSlideScore).
+ * Include Sudoku best time (sudokuBestTime).
  */
 function getLocalHighScores() {
   let memoryGameScore = null;
   let reactionGameScore = null;
   let typingBestWpm = null;
-  let iceSlideBest = null;
+  let sudokuBestTime = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -96,9 +96,9 @@ function getLocalHighScores() {
       }
     } catch (e) { }
     try {
-      const iceRaw = window.localStorage.getItem("iceSlideScore");
-      if (iceRaw !== null && !isNaN(parseInt(iceRaw, 10))) {
-        iceSlideBest = parseInt(iceRaw, 10);
+      const sudokuRaw = window.localStorage.getItem("sudokuBestTime");
+      if (sudokuRaw !== null && !isNaN(parseInt(sudokuRaw, 10))) {
+        sudokuBestTime = parseInt(sudokuRaw, 10);
       }
     } catch (e) {}
   }
@@ -131,19 +131,21 @@ function getLocalHighScores() {
     typingDisplay = "No score yet";
   }
 
-  // --- Ice Slide Puzzle score ---
-  let iceSlideDisplay;
-  if (typeof iceSlideBest === "number" && !isNaN(iceSlideBest)) {
-    iceSlideDisplay = iceSlideBest + " steps";
+  // --- Sudoku Best Time ---
+  let sudokuDisplay;
+  if (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime)) {
+    const m = Math.floor(sudokuBestTime / 60);
+    const s = sudokuBestTime % 60;
+    sudokuDisplay = `${m}:${s < 10 ? "0" : ""}${s}`;
   } else {
-    iceSlideDisplay = "No score yet";
+    sudokuDisplay = "No score yet";
   }
 
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
-    { game: "Ice Slide Puzzle", score: iceSlideDisplay }
+    { game: "Sudoku", score: sudokuDisplay }
   ];
 }
 
