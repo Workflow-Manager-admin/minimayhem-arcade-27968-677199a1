@@ -40,12 +40,13 @@ const GAMES = [
     color: "#4F46E5",
     playPath: "/games/typing"
   },
+  // --- Insert Snake Game Card Here ---
   {
-    name: "Snake (Hard)",
+    name: "Snake",
     icon: "🐍",
-    tagline: "Guide the snake, eat food, and avoid your own tail! Try the advanced challenge with fast speeds & special bonuses.",
-    tag: "Hard",
-    color: "#4f873e",
+    tagline: "Classic arcade action! Guide the snake to eat food, avoid walls and your own tail. See how long you can survive and break your best score.",
+    tag: "Arcade",
+    color: "#23c738",
     playPath: "/games/snake"
   },
   {
