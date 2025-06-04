@@ -97,6 +97,7 @@ function getLocalHighScores() {
   let memoryGameScore = null;
   let reactionGameScore = null;
   let typingBestWpm = null;
+  let typingWordChallengeBest = null;
   let sudokuBestTime = null;
   let slidingBestMoves = null;
   let slidingBestTime = null;
@@ -128,6 +129,13 @@ function getLocalHighScores() {
       const typingRaw = window.localStorage.getItem("mmarcade-typing-bestwpm");
       if (typingRaw !== null && !isNaN(parseFloat(typingRaw))) {
         typingBestWpm = Math.round(parseFloat(typingRaw) * 100) / 100;
+      }
+    } catch (e) { }
+    // New: Read best score for Word Typing Challenge
+    try {
+      const typingChallengeRaw = window.localStorage.getItem("mmarcade-typing-challenge-bestscore");
+      if (typingChallengeRaw !== null && !isNaN(parseFloat(typingChallengeRaw))) {
+        typingWordChallengeBest = Math.round(parseFloat(typingChallengeRaw) * 100) / 100;
       }
     } catch (e) { }
     try {
@@ -174,6 +182,11 @@ function getLocalHighScores() {
       : reactionGameScore + " ms")
     : "No score yet";
 
+  let typingChallengeDisplay =
+    typeof typingWordChallengeBest === "number" && !isNaN(typingWordChallengeBest)
+      ? `${typingWordChallengeBest} Best Score`
+      : "No score yet";
+
   let lightBeamDisplay =
     typeof lightBeamBestScore === "number" && !isNaN(lightBeamBestScore)
       ? `${lightBeamBestScore} best` // simple label, can update to "moves", "time", etc if game definition finalizes
@@ -197,6 +210,7 @@ function getLocalHighScores() {
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
+    { game: "Word Typing Challenge", score: typingChallengeDisplay },
     { game: "Light Beam Puzzle", score: lightBeamDisplay },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
     { game: "Sudoku", score: sudokuDisplay }
