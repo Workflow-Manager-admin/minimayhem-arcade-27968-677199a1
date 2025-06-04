@@ -1,364 +1,352 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import "./App.css";
+import "./GamesPage.css"; // Use game card styles for grid
 import "./ScoreboardPage.css";
-import { useNavigate } from "react-router-dom";
 
-// PUBLIC_INTERFACE
-// ScoreboardPage: 3x2 card grid, each card = game name + emoji, best score, last 5 scores, Reset All Scores button at bottom.
-// No Light Beam or inactive games. Fully styled, accessible, works in dark/light.
+/*
+  PUBLIC_INTERFACE
+  ScoreboardPage: Displays a 3x2 grid of cards for each active game.
+  Each card shows game emoji, game name, best score, last 5 scores, and a Reset All Scores button at bottom.
+  Scores are retrieved from localStorage per-game. Only enabled games are shown.
+*/
 
 const GAMES = [
-  {
-    key: "block",
-    name: "Block Game",
-    emoji: "🔷",
-    bestKey: "mmarcade-blockgame-bestscore",
-    recentsKey: "mmarcade-blockgame-recents",
-    bestLabel: "Best Score",
-    getBest: val =>
-      typeof val === "number" && !isNaN(val) ? val : "No score yet",
-    formatRecent: val =>
-      typeof val === "number" && !isNaN(val) ? `${val}` : "-",
-  },
   {
     key: "memory",
     name: "Memory Game",
     emoji: "🧠",
-    bestKey: "mmarcade-memgame-highscore",
-    recentsKey: "mmarcade-memgame-recent",
-    bestLabel: "Best (Moves, Time)",
-    getBest: val =>
-      val && typeof val.moves === "number"
-        ? `${val.moves} moves, ${formatTime(val.time)}`
-        : "No win yet",
-    formatRecent: val =>
-      val && typeof val.moves === "number"
-        ? `${val.moves} moves, ${formatTime(val.time)}`
-        : "-",
+    lsBest: "mmarcade-memgame-highscore",
+    lsRecent: "mmarcade-memgame-history",
+    formatBest: (val) => val && typeof val.moves === "number" && typeof val.time === "number"
+      ? `${val.moves} moves, ${formatTime(val.time)}`
+      : "—",
+    formatScore: (s) => (s && typeof s.moves === "number" && typeof s.time === "number"
+      ? `${s.moves} moves, ${formatTime(s.time)}`
+      : s && typeof s === "object" && s !== null
+        ? JSON.stringify(s)
+        : typeof s === "string"
+        ? s
+        : "—"),
+    defaultBest: "—",
+    defaultList: [],
+    iconColor: "#00B0E0"
   },
   {
     key: "reaction",
     name: "Reaction Speed",
     emoji: "⚡",
-    bestKey: "reactionGameScore", // legacy (int ms)
-    recentsKey: "reactionGameRecents",
-    bestLabel: "Best Time",
-    getBest: val =>
-      typeof val === "number" && !isNaN(val)
-        ? val > 1200
-          ? (val / 1000).toFixed(3) + "s"
-          : val + " ms"
-        : "No score yet",
-    formatRecent: val =>
-      typeof val === "number" && !isNaN(val)
-        ? val > 1200
-          ? (val / 1000).toFixed(3) + "s"
-          : val + " ms"
-        : "-",
+    lsBest: "reactionGameScore",
+    lsRecent: "reactionGameScoreList",
+    formatBest: (val) =>
+      (typeof val === "number" && !isNaN(val))
+        ? (val > 1200 ? (val / 1000).toFixed(3) + "s" : `${val} ms`)
+        : "—",
+    formatScore: (s) =>
+      typeof s === "number"
+        ? (s > 1200 ? (s / 1000).toFixed(3) + "s" : `${s} ms`)
+        : "—",
+    defaultBest: "—",
+    defaultList: [],
+    iconColor: "#FFD301"
   },
   {
     key: "typing",
     name: "Typing Challenge",
     emoji: "⌨️",
-    bestKey: "mmarcade-typing-bestwpm",
-    recentsKey: "mmarcade-typing-wpm-recents",
-    bestLabel: "Best WPM",
-    getBest: val =>
-      typeof val === "number" && !isNaN(val) ? `${val} WPM` : "No score yet",
-    formatRecent: val =>
-      typeof val === "number" && !isNaN(val) ? `${val} WPM` : "-",
+    lsBest: "mmarcade-typing-bestwpm",
+    lsRecent: "mmarcade-typing-history",
+    formatBest: (val) =>
+      typeof val === "number" && !isNaN(val) ? `${val} WPM` : "—",
+    formatScore: (s) =>
+      typeof s === "number" && !isNaN(s) ? `${s} WPM` : "—",
+    defaultBest: "—",
+    defaultList: [],
+    iconColor: "#fa537b"
   },
   {
-    key: "wordTyping",
-    name: "Word Typing Challenge",
-    emoji: "📝",
-    bestKey: "mmarcade-word-typing-bestscore",
-    recentsKey: "mmarcade-word-typing-recents",
-    bestLabel: "Best Points",
-    getBest: val =>
-      typeof val === "number" && !isNaN(val) ? `${val} pts` : "No score yet",
-    formatRecent: val =>
-      typeof val === "number" && !isNaN(val) ? `${val} pts` : "-",
+    key: "quickmath",
+    name: "Quick Math",
+    emoji: "➗",
+    lsBest: "quickMathScore",
+    lsRecent: "quickMathScoreList",
+    formatBest: (val) =>
+      typeof val === "number" && !isNaN(val) ? `${val} pts` : "—",
+    formatScore: (s) =>
+      typeof s === "number" && !isNaN(s) ? `${s} pts` : "—",
+    defaultBest: "—",
+    defaultList: [],
+    iconColor: "#437fe8"
   },
   {
-    key: "sliding",
-    name: "Sliding Tile Puzzle",
-    emoji: "🔲",
-    bestKey: "mmarcade-slidingtile-best-4",
-    recentsKey: "mmarcade-slidingtile-recent-4",
-    bestLabel: "Best (Moves, Time)",
-    getBest: val =>
-      val && typeof val.moves === "number"
-        ? `${val.moves} moves, ${formatTime(val.time)}`
-        : "No win yet",
-    formatRecent: val =>
-      val && typeof val.moves === "number"
-        ? `${val.moves} moves, ${formatTime(val.time)}`
-        : "-",
+    key: "blockgame",
+    name: "Block Game",
+    emoji: "🔷",
+    lsBest: "mmarcade-blockgame-bestscore",
+    lsRecent: "mmarcade-blockgame-history",
+    formatBest: (val) =>
+      typeof val === "number" && !isNaN(val) ? `${val} pts` : "—",
+    formatScore: (s) =>
+      typeof s === "number" && !isNaN(s) ? `${s} pts` : "—",
+    defaultBest: "—",
+    defaultList: [],
+    iconColor: "#00FFD7"
+  },
+  {
+    key: "randomfun",
+    name: "Random Fun",
+    emoji: "🎲",
+    lsBest: "mmarcade-random-bestscore",
+    lsRecent: "mmarcade-random-history",
+    formatBest: (val) => (val !== undefined && val !== null ? val : "—"),
+    formatScore: (s) => (s !== undefined && s !== null ? s : "—"),
+    defaultBest: "—",
+    defaultList: [],
+    iconColor: "#ef7b09"
   },
 ];
 
-// Time formatter for memory/sliding: mm:ss
+// Helper to format seconds as mm:ss
 function formatTime(sec) {
-  if (typeof sec !== "number" || isNaN(sec)) return "-";
-  let m = Math.floor(sec / 60);
-  let s = sec % 60;
+  if (typeof sec !== "number" || isNaN(sec)) return "—";
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
   return `${m}:${s < 10 ? "0" : ""}${s}`;
+}
+
+// Return localStorage results for a game. Each game tracks best + history (array), fallback to []/—.
+function getGameScores(game) {
+  // Best Score
+  let best = game.defaultBest;
+  let last5 = game.defaultList;
+  if (typeof window !== "undefined") {
+    // Retrieve best (various formats)
+    try {
+      const bestRaw = window.localStorage.getItem(game.lsBest);
+      if (bestRaw !== null) {
+        if (game.key === "memory" && bestRaw) {
+          best = JSON.parse(bestRaw);
+        } else if (game.key === "reaction") {
+          best = parseInt(bestRaw, 10);
+        } else if (["quickmath", "blockgame"].includes(game.key)) {
+          best = parseInt(bestRaw, 10);
+        } else if (game.key === "randomfun" && bestRaw) {
+          best = bestRaw;
+        } else if (game.key === "typing") {
+          best = parseFloat(bestRaw);
+        }
+      }
+    } catch {}
+
+    // Retrieve last5 (as array; fallback to [])
+    try {
+      const recentsRaw = window.localStorage.getItem(game.lsRecent);
+      if (recentsRaw !== null) {
+        // If array as stringified JSON array
+        let parsed = JSON.parse(recentsRaw);
+        if (Array.isArray(parsed)) {
+          last5 = parsed.slice(-5).reverse();
+        }
+      } else {
+        // Some games store only last value (not array)
+        if (game.key === "reaction") {
+          const v = window.localStorage.getItem("reaction_time_last");
+          if (v !== null && !isNaN(parseInt(v, 10))) {
+            last5 = [parseInt(v, 10)];
+          }
+        } else if (game.key === "memory") {
+          // Try to show last played
+          const v = window.localStorage.getItem("mmarcade-memgame-lastscore");
+          if (v) {
+            last5 = [JSON.parse(v)];
+          }
+        }
+      }
+    } catch {}
+  }
+  return {
+    best,
+    last5,
+  };
+}
+
+// Remove all scores for all games from localStorage, for a "global reset" feature.
+function resetAllScores() {
+  if (typeof window === "undefined") return;
+  GAMES.forEach((g) => {
+    try {
+      window.localStorage.removeItem(g.lsBest);
+      window.localStorage.removeItem(g.lsRecent);
+      // Remove alternate keys if present
+      if (g.key === "memory") window.localStorage.removeItem("mmarcade-memgame-lastscore");
+      if (g.key === "reaction") window.localStorage.removeItem("reaction_time_last");
+    } catch {}
+  });
 }
 
 // PUBLIC_INTERFACE
 function ScoreboardPage() {
-  const [gameResults, setGameResults] = useState({});
-  const [showResetModal, setShowResetModal] = useState(false);
-  const [resetFeedback, setResetFeedback] = useState("");
-  const navigate = useNavigate();
-  const resetBtnRef = useRef();
+  // state: array of {game, best, last5}
+  const [scores, setScores] = useState([]);
 
-  // On mount/load, fetch all scores and recent arrays for all games
+  // On mount and on reset force update from localStorage
   useEffect(() => {
-    function fetchForAllGames() {
-      const results = {};
-      for (const g of GAMES) {
-        let best = null;
-        let recentsArr = [];
-        // Best
-        try {
-          let raw = window.localStorage.getItem(g.bestKey);
-          if (
-            g.key === "memory" ||
-            g.key === "sliding"
-          ) {
-            best = raw ? JSON.parse(raw) : null;
-          } else if (
-            g.key === "typing" ||
-            g.key === "wordTyping"
-          ) {
-            best = raw !== null && !isNaN(Number(raw)) ? Number(raw) : null;
-          } else if (g.key === "block" || g.key === "reaction") {
-            best = raw !== null && !isNaN(parseInt(raw, 10))
-              ? parseInt(raw, 10)
-              : null;
-          } else {
-            best = raw; // fallback
-          }
-        } catch {
-          best = null;
-        }
-        // Recents
-        try {
-          let recentsRaw = window.localStorage.getItem(g.recentsKey) || "[]";
-          let rec = [];
-          if (
-            g.key === "memory" ||
-            g.key === "sliding"
-          ) {
-            rec = JSON.parse(recentsRaw);
-            if (!Array.isArray(rec)) rec = [];
-          } else if (g.key === "typing" || g.key === "wordTyping" || g.key === "block" || g.key === "reaction") {
-            rec = JSON.parse(recentsRaw);
-            if (!Array.isArray(rec)) rec = [];
-          }
-          // If no recents logic: fallback to legacy/last
-          if (rec.length === 0) {
-            // Try to get 'legacy last score'
-            if (g.key === "memory") {
-              try {
-                let last = window.localStorage.getItem("mmarcade-memgame-lastscore");
-                if (last) {
-                  const o = JSON.parse(last);
-                  rec = o && typeof o.moves === "number" ? [o] : [];
-                }
-              } catch {}
-            } else if (g.key === "sliding") {
-              try {
-                let last = window.localStorage.getItem("mmarcade-slidingtile-best-4");
-                if (last) {
-                  const o = JSON.parse(last);
-                  rec = o && typeof o.moves === "number" ? [o] : [];
-                }
-              } catch {}
-            } else if (g.key === "reaction") {
-              let last = window.localStorage.getItem("reaction_time_last");
-              if (last !== null && !isNaN(parseInt(last, 10))) {
-                rec = [parseInt(last, 10)];
-              }
-            } else if (g.key === "block") {
-              let last = window.localStorage.getItem("mmarcade-blockgame-bestscore");
-              if (last !== null && !isNaN(parseInt(last, 10))) {
-                rec = [parseInt(last, 10)];
-              }
-            } else if (g.key === "typing") {
-              let last = window.localStorage.getItem("mmarcade-typing-bestwpm");
-              if (last !== null && !isNaN(Number(last))) {
-                rec = [Number(last)];
-              }
-            } else if (g.key === "wordTyping") {
-              let last = window.localStorage.getItem("mmarcade-word-typing-bestscore");
-              if (last !== null && !isNaN(Number(last))) {
-                rec = [Number(last)];
-              }
-            }
-          }
-        // limit to latest 5
-        recentsArr = rec.slice(-5).reverse();
-        } catch {
-          recentsArr = [];
-        }
-        results[g.key] = { best, recents: recentsArr };
-      }
-      return results;
-    }
-    setGameResults(fetchForAllGames());
-  }, [resetFeedback, showResetModal]);
+    const data = GAMES.map((game) => ({
+      ...game,
+      ...getGameScores(game),
+    }));
+    setScores(data);
+  }, []);
 
-  // Modal: Reset all scores
-  function openResetModal() {
-    setShowResetModal(true);
-    setTimeout(() => {
-      try {
-        document.getElementById("scoreboard-reset-confirm")?.focus();
-      } catch {}
-    }, 35);
-  }
-  function closeResetModal() {
-    setShowResetModal(false);
-    setTimeout(() => {
-      if (resetBtnRef.current) resetBtnRef.current.focus();
-    }, 40);
-  }
-  function handleResetScores() {
-    try {
-      // Remove all best + recents for the 6 games
-      for (const g of GAMES) {
-        window.localStorage.removeItem(g.bestKey);
-        window.localStorage.removeItem(g.recentsKey);
-        // Remove alternate last/legacy keys
-        if (g.key === "memory") {
-          window.localStorage.removeItem("mmarcade-memgame-lastscore");
-        }
-        if (g.key === "sliding") {
-          window.localStorage.removeItem("mmarcade-slidingtile-best-4");
-        }
-        if (g.key === "reaction") {
-          window.localStorage.removeItem("reaction_time_last");
-        }
-        if (g.key === "block") {
-          window.localStorage.removeItem("mmarcade-blockgame-bestscore");
-        }
-        if (g.key === "typing") {
-          window.localStorage.removeItem("mmarcade-typing-bestwpm");
-        }
-        if (g.key === "wordTyping") {
-          window.localStorage.removeItem("mmarcade-word-typing-bestscore");
-        }
-      }
-      setResetFeedback("Scores reset!");
-    } catch {
-      setResetFeedback("Error resetting.");
+  // Handle reset all
+  function handleResetAll() {
+    // Confirm reset (optional: remove for minimal interaction)
+    // eslint-disable-next-line no-restricted-globals
+    if (window.confirm("Are you sure you want to reset ALL high scores and history?")) {
+      resetAllScores();
+      // Re-fetch for every card
+      const data = GAMES.map((game) => ({
+        ...game,
+        ...getGameScores(game),
+      }));
+      setScores(data);
     }
-    setShowResetModal(false);
-    setTimeout(() => setResetFeedback(""), 1700);
-  }
-
-  useEffect(() => {
-    if (showResetModal) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-  }, [showResetModal]);
-
-  // PUBLIC_INTERFACE
-  // ScoreCard component for each card
-  function ScoreCard({ game, result }) {
-    return (
-      <div className="scoreboard-card" tabIndex={0} aria-label={`${game.name} scores`}>
-        <div className="scoreboard-game-title">
-          <span className="scoreboard-game-emoji" aria-hidden="true">{game.emoji}</span>
-          {game.name}
-        </div>
-        <div className="scoreboard-best-label">{game.bestLabel}:</div>
-        <span className="scoreboard-best-score">{game.getBest(result.best)}</span>
-        <div className="scoreboard-recent-label" style={{margin: "8px 0 3px 0", color: "var(--text-secondary)", fontWeight: 500}}>Last 5 Scores:</div>
-        <ul className="scoreboard-recent-list">
-          {(result.recents && result.recents.length)
-            ? result.recents.map((r, i) => (
-                <li key={i} className="scoreboard-recent-score">
-                  {game.formatRecent(r)}
-                </li>
-              ))
-            : <li className="scoreboard-recent-score" style={{fontStyle: "italic", opacity: 0.67}}>No recent scores</li>
-          }
-        </ul>
-      </div>
-    );
   }
 
   return (
-    <div className="scoreboard-root">
-      <main className="scoreboard-main">
-        <h1 className="scoreboard-heading" tabIndex={0}>
-          <span role="img" aria-label="Trophy">🏆</span> Your Scoreboard
-        </h1>
-        <div className="scoreboard-card-grid" tabIndex={-1}>
-          {GAMES.map((g, i) => (
-            <ScoreCard key={g.key} game={g} result={gameResults[g.key] || {}} />
+    <main className="container scoreboard-page-root" style={{ paddingTop: 96, paddingBottom: 38, minHeight: "100vh" }}>
+      <h1 style={{
+        fontWeight: 900,
+        fontSize: "2.3rem",
+        textAlign: "center",
+        marginBottom: 30,
+        letterSpacing: "-1.5px",
+        color: "var(--games-accent, #68adc4)",
+        textShadow: "0 3px 18px #68adc438"
+      }}>
+        🎮 Arcade Scoreboard
+      </h1>
+      <section className="scoreboard-grid-section" aria-label="Scoreboard cards">
+        <div
+          className="scoreboard-grid"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gridTemplateRows: "repeat(2, 1fr)",
+            gap: "40px 22px",
+            maxWidth: 920,
+            margin: "0 auto 48px auto",
+          }}
+        >
+          {scores.map((g, idx) => (
+            <ScoreCard
+              key={g.key}
+              name={g.name}
+              emoji={g.emoji}
+              iconColor={g.iconColor}
+              best={g.formatBest(g.best)}
+              last5={g.last5}
+              formatScore={g.formatScore}
+            />
           ))}
         </div>
-        <div className="scoreboard-reset-row">
-          <button
-            ref={resetBtnRef}
-            className="scoreboard-reset-btn"
-            onClick={openResetModal}
-            aria-label="Reset all scores"
-          >
-            Reset All Scores
-          </button>
-        </div>
-        {resetFeedback && (
-          <div className="scoreboard-reset-message" style={{
-            textAlign: "center",
-            fontWeight: 700,
-            color: "#e57373",
-            marginTop: "0.4em"
-          }}>
-            {resetFeedback}
-          </div>
-        )}
+      </section>
+      <div style={{
+        display: "flex",
+        justifyContent: "center",
+        marginTop: 20
+      }}>
         <button
-          className="scoreboard-back-btn"
-          onClick={() => navigate("/games")}
-          style={{marginBottom: 36, marginTop: 6}}
+          className="btn btn-large"
+          style={{
+            fontWeight: 700,
+            fontSize: "1.13rem",
+            background: "#ed2828",
+            borderRadius: 6,
+            padding: "13px 34px",
+            boxShadow: "0 2px 16px #f9585859",
+            color: "#fff",
+          }}
+          onClick={handleResetAll}
         >
-          ← Back to Games
+          Reset All Scores
         </button>
-      </main>
-      {showResetModal && (
-        <div className="scoreboard-reset-modal-backdrop" tabIndex={-1} aria-modal="true" role="dialog">
-          <div className="scoreboard-reset-modal-content">
-            <div className="scoreboard-reset-modal-title">
-              Reset All Scores?
-            </div>
-            <div>Are you sure you want to clear all best scores and recents for all games? This can't be undone.</div>
-            <div className="scoreboard-reset-modal-buttons">
-              <button
-                id="scoreboard-reset-cancel"
-                className="scoreboard-reset-cancel"
-                onClick={closeResetModal}
-              >
-                Cancel
-              </button>
-              <button
-                id="scoreboard-reset-confirm"
-                className="scoreboard-reset-confirm"
-                onClick={handleResetScores}
-              >
-                Reset
-              </button>
-            </div>
-          </div>
+      </div>
+    </main>
+  );
+}
+
+// Card for each game's scoreboard info
+function ScoreCard({ name, emoji, best, last5, formatScore, iconColor }) {
+  return (
+    <article
+      className="scoreboard-card"
+      tabIndex={0}
+      style={{
+        background: "var(--games-card-bg, #fff)",
+        border: "1.2px solid var(--games-card-border, #e3e8f088)",
+        borderRadius: 20,
+        boxShadow: "0 7px 29px #22214e18, 0 2px 9px #4f46e515",
+        padding: "29px 17px 23px 17px",
+        minHeight: 225,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+      }}
+      aria-label={`Scores for ${name}`}
+    >
+      <span
+        className="scoreboard-card-emoji"
+        style={{
+          fontSize: "2.8rem",
+          marginBottom: 9,
+          userSelect: "none",
+          textShadow: iconColor ? `0 2px 12px ${iconColor}70` : "0 2px 8px #9997"
+        }}
+        aria-hidden="true"
+      >
+        {emoji}
+      </span>
+      <div
+        className="scoreboard-card-title"
+        style={{
+          fontWeight: 800,
+          fontSize: "1.17rem",
+          color: "var(--games-accent, #68adc4)"
+        }}
+      >
+        {name}
+      </div>
+      <div style={{
+        fontWeight: 600,
+        color: "#495bb3",
+        marginTop: 7,
+        letterSpacing: "0.01em"
+      }}>
+        Best: <span style={{ fontWeight: 900 }}>{best}</span>
+      </div>
+      <div style={{ marginTop: 11, width: "100%" }}>
+        <div style={{
+          fontSize: "0.99rem",
+          color: "#7a779e",
+          fontWeight: 500,
+          marginBottom: 3,
+          letterSpacing: "0.01em"
+        }}>
+          Last 5 Scores:
         </div>
-      )}
-    </div>
+        {last5 && last5.length ? (
+          <ol style={{ paddingLeft: 17, margin: "0 0 0 0", color: "#20214b", fontWeight: 600 }}>
+            {last5.slice(0, 5).map((s, i) => (
+              <li key={i} style={{ marginBottom: 1, color: "#33337f", fontWeight: 700, fontSize: "1em" }}>
+                {formatScore(s)}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div style={{ color: "#b5b9c7", marginTop: 4 }}>No recent scores</div>
+        )}
+      </div>
+    </article>
   );
 }
 
