@@ -16,6 +16,7 @@ import AboutPrivacyPage from './AboutPrivacyPage.jsx';
 import HelpPage from './HelpPage.jsx'; // Help Page route integration
 import ContactPage from './ContactPage.jsx'; // Contact Page import
 import ComingSoon from './ComingSoon.jsx';
+import ShadowRunnerPage from './ShadowRunnerPage.jsx';
 
 /**
  * PUBLIC_INTERFACE
@@ -41,15 +42,10 @@ function App() {
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
-            {/* NEW: Shadow Runner placeholder route */}
+            {/* Shadow Runner: Route to the real game page */}
             <Route
               path="/games/shadow-runner"
-              element={
-                <ComingSoon
-                  title="Shadow Runner Coming Soon!"
-                  description="This endless runner mini-game is in development. Check back soon to dash and dodge your way to a new high score!"
-                />
-              }
+              element={<ShadowRunnerPage />}
             />
             <Route path="/scoreboard" element={<ScoreboardPage />} />
             {/* About & Privacy page routed to /about-privacy */}
