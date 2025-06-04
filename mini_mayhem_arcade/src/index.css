@@ -1,3 +1,6 @@
+/* Import Montserrat from Google Fonts for global, stylish font */
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700,800,900&display=swap');
+
 /* Base resets and coding styles */
 * {
   box-sizing: border-box;
@@ -7,6 +10,9 @@
   --body-bg-gradient: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
   --body-text: #222;
   --body-transition: background 0.45s cubic-bezier(.32,.82,.61,1), color 0.32s;
+  --main-font: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
 }
 
 [data-theme="dark"] {
@@ -17,9 +23,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: var(--main-font);
   background: var(--body-bg-gradient);
   color: var(--body-text);
   min-height: 100vh;
@@ -29,6 +33,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: var(--body-transition);
+}
+
+/* Apply new font to all headings and primary elements for consistency */
+h1, h2, h3, h4, h5, h6,
+button, input, select, textarea,
+label, .btn, .navbar, .container, .title, .subtitle, .description {
+  font-family: var(--main-font);
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 /* Ensure root is full height for gradient to cover all viewport */
