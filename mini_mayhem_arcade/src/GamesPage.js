@@ -14,7 +14,11 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-// --- The GAMES array (Shadow Runner removed; ready for Light Beam Puzzle future addition)
+/*
+ * All Shadow Runner references have been removed.
+ * The GAMES array has no Shadow Runner entry, and all logic related to
+ * Shadow Runner for cards, score snapshot, or navigation has been removed.
+ */
 const GAMES = [
   {
     name: "Block Game",
