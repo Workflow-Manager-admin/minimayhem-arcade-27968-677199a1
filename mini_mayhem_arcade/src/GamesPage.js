@@ -44,12 +44,13 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
+  // Word Typing Challenge card (added/validated)
   {
     name: "Word Typing Challenge",
-    icon: "📝",
-    tagline: "Type as many words as you can—speed and accuracy matter! Great for practicing typing.",
-    tag: "New!",
-    color: "#fb6379",
+    icon: "⌨️",
+    tagline: "Type as many words as you can—speed and accuracy both matter! Test your skills in our fast-paced typing challenge.",
+    tag: "Practice",
+    color: "#fa537b",
     playPath: "/games/typing-challenge"
   },
   {
