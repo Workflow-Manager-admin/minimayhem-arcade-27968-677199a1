@@ -161,6 +161,7 @@
   pointer-events: none;
 }
 
+/* ----- CRITICAL: TILE GRID CONTAINER AND TILES ----- */
 .slidetile-board {
   margin: 0 auto 12px auto;
   display: grid;
@@ -172,20 +173,18 @@
   outline: none;
   will-change: filter;
   place-items: center;
+
+  /* Fixed, fully responsive container: max 400x400px, max 90vw, always square */
+  width: min(400px, 90vw);
+  height: min(400px, 90vw);
+  min-width: 0;
+  min-height: 0;
 }
 [data-theme="dark"] .slidetile-board {
   background: #181a28;
 }
 
-.slidetile-board.grid4 { width: 336px; height: 336px; }
-.slidetile-board.grid5 { width: 400px; height: 400px; }
-.slidetile-board.grid6 { width: 468px; height: 468px; }
-@media (max-width: 520px) {
-  .slidetile-board.grid4 { width: 98vw; height: 98vw; }
-  .slidetile-board.grid5 { width: 98vw; height: 98vw; }
-  .slidetile-board.grid6 { width: 98vw; height: 98vw; }
-}
-
+/* Remove all grid4/grid5/grid6 classes */
 .tile {
   background: linear-gradient(120deg, #68adc4 82%, #4f46e5 100%);
   color: #fff;
@@ -204,8 +203,13 @@
   outline: none;
   transition: background .17s, color .18s, filter 0.14s;
   filter: brightness(0.99);
+
+  /* Make tile fill its grid cell and always stay square */
+  width: 100%;
+  height: 100%;
   aspect-ratio: 1 / 1;
-  width: 100%; height: 100%;
+  min-width: 0;
+  min-height: 0;
 }
 .tile:focus-visible, .tile:hover {
   background: linear-gradient(120deg, #ffb84c 70%, #68adc4 100%);
@@ -219,6 +223,25 @@
   outline: none;
 }
 
+/* Reduce tile font-size on small screens for clean fit */
+@media (max-width: 450px) {
+  .tile { font-size: 1.12rem; }
+}
+
+/* Responsive container styling */
+@media (max-width: 520px) {
+  .slidetile-main { padding: 2vw 2vw; }
+  .slidetile-board {
+    width: 98vw !important;
+    height: 98vw !important;
+    min-width: unset;
+    min-height: unset;
+  }
+  .tile { font-size: 1.15em; }
+  .slidetile-controls-row { gap: 6px; flex-wrap: wrap; }
+}
+
+/* Win/instruction area styling */
 .slidetile-tip {
   margin-top: 19px;
   color: #406499;
@@ -263,11 +286,4 @@
   80% { transform: scale(0.97);}
   95% { transform: scale(1.04);}
   100% { transform: scale(1); opacity: 1;}
-}
-
-@media (max-width: 520px) {
-  .slidetile-main { padding: 2vw 2vw; }
-  .slidetile-board { width: 98vw !important; height: 98vw !important; min-width: unset; min-height: unset; }
-  .tile { font-size: 1.25em; }
-  .slidetile-controls-row { gap: 6px; flex-wrap: wrap; }
 }
