@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-/* --- GAMES array: Updated to include Block Game, with no Snake. --- */
+// --- The GAMES array (Shadow Runner removed; ready for Light Beam Puzzle future addition)
 const GAMES = [
   {
     name: "Block Game",
@@ -40,7 +40,7 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
-  // Light Beam Puzzle will be added here in the next integration step.
+  // Light Beam Puzzle integration slot (to be added)
   {
     name: "Sudoku",
     icon: "🔢",
@@ -59,21 +59,17 @@ const GAMES = [
   }
 ];
 
-/*
- * Update: If Shadow Runner is the featured game, always use correct SPA link.
- * Here, keeping default as Sliding Tile Puzzle as per existing logic.
- */
+// Featured Game stays as before; update for future if Light Beam Puzzle is featured.
 const FEATURED_GAME = {
   name: "Sliding Tile Puzzle",
   icon: "🔲",
-  desc:
-    "Arrange all the tiles in order by sliding them into the empty space. Now includes 5x5 grid (hard)! Fewer moves and less time mean a better score. Restart, undo, change size, and race your best!",
+  desc: "Arrange all the tiles in order by sliding them into the empty space. Now includes 5x5 grid (hard)! Fewer moves and less time mean a better score. Restart, undo, change size, and race your best!",
   action: "/games/sliding-tile"
 };
 
-/**
+/** 
  * Get local high scores for display in scoreboard widget.
- * Now includes Shadow Runner (best score).
+ * Shadow Runner completely removed.
  */
 function getLocalHighScores() {
   let blockHighScore = null;
@@ -83,7 +79,6 @@ function getLocalHighScores() {
   let sudokuBestTime = null;
   let slidingBestMoves = null;
   let slidingBestTime = null;
-  let shadowRunnerBest = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -102,7 +97,6 @@ function getLocalHighScores() {
       }
     } catch (e) { }
     try {
-      // Reaction game local storage key name - use "reactionGameScore"
       const reactScoreRaw = window.localStorage.getItem("reactionGameScore");
       if (reactScoreRaw !== null && !isNaN(parseInt(reactScoreRaw, 10))) {
         reactionGameScore = parseInt(reactScoreRaw, 10);
@@ -120,8 +114,6 @@ function getLocalHighScores() {
         sudokuBestTime = parseInt(sudokuRaw, 10);
       }
     } catch (e) {}
-    // Sliding tile best data now uses object key: mmarcade-slidingtile-best-4 (or 5, 6)
-    // We'll use best 4x4 solve for snapshot display
     try {
       const slidingBestRaw = window.localStorage.getItem("mmarcade-slidingtile-best-4");
       if (slidingBestRaw) {
@@ -130,14 +122,6 @@ function getLocalHighScores() {
           slidingBestMoves = moves;
           slidingBestTime = time;
         }
-      }
-    } catch (e) {}
-
-    // Shadow Runner: best (farthest score)—store key as "shadowRunnerBestScore"
-    try {
-      const shadowRunnerRaw = window.localStorage.getItem("shadowRunnerBestScore");
-      if (shadowRunnerRaw !== null && !isNaN(parseInt(shadowRunnerRaw, 10))) {
-        shadowRunnerBest = parseInt(shadowRunnerRaw, 10);
       }
     } catch (e) {}
   }
@@ -174,27 +158,18 @@ function getLocalHighScores() {
       ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
       : "No win yet";
 
-  // Shadow Runner display logic
-  let shadowRunnerDisplay;
-  if (typeof shadowRunnerBest === "number" && !isNaN(shadowRunnerBest)) {
-    shadowRunnerDisplay = `${shadowRunnerBest} m`;
-  } else {
-    shadowRunnerDisplay = "No score yet";
-  }
-
-  // Score snapshot: new Shadow Runner entry appended.
+  // Shadow Runner removed. 
   return [
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
-    { game: "Sudoku", score: sudokuDisplay },
-    { game: "Shadow Runner", score: shadowRunnerDisplay }
+    { game: "Sudoku", score: sudokuDisplay }
   ];
 }
 
 /*
- * Update all Shadow Runner navigation to use <Link to='/games/shadow-runner'>.
+ * Main GamesPage implementation
  */
 function GamesPage() {
   // Animation: fade in grid on mount
@@ -205,10 +180,7 @@ function GamesPage() {
     }
   }, []);
 
-  // Helper (was for Shadow Runner path, now not needed)
-  // Future games like Light Beam Puzzle should use their own playPath entry.
-
-  // Also, FeaturedGameBanner needs special handling if Shadow Runner is featured in future.
+  // Ready for Light Beam Puzzle; all navigation and playPath logic is standard (no Shadow Runner exceptions).
   return (
     <div className="games-page-root">
       <main className="games-main-content">
@@ -259,7 +231,7 @@ function GamesPage() {
 /**
  * PUBLIC_INTERFACE
  * FeaturedGameBanner: Banner for the featured or "game of the day".
- * Ensures all navigation ("Play Now") is done with <Link> for client-side routing, including Shadow Runner.
+ * Ensures all navigation ("Play Now") is done with <Link> for client-side routing.
  */
 function FeaturedGameBanner({ game }) {
   return (
@@ -271,7 +243,6 @@ function FeaturedGameBanner({ game }) {
           <div className="featured-title">{game.name}</div>
           <div className="featured-desc">{game.desc}</div>
         </div>
-        {/* Always use Link for client-side navigation */}
         {game.action && game.action.startsWith("/") ? (
           <Link
             to={game.action}
