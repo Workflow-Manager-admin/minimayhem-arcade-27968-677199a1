@@ -136,13 +136,25 @@ function FeaturedGameBanner({ game }) {
           <div className="featured-title">{game.name}</div>
           <div className="featured-desc">{game.desc}</div>
         </div>
-        <a
-          href={game.action}
-          className="featured-play-btn"
-          aria-label={`Play ${game.name}`}
-        >
-          Play Now
-        </a>
+        {game.action && game.action.startsWith("/")
+          ? (
+            <Link
+              to={game.action}
+              className="featured-play-btn"
+              aria-label={`Play ${game.name}`}
+            >
+              Play Now
+            </Link>
+          ) : (
+            <a
+              href={game.action}
+              className="featured-play-btn"
+              aria-label={`Play ${game.name}`}
+            >
+              Play Now
+            </a>
+          )
+        }
       </div>
     </aside>
   );
