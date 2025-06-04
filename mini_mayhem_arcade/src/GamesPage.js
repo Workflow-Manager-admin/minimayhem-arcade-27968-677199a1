@@ -44,7 +44,6 @@ const GAMES = [
     color: "#FACA15",
     playPath: "/games/reaction"
   },
-  // --- Word Typing Challenge Card ---
   {
     name: "Word Typing Challenge",
     icon: "📝",
@@ -53,7 +52,6 @@ const GAMES = [
     color: "#fb6379",
     playPath: "/games/typing-challenge"
   },
-  // --- Light Beam Puzzle Card ---
   {
     name: "Light Beam Puzzle",
     icon: "🔦",
