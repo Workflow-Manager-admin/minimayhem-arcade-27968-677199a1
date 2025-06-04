@@ -205,11 +205,8 @@ function GamesPage() {
     }
   }, []);
 
-  // Helper to always enforce /games/shadow-runner for Shadow Runner
-  function getShadowRunnerSafePlayPath(game) {
-    if (game.name === "Shadow Runner") return "/games/shadow-runner";
-    return game.playPath || `/games/${slugify(game.name)}`;
-  }
+  // Helper (was for Shadow Runner path, now not needed)
+  // Future games like Light Beam Puzzle should use their own playPath entry.
 
   // Also, FeaturedGameBanner needs special handling if Shadow Runner is featured in future.
   return (
