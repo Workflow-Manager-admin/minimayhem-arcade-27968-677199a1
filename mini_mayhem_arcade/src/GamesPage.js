@@ -17,6 +17,14 @@ const SCORE_SNAPSHOT_ENABLED = true;
 /* --- GAMES array: Only current, active games remain. Snake references removed. --- */
 const GAMES = [
   {
+    name: "Block Game",
+    icon: "🔷",
+    tagline: "Fit random neon blocks onto a 10x10 grid. Clear rows or columns for big points! Relaxed block puzzle fun.",
+    tag: "New!",
+    color: "#00FFD7",
+    playPath: "/games/block"
+  },
+  {
     name: "Memory Game",
     icon: "🧠",
     tagline: "Sharpen your memory! Repeat sequences of colors, sounds, or patterns.",
