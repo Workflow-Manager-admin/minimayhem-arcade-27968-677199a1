@@ -18,6 +18,7 @@ import ContactPage from './ContactPage.jsx'; // Contact Page import
 import ComingSoon from './ComingSoon.jsx';
 // (ShadowRunnerPage import removed)
 import LightBeamPuzzlePage from './LightBeamPuzzlePage.jsx';
+import WordTypingChallengePage from './WordTypingChallengePage.jsx';
 
 /**
  * PUBLIC_INTERFACE
@@ -40,6 +41,7 @@ function App() {
             <Route path="/games/memory" element={<MemoryGamePage />} />
             <Route path="/games/reaction" element={<ReactionRushPage />} />
             <Route path="/games/typing" element={<TypingChallengePage />} />
+            <Route path="/games/typing-challenge" element={<WordTypingChallengePage />} />
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
