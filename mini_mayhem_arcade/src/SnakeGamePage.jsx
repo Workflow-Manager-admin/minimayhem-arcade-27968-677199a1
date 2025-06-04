@@ -152,7 +152,6 @@ function SnakeGamePage() {
 
   const gameTickRef = useRef();
   const obstacleTickRef = useRef();
-  const lastMoveTimeRef = useRef(Date.now());
   const isMounted = useRef(false);
 
   // Setup game timers
@@ -169,7 +168,7 @@ function SnakeGamePage() {
       clearInterval(obstacleTickRef.current);
     };
     // eslint-disable-next-line
-  }, [gameState, speed, snake, direction, obstacles, food, reverse]);
+  }, [gameState, speed, obstacles, food, reverse]);
 
   // Increase animation frame counter for visuals
   useEffect(() => {
@@ -178,29 +177,35 @@ function SnakeGamePage() {
     return () => clearInterval(anim);
   }, [gameState]);
 
-  // Keyboard handler
+  // --- KEY HANDLER WITH NO-REVERSAL RULE ---
   useEffect(() => {
     const handler = (e) => {
-      // Prevent browser scrolling with arrow keys
       if (
         e.key === "ArrowUp" ||
         e.key === "ArrowDown" ||
         e.key === "ArrowLeft" ||
-        e.key === "ArrowRight"
+        e.key === "ArrowRight" ||
+        ["w", "a", "s", "d", "W", "A", "S", "D"].includes(e.key)
       ) {
         e.preventDefault();
       }
-      if (["ArrowUp", "w", "W"].includes(e.key)) {
-        setPendingDir(curr => turnToDir({ x: 0, y: -1 }));
-      }
-      if (["ArrowDown", "s", "S"].includes(e.key)) {
-        setPendingDir(curr => turnToDir({ x: 0, y: 1 }));
-      }
-      if (["ArrowLeft", "a", "A"].includes(e.key)) {
-        setPendingDir(curr => turnToDir({ x: -1, y: 0 }));
-      }
-      if (["ArrowRight", "d", "D"].includes(e.key)) {
-        setPendingDir(curr => turnToDir({ x: 1, y: 0 }));
+      let nextDir = null;
+      if ([ "ArrowUp", "w", "W"].includes(e.key)) nextDir = { x: 0, y: -1 };
+      if ([ "ArrowDown", "s", "S"].includes(e.key)) nextDir = { x: 0, y: 1 };
+      if ([ "ArrowLeft", "a", "A"].includes(e.key)) nextDir = { x: -1, y: 0 };
+      if ([ "ArrowRight", "d", "D"].includes(e.key)) nextDir = { x: 1, y: 0 };
+
+      if (nextDir) {
+        // Core fix: Ignore direct reversal (unless length==1)
+        setPendingDir(curr => {
+          let currDir = reverse ? reverseDir(direction) : direction;
+          // Disallow reversing directly (unless just one segment)
+          if (snake.length > 1 && isOpposite(currDir, nextDir)) {
+            // ignore
+            return curr;
+          }
+          return nextDir;
+        });
       }
       if ((e.key === " " || e.key === "Enter") && gameState !== "running") {
         restartGame();
@@ -212,18 +217,35 @@ function SnakeGamePage() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
     // eslint-disable-next-line
-  }, [gameState, reverse, direction]);
+  }, [gameState, reverse, direction, snake.length]);
 
-  // Tick main game
+  // --- MOVEMENT + COLLISION (WITH BORDER/SELF CHECK) ---
   function gameLoop() {
     setSnake(prevSnake => {
       let curDir = reverse ? reverseDir(pendingDir) : pendingDir;
-      if (isOpposite(curDir, direction) && prevSnake.length > 1 && !reverse)
-        curDir = direction; // prevent fatal flip
+      // Disallow direct-reverse movement
+      if (isOpposite(curDir, direction) && prevSnake.length > 1 && !reverse) {
+        curDir = direction;
+      }
+
       setDirection(curDir);
 
-      // Next head (with wrapping)
-      let head = nextHead(prevSnake[0], curDir);
+      // Next head, with edge wrapping (change for strict border: remove '% ...')
+      let head = {
+        x: prevSnake[0].x + curDir.x,
+        y: prevSnake[0].y + curDir.y
+      };
+
+      // --- BORDER CHECK (ends game if out of bounds) ---
+      if (
+        head.x < 0 ||
+        head.x >= BOARD_SIZE ||
+        head.y < 0 ||
+        head.y >= BOARD_SIZE
+      ) {
+        triggerGameOver("You hit the wall!");
+        return prevSnake;
+      }
 
       // Collision with obstacles?
       if (obstacles.some(o => cellEq(o, head))) {
@@ -235,7 +257,7 @@ function SnakeGamePage() {
         triggerGameOver("You ran into yourself!");
         return prevSnake;
       }
-      // Bomb check
+      // Bomb or food
       const hitFoodIdx = food.findIndex(f => cellEq(f.cell, head));
       if (hitFoodIdx !== -1) {
         const f = food[hitFoodIdx];
@@ -248,65 +270,56 @@ function SnakeGamePage() {
           triggerGameOver("That apple was a FAKE! 💀");
           return prevSnake;
         }
-        // Special: SPEED UP
         if (f.type === "speedup") doSpeedup();
-
-        // Scoring, extend snake, remove that food and respawn
         setScore(s => s + getFoodType(f.type).score);
         const growPart = [head, ...prevSnake];
         removeFoodTimed(f.id);
         setFood(fs => {
           let next = fs.filter((ff) => ff.id !== f.id);
-          // Replenish food if just one left or consumed special
           if (next.length < 3) {
             next = next.concat(genFoods(growPart, obstacles, next));
           }
           return next;
         });
-        // Maybe reverse controls on even multiples
         if ((f.type === "speedup" || f.type === "classic") && Math.random() <= 0.12) {
           blinkReverse();
         }
         return growPart;
       } else {
-        // Normal move (no food), tail shrinks
-        let tailStop = prevSnake.length - 1;
+        // normal move
+        const tailStop = prevSnake.length - 1;
         return [head, ...prevSnake.slice(0, tailStop)];
       }
     });
     setFrame(f => f + 1);
-    // Remove expired food
     cleanupOldFood();
-
-    // Obstacles are handled on separate timer, not in main game loop
   }
 
-  // Turn handler: ignores actually flipping to same/opposite direction
+  // Turn handler
   function turnToDir(newDir) {
     return reverse ? reverseDir(newDir) : newDir;
   }
 
-  // Moving obstacles mechanic
+  // --- MOVING OBSTACLES ---
   function moveObstacles() {
     setObstacles(prevObs => {
-      // Move each obstacle in a random direction (avoiding snake/food/other obstacle if possible)
       return prevObs.map((o, idx) => {
         const choices = [
           { x: 0, y: -1 }, { x: 0, y: 1 },
           { x: -1, y: 0 }, { x: 1, y: 0 }
         ];
-        // Sometimes obstacles just blink in place
         if (Math.random() < 0.19) return o;
-        // Shuffle directions for randomness
         let dirs = choices.sort(() => Math.random() - 0.5);
         for (let dir of dirs) {
           let npos = {
-            x: (o.x + dir.x + BOARD_SIZE) % BOARD_SIZE,
-            y: (o.y + dir.y + BOARD_SIZE) % BOARD_SIZE
+            x: o.x + dir.x,
+            y: o.y + dir.y
           };
           if (
+            npos.x >= 0 && npos.x < BOARD_SIZE &&
+            npos.y >= 0 && npos.y < BOARD_SIZE &&
             !snake.some(s => cellEq(s, npos)) &&
-            !obstacles.some((ob, oi) => oi !== idx && cellEq(ob, npos)) &&
+            !prevObs.some((ob, oi) => oi !== idx && cellEq(ob, npos)) &&
             !food.some(f => cellEq(f.cell, npos))
           ) {
             return npos;
@@ -318,7 +331,6 @@ function SnakeGamePage() {
   }
 
   // --- FOOD MANAGEMENT ---
-  // Remove/dispose food by ID and its timer
   function removeFoodTimed(id) {
     setFoodTimers(ft => {
       if (ft[id]) {
@@ -331,20 +343,16 @@ function SnakeGamePage() {
     });
   }
 
-  // Remove expired foods, respawn if needed
   function cleanupOldFood() {
     setFood(fs => {
       const now = Date.now();
-      let changed = false;
       let filtered = fs.filter(f => {
         if (f.expires && f.expires < now) {
           removeFoodTimed(f.id);
-          changed = true;
           return false;
         }
         return true;
       });
-      // Respawn if all food eaten
       if (filtered.length < 2) {
         filtered = filtered.concat(genFoods(snake, obstacles, filtered));
       }
@@ -352,7 +360,6 @@ function SnakeGamePage() {
     });
   }
 
-  // Used to spawn food, may schedule special foods to disappear in time
   function genFoods(snakeArr, obsArr, existingFoodsArr = []) {
     const taken = [
       ...(snakeArr || []),
@@ -367,13 +374,11 @@ function SnakeGamePage() {
       { type: "fake", prob: FAKE_FOOD_CHANCE }
     ].sort(() => Math.random() - 0.5);
 
-    // Always at least 1 classic food
     foods.push({
       ...randomFoodCell(taken),
       type: "classic",
       id: "classic-" + Math.random().toString(36).substring(2, 9)
     });
-    // Bonus/specials
     fTypes.forEach((def) => {
       if (Math.random() < def.prob) {
         foods.push({
@@ -386,7 +391,6 @@ function SnakeGamePage() {
         });
       }
     });
-    // Install timers for special food if needed:
     foods.forEach(food => {
       if (food.expires) {
         setFoodTimers(ft => {
@@ -406,18 +410,15 @@ function SnakeGamePage() {
     return foods;
   }
 
-  // Random cell not in taken, with .cell field
   function randomFoodCell(taken) {
     const cell = randomCell(taken);
     return { cell };
   }
 
-  // Used to lookup food type object
   function getFoodType(ftype) {
     return FOOD_TYPES.find(f => f.type === ftype) || FOOD_TYPES[0];
   }
 
-  // Generate obstacles (avoid snake head/tail)
   function genObstacles(snakeArr) {
     let obs = [];
     let taken = [...snakeArr];
@@ -438,7 +439,7 @@ function SnakeGamePage() {
     }, 3500);
   }
 
-  // --- SPEEDUP MECHANIC (for a few seconds) ---
+  // --- SPEEDUP MECHANIC ---
   function doSpeedup() {
     setSpeed(GAME_SPEED_FAST);
     setMessage("⚡ Speed up!");
@@ -454,11 +455,9 @@ function SnakeGamePage() {
     setMessage(msg);
     setLastScore(score);
     persistScore(score);
-    // High Score logic
     setBestScore(prev =>
       (score > prev) ? (saveBest(score), score) : prev
     );
-    // Clear food timers
     for (const id in foodTimers) {
       clearTimeout(foodTimers[id]);
     }
@@ -510,7 +509,7 @@ function SnakeGamePage() {
     // eslint-disable-next-line
   }, []);
 
-  // --- RENDERING ---
+  // --- RENDER ---
   return (
     <div className="snake-root" style={{ minHeight: "100vh", fontFamily: "'Montserrat', 'Inter', Arial, sans-serif", background: "linear-gradient(120deg, #13d1b3 0%, #3b34bd 100%)" }}>
       <SnakeArcadeCSS />
@@ -553,7 +552,6 @@ function SnakeGamePage() {
               for (let y = 0; y < BOARD_SIZE; y++) {
                 for (let x = 0; x < BOARD_SIZE; x++) {
                   const idx = y * BOARD_SIZE + x;
-                  // Snake
                   const sIdx = snake.findIndex(se => se.x === x && se.y === y);
                   if (sIdx === 0) {
                     // Head
@@ -606,7 +604,6 @@ function SnakeGamePage() {
                       </div>
                     );
                   }
-                  // Empty cell
                   else {
                     boardArr.push(
                       <div key={idx}
@@ -688,7 +685,7 @@ function SnakeGamePage() {
           fontSize: "1.04em"
         }}>
           <span role="img" aria-label="keyboard">⌨️</span>
-          Use W/A/S/D or Arrow keys to move. Eat apples (🍏), speed boosts (⚡), avoid bombs/obstacles (💣). Edge wraps you to the other side!
+          Use W/A/S/D or Arrow keys to move. Eat apples (🍏), speed boosts (⚡), avoid bombs/obstacles (💣). If you hit the wall or yourself, the game ends!
           <br />
           <span style={{ color: "#35eaf9" }}>
             High Score: {bestScore ?? 0}
