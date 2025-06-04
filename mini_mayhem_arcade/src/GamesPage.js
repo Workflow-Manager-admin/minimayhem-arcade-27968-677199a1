@@ -37,7 +37,8 @@ const GAMES = [
     icon: "⌨️",
     tagline: "Type words quickly and accurately. Boost your typing power!",
     tag: "Skill",
-    color: "#4F46E5"
+    color: "#4F46E5",
+    playPath: "/games/typing"
   },
   {
     name: "Quick Math",
@@ -71,6 +72,7 @@ function getLocalHighScores() {
   // Get Memory Game last score object { moves, time }
   let memoryGameScore = null;
   let reactionGameScore = null;
+  let typingBestWpm = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -96,6 +98,16 @@ function getLocalHighScores() {
       }
     } catch (e) {
       // ignore
+    }
+
+    // Typing Challenge best WPM from localStorage
+    try {
+      const typingRaw = window.localStorage.getItem("mmarcade-typing-bestwpm");
+      if (typingRaw !== null && !isNaN(parseFloat(typingRaw))) {
+        typingBestWpm = Math.round(parseFloat(typingRaw) * 100) / 100;
+      }
+    } catch (e) {
+      // ignore/invalid
     }
   }
 
@@ -123,11 +135,19 @@ function getLocalHighScores() {
     reactionDisplay = "No score yet";
   }
 
+  // Format Typing Challenge best WPM display
+  let typingDisplay;
+  if (typeof typingBestWpm === "number" && !isNaN(typingBestWpm)) {
+    typingDisplay = typingBestWpm;
+  } else {
+    typingDisplay = "No score yet";
+  }
+
   // Other games remain placeholder for now
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
-    { game: "Typing Challenge", score: 41 },
+    { game: "Typing Challenge", score: typingDisplay },
     { game: "Quick Math", score: 34 }
   ];
 }
