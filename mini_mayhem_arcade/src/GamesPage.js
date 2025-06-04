@@ -81,7 +81,7 @@ const FEATURED_GAME = {
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Supports Block Game (no Snake logic).
+ * Now includes Shadow Runner (best score).
  */
 function getLocalHighScores() {
   let blockHighScore = null;
@@ -91,6 +91,7 @@ function getLocalHighScores() {
   let sudokuBestTime = null;
   let slidingBestMoves = null;
   let slidingBestTime = null;
+  let shadowRunnerBest = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -139,56 +140,64 @@ function getLocalHighScores() {
         }
       }
     } catch (e) {}
+
+    // Shadow Runner: best (farthest score)—store key as "shadowRunnerBestScore"
+    try {
+      const shadowRunnerRaw = window.localStorage.getItem("shadowRunnerBestScore");
+      if (shadowRunnerRaw !== null && !isNaN(parseInt(shadowRunnerRaw, 10))) {
+        shadowRunnerBest = parseInt(shadowRunnerRaw, 10);
+      }
+    } catch (e) {}
   }
 
-  let blockDisplay;
-  if (typeof blockHighScore === "number" && !isNaN(blockHighScore)) {
-    blockDisplay = blockHighScore;
+  let blockDisplay = (typeof blockHighScore === "number" && !isNaN(blockHighScore))
+    ? blockHighScore
+    : "No score yet";
+
+  let memoryDisplay = memoryGameScore
+    ? (() => {
+        const m = Math.floor(memoryGameScore.time / 60);
+        const s = memoryGameScore.time % 60;
+        const timeStr = `${m}:${s < 10 ? "0" : ""}${s}`;
+        return `${memoryGameScore.moves} moves, ${timeStr}`;
+      })()
+    : "No score yet";
+
+  let reactionDisplay = (typeof reactionGameScore === "number" && !isNaN(reactionGameScore))
+    ? (reactionGameScore > 1200
+      ? (reactionGameScore / 1000).toFixed(3) + "s"
+      : reactionGameScore + " ms")
+    : "No score yet";
+
+  let sudokuDisplay = (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime))
+    ? (() => {
+        const m = Math.floor(sudokuBestTime / 60);
+        const s = sudokuBestTime % 60;
+        return `${m}:${s < 10 ? "0" : ""}${s}`;
+      })()
+    : "No score yet";
+
+  let slidingDisplay =
+    typeof slidingBestMoves === "number" && typeof slidingBestTime === "number"
+      ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
+      : "No win yet";
+
+  // Shadow Runner display logic
+  let shadowRunnerDisplay;
+  if (typeof shadowRunnerBest === "number" && !isNaN(shadowRunnerBest)) {
+    shadowRunnerDisplay = `${shadowRunnerBest} m`;
   } else {
-    blockDisplay = "No score yet";
+    shadowRunnerDisplay = "No score yet";
   }
 
-  let memoryDisplay;
-  if (memoryGameScore) {
-    const m = Math.floor(memoryGameScore.time / 60);
-    const s = memoryGameScore.time % 60;
-    const timeStr = `${m}:${s < 10 ? "0" : ""}${s}`;
-    memoryDisplay = `${memoryGameScore.moves} moves, ${timeStr}`;
-  } else {
-    memoryDisplay = "No score yet";
-  }
-
-  let reactionDisplay;
-  if (typeof reactionGameScore === "number" && !isNaN(reactionGameScore)) {
-    if (reactionGameScore > 1200) {
-      reactionDisplay = (reactionGameScore / 1000).toFixed(3) + "s";
-    } else {
-      reactionDisplay = reactionGameScore + " ms";
-    }
-  } else {
-    reactionDisplay = "No score yet";
-  }
-
-  let sudokuDisplay;
-  if (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime)) {
-    const m = Math.floor(sudokuBestTime / 60);
-    const s = sudokuBestTime % 60;
-    sudokuDisplay = `${m}:${s < 10 ? "0" : ""}${s}`;
-  } else {
-    sudokuDisplay = "No score yet";
-  }
-
-  let slidingDisplay = (typeof slidingBestMoves === "number" && typeof slidingBestTime === "number")
-    ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
-    : "No win yet";
-
-  // Score snapshot omits Typing Challenge (will later add Shadow Runner if needed)
+  // Score snapshot: new Shadow Runner entry appended.
   return [
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
-    { game: "Sudoku", score: sudokuDisplay }
+    { game: "Sudoku", score: sudokuDisplay },
+    { game: "Shadow Runner", score: shadowRunnerDisplay }
   ];
 }
 
