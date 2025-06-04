@@ -63,7 +63,7 @@ const GAMES = [
   }
 ];
 
-// Example featured game (could pick randomly per day in a real app)
+// Featured game is now Word Ladder
 const FEATURED_GAME = {
   name: "Word Ladder",
   icon: "🔗",
@@ -73,13 +73,14 @@ const FEATURED_GAME = {
 
 /**
  * Get local high scores for display in scoreboard widget.
- * Include Sudoku best time (sudokuBestTime).
+ * Includes Word Ladder best steps as part of snapshot.
  */
 function getLocalHighScores() {
   let memoryGameScore = null;
   let reactionGameScore = null;
   let typingBestWpm = null;
   let sudokuBestTime = null;
+  let wordLadderBestSteps = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -107,6 +108,12 @@ function getLocalHighScores() {
       const sudokuRaw = window.localStorage.getItem("sudokuBestTime");
       if (sudokuRaw !== null && !isNaN(parseInt(sudokuRaw, 10))) {
         sudokuBestTime = parseInt(sudokuRaw, 10);
+      }
+    } catch (e) {}
+    try {
+      const ladderRaw = window.localStorage.getItem("mmarcade-wordladder-hard-best");
+      if (ladderRaw !== null && !isNaN(parseInt(ladderRaw, 10))) {
+        wordLadderBestSteps = parseInt(ladderRaw, 10);
       }
     } catch (e) {}
   }
@@ -139,7 +146,6 @@ function getLocalHighScores() {
     typingDisplay = "No score yet";
   }
 
-  // --- Sudoku Best Time ---
   let sudokuDisplay;
   if (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime)) {
     const m = Math.floor(sudokuBestTime / 60);
@@ -149,10 +155,15 @@ function getLocalHighScores() {
     sudokuDisplay = "No score yet";
   }
 
+  let wordLadderDisplay = (typeof wordLadderBestSteps === "number" && !isNaN(wordLadderBestSteps))
+    ? `${wordLadderBestSteps} steps`
+    : "No win yet";
+
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
+    { game: "Word Ladder", score: wordLadderDisplay },
     { game: "Sudoku", score: sudokuDisplay }
   ];
 }
@@ -190,7 +201,6 @@ function GamesPage() {
           <h2 className="sr-only" id="games-gallery-title">Available Mini-Games</h2>
           <div className="games-card-grid" ref={gridRef}>
             {GAMES.map((g, i) => {
-              // Use pre-set playPath for special routes, else slugify
               let playPath = g.playPath || `/games/${slugify(g.name)}`;
               return (
                 <GameCard
