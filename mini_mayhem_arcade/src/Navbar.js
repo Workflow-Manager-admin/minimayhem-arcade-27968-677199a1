@@ -107,9 +107,6 @@ function Navbar() {
             aria-label="Main menu"
           >
             <li>
-              <a href="/" className="mmarcade-nav-link" tabIndex={menuOpen || window.innerWidth > 900 ? 0 : -1}>Home</a>
-            </li>
-            <li>
               <a href="/games" className="mmarcade-nav-link" tabIndex={menuOpen || window.innerWidth > 900 ? 0 : -1}>Games</a>
             </li>
             <li>
