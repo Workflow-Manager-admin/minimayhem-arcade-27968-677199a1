@@ -102,19 +102,26 @@ function GamesPage() {
         <section className="games-card-gallery-section" aria-labelledby="games-gallery-title">
           <h2 className="sr-only" id="games-gallery-title">Available Mini-Games</h2>
           <div className="games-card-grid" ref={gridRef}>
-            {GAMES.map((g, i) => (
-              <GameCard
-                key={g.name}
-                icon={g.icon}
-                title={g.name}
-                desc={g.tagline}
-                color={g.color}
-                tag={g.tag}
-                playPath={`/games/${slugify(g.name)}`}
-                // use i for animation delay
-                style={{ animationDelay: (0.08 * i) + "s" }}
-              />
-            ))}
+            {GAMES.map((g, i) => {
+              // Custom playPath for Memory Game to go to /games/memory, not /games/memory-game
+              let playPath =
+                g.name.toLowerCase().trim() === "memory game"
+                  ? "/games/memory"
+                  : `/games/${slugify(g.name)}`;
+              return (
+                <GameCard
+                  key={g.name}
+                  icon={g.icon}
+                  title={g.name}
+                  desc={g.tagline}
+                  color={g.color}
+                  tag={g.tag}
+                  playPath={playPath}
+                  // use i for animation delay
+                  style={{ animationDelay: (0.08 * i) + "s" }}
+                />
+              );
+            })}
           </div>
         </section>
       </main>
