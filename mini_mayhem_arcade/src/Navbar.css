@@ -267,37 +267,177 @@
   justify-content: flex-end;
 }
 
-/* Theme toggle button */
-.theme-toggle {
+/* --- Stylish Theme Toggle Switch --- */
+.arcade-toggle-switch-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: var(--navbar-hover, #4f46e5);
-  border: none;
-  border-radius: 7px;
+  justify-content: flex-end;
+  margin-left: 0.5em;
+}
+
+.arcade-toggle-switch {
+  --toggle-width: 50px;
+  --toggle-height: 28px;
+  --track-bg-light: #e7eefa;
+  --track-bg-dark: #23254a;
+  --track-bg-active: #4f46e5;
+  --thumb-size: 32px;
+  --thumb-gap: 2.5px;
+  --focus-shadow: 0 0 0 3px rgba(79,70,229,0.22);
+  --sun-color: #ffe066;
+  --moon-color: #3749a4;
   cursor: pointer;
-  padding: 7px 14px;
-  color: #fff;
-  font-size: 1.05rem;
-  min-width: 0;
-  min-height: 37px;
-  transition: background .14s, box-shadow .13s;
-  box-shadow: 0 1px 6px 0 #14315522;
-  outline: none;
-}
-.theme-toggle:focus,
-.theme-toggle:hover {
-  background: #3730a3;
-  color: #fff;
-}
-.theme-toggle-icon {
   display: flex;
   align-items: center;
-  font-size: 1.45rem;
-}
-.theme-toggle-label {
+  outline: none;
+  user-select: none;
+  position: relative;
+  font-family: inherit;
   font-size: 1rem;
-  font-weight: 600;
+  min-width: calc(var(--toggle-width) + 70px);
+}
+.arcade-toggle-switch:focus-visible {
+  box-shadow: var(--focus-shadow);
+  border-radius: 2em;
+}
+.arcade-toggle-switch .arcade-toggle-label {
+  margin-left: 15px;
+  margin-right: 4px;
+  font-size: 1.04rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--navbar-text, #222);
+  transition: color 0.32s;
+}
+
+.arcade-toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.arcade-toggle-track {
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  background: var(--track-bg-light);
+  border-radius: 2em;
+  position: relative;
+  transition: background 0.28s cubic-bezier(.67,.16,.43,.81), box-shadow 0.18s;
+  box-shadow: 0 2px 7px #15155e19;
+  display: inline-flex;
+  align-items: center;
+}
+
+[data-theme="dark"] .arcade-toggle-track {
+  background: var(--track-bg-dark);
+}
+
+.arcade-toggle-switch[aria-checked="true"] .arcade-toggle-track {
+  background: var(--track-bg-active);
+  box-shadow: 0 4px 12px #4f46e567;
+}
+
+/* Thumb */
+.arcade-toggle-thumb {
+  position: absolute;
+  top: 50%;
+  left: var(--thumb-gap);
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1.5px 8px #4f46e540, 0 2px 9px #2221;
+  transform: translateY(-50%) translateX(0);
+  transition:
+    background 0.24s cubic-bezier(.45,.7,.48,1),
+    box-shadow 0.19s,
+    left 0.34s cubic-bezier(.46,.11,.27,1),
+    filter 0.13s;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  will-change: left;
+  font-size: 1.33em;
+}
+
+.arcade-toggle-switch[aria-checked="true"] .arcade-toggle-thumb {
+  left: calc(100% - var(--thumb-size) - var(--thumb-gap));
+  background: #111836;
+  filter: brightness(1.08) drop-shadow(0 0 6px #4f46e540);
+}
+
+/* Animated sun/moon icon */
+.arcade-sun-icon, .arcade-moon-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.27s cubic-bezier(.33,.91,.51,.99), opacity 0.26s;
+  /* Added sparkle/scale for feedback */
+}
+
+.arcade-toggle-switch[aria-checked="true"] .arcade-sun-icon {
+  opacity: 0; transform: scale(0.65) rotate(-16deg);
+  transition: opacity 0.32s, transform 0.29s;
+}
+.arcade-toggle-switch[aria-checked="true"] .arcade-moon-icon {
+  opacity: 1; transform: scale(1) rotate(0deg);
+}
+
+.arcade-toggle-switch[aria-checked="false"] .arcade-moon-icon {
+  opacity: 0; transform: scale(0.65) rotate(20deg);
+  transition: opacity 0.32s, transform 0.29s;
+}
+.arcade-toggle-switch[aria-checked="false"] .arcade-sun-icon {
+  opacity: 1; transform: scale(1) rotate(0deg);
+}
+
+/* Focus/active/touch feedback */
+.arcade-toggle-switch:active .arcade-toggle-track,
+.arcade-toggle-switch:focus .arcade-toggle-track {
+  box-shadow: 0 0 0 3px #ffc80091, 0 2px 8px #4f46e551;
+}
+.arcade-toggle-thumb:active,
+.arcade-toggle-thumb:focus {
+  filter: brightness(1.19) drop-shadow(0px 0px 4px #fbc97b);
+}
+
+.arcade-toggle-switch:focus-visible .arcade-toggle-thumb {
+  outline: 2.5px solid #ffd447;
+  outline-offset: 3px;
+}
+
+/* Responsive – shrink slightly at mobile widths */
+@media (max-width: 600px) {
+  .arcade-toggle-switch {
+    --toggle-width: 38px;
+    --toggle-height: 21px;
+    --thumb-size: 20px;
+    font-size: .95em;
+    min-width: unset;
+  }
+  .arcade-toggle-label {
+    font-size: .98rem;
+    margin-left: 9px;
+  }
+}
+
+/* Remove legacy theme-toggle button style to avoid clash */
+.theme-toggle,
+.theme-toggle:focus,
+.theme-toggle:hover,
+.theme-toggle:active {
+  display: none !important;
+  background: none !important;
+  color: inherit !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  min-width: 0 !important;
 }
 
 /* Responsive: mobile nav logic */
