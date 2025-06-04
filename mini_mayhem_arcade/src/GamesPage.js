@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import "./GamesPage.css";
 import Navbar from "./Navbar";
+import { Link } from "react-router-dom";
 
 /*
  * PUBLIC_INTERFACE
@@ -181,14 +182,14 @@ function GameCard({ icon, title, desc, color, tag, playPath, style }) {
         {tag && <span className="game-tag">{tag}</span>}
       </div>
       <span className="game-desc">{desc}</span>
-      <a
-        href={playPath}
+      <Link
+        to={playPath}
         className="game-play-btn"
         tabIndex={0}
         aria-label={`Play ${title}`}
       >
         Play Now
-      </a>
+      </Link>
     </article>
   );
 }
