@@ -44,7 +44,12 @@ function App() {
             {/* NEW: Shadow Runner placeholder route */}
             <Route
               path="/games/shadow-runner"
-              element={<ComingSoon title="Shadow Runner Coming Soon!" description="This endless runner mini-game is in development. Check back soon to dash and dodge your way to a new high score!" />}
+              element={
+                <ComingSoon
+                  title="Shadow Runner Coming Soon!"
+                  description="This endless runner mini-game is in development. Check back soon to dash and dodge your way to a new high score!"
+                />
+              }
             />
             <Route path="/scoreboard" element={<ScoreboardPage />} />
             {/* About & Privacy page routed to /about-privacy */}
