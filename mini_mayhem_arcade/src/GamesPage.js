@@ -78,6 +78,7 @@ const FEATURED_GAME = {
 /**
  * Get local high scores for display in scoreboard widget.
  * Now includes Sliding Tile Puzzle best steps/time.
+ * Adds Snake game with best and last run scores from localStorage.
  */
 function getLocalHighScores() {
   let memoryGameScore = null;
@@ -86,6 +87,8 @@ function getLocalHighScores() {
   let sudokuBestTime = null;
   let slidingBestMoves = null;
   let slidingBestTime = null;
+  let snakeBestScore = null;
+  let snakeLastScore = null;
 
   if (typeof window !== "undefined") {
     try {
@@ -127,6 +130,22 @@ function getLocalHighScores() {
         slidingBestTime = parseInt(slidingTime, 10);
       }
     } catch (e) {}
+
+    // Add Snake scores:
+    try {
+      // Best score for snake: "snakeGameBestScore"
+      const sbest = window.localStorage.getItem("snakeGameBestScore");
+      if (sbest !== null && !isNaN(parseInt(sbest, 10))) {
+        snakeBestScore = parseInt(sbest, 10);
+      }
+    } catch (e) {}
+    try {
+      // Last run score for snake: "snakeGameLastScore"
+      const slast = window.localStorage.getItem("snakeGameLastScore");
+      if (slast !== null && !isNaN(parseInt(slast, 10))) {
+        snakeLastScore = parseInt(slast, 10);
+      }
+    } catch (e) {}
   }
 
   let memoryDisplay;
@@ -157,6 +176,13 @@ function getLocalHighScores() {
     typingDisplay = "No score yet";
   }
 
+  let snakeDisplay = (typeof snakeBestScore === "number" && !isNaN(snakeBestScore))
+    ? `Best: ${snakeBestScore}`
+    : "No best yet";
+  let snakeRecentDisplay = (typeof snakeLastScore === "number" && !isNaN(snakeLastScore))
+    ? `Last: ${snakeLastScore}`
+    : "No recent run";
+
   let sudokuDisplay;
   if (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime)) {
     const m = Math.floor(sudokuBestTime / 60);
@@ -170,10 +196,13 @@ function getLocalHighScores() {
     ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
     : "No win yet";
 
+  // Now return with Snake included as two rows:
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
+    { game: "Snake (Hard) – Best", score: snakeDisplay },
+    { game: "Snake (Hard) – Last Run", score: snakeRecentDisplay },
     { game: "Sliding Tile Puzzle", score: slidingDisplay },
     { game: "Sudoku", score: sudokuDisplay }
   ];
