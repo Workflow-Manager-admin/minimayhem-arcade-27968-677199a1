@@ -1,261 +1,305 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./SlidingTilePuzzlePage.css";
 
-// Size of the board (can allow difficulty selector later)
-const BOARD_SIZE = 4;
-
 /**
- * Returns a fresh solved board (2D array, 0 = blank, tiles numbered 1..N^2-1)
+ * PUBLIC_INTERFACE
+ * SlidingTilePuzzlePage
+ * Now supports grid size selection (4x4/5x5/6x6), move count, timer, undo, shuffle, and proper win detection.
  */
-function createSolvedBoard(size) {
-  const arr = [];
-  let n = 1;
-  for (let y = 0; y < size; y++) {
-    arr.push([]);
-    for (let x = 0; x < size; x++) {
-      if (y === size - 1 && x === size - 1) {
-        arr[y].push(0); // blank
-      } else {
-        arr[y].push(n++);
-      }
-    }
-  }
-  return arr;
-}
-
-/**
- * Checks if the given board is SOLVED (tiles 1..N^2-1 in order, blank at end)
- */
-function checkSolved(bd) {
-  let n = 1;
-  const N = bd.length;
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      if (y === N - 1 && x === N - 1) {
-        if (bd[y][x] !== 0) return false;
-      } else if (bd[y][x] !== n++) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-/**
- * Check if the current board is solvable using inversion logic.
- * Supports both odd NxN and even NxN.
- */
-function isSolvable(board) {
-  const N = board.length;
-  const flat = board.flat();
-  let inversions = 0;
-  for (let i = 0; i < flat.length; ++i) {
-    for (let j = i + 1; j < flat.length; ++j) {
-      if (flat[i] && flat[j] && flat[i] > flat[j]) inversions++;
-    }
-  }
-  let blankRowFromBottom;
-  for (let y = 0; y < N; y++) {
-    for (let x = 0; x < N; x++) {
-      if (board[y][x] === 0) blankRowFromBottom = N - y;
-    }
-  }
-  if (N % 2 === 1) {
-    // Odd: solvable if inversions even
-    return inversions % 2 === 0;
-  } else {
-    // Even: solvable if (blankRowFromBottom even and inversions odd) or vice versa
-    return ((blankRowFromBottom % 2 === 0) === (inversions % 2 === 1));
-  }
-}
-
-/**
- * Deep copies a board (2D array)
- */
-function deepCopyBoard(bd) {
-  return bd.map((row) => [...row]);
-}
-
-function findBlank(bd) {
-  for (let y = 0; y < bd.length; y++) {
-    for (let x = 0; x < bd[0].length; x++) {
-      if (bd[y][x] === 0) return { x, y };
-    }
-  }
-  return null;
-}
-
-function canMoveTile(bd, x, y) {
-  const { x: bx, y: by } = findBlank(bd);
-  return (
-    (x === bx && Math.abs(y - by) === 1) ||
-    (y === by && Math.abs(x - bx) === 1)
-  );
-}
-
-// PUBLIC_INTERFACE
 function SlidingTilePuzzlePage() {
-  // State for board & stats
-  const [board, setBoard] = useState(() => createSolvedBoard(BOARD_SIZE));
-  const [moves, setMoves] = useState(0);
-  const [won, setWon] = useState(false);
+  // Supported grid sizes
+  const SIZES = [4, 5, 6];
 
-  /**
-   * Shuffle the board into a random, solvable, non-solved state.
-   * Uses blank-move random shuffling to guarantee solvability.
-   * If board is accidentally solved at the end, tries again.
-   */
-  function shuffleSolvableUnsolved() {
-    let bd = createSolvedBoard(BOARD_SIZE);
-    let tries = 0;
-    let gotUnsolved = false;
-    while (!gotUnsolved && tries < 40) {
-      // Shuffle with valid blank moves (to ensure solvable and realistic positions)
-      bd = createSolvedBoard(BOARD_SIZE);
-      let blank = { ...findBlank(bd) };
-      // Do a sequence of random adjacent moves (80 steps for good mix)
-      for (let i = 0; i < 80; ++i) {
-        let neighbors = [];
-        if (blank.y > 0) neighbors.push([blank.x, blank.y - 1]);
-        if (blank.y < BOARD_SIZE - 1) neighbors.push([blank.x, blank.y + 1]);
-        if (blank.x > 0) neighbors.push([blank.x - 1, blank.y]);
-        if (blank.x < BOARD_SIZE - 1) neighbors.push([blank.x + 1, blank.y]);
-        const [nx, ny] = neighbors[Math.floor(Math.random() * neighbors.length)];
-        // Swap
-        bd[blank.y][blank.x] = bd[ny][nx];
-        bd[ny][nx] = 0;
-        blank = { x: nx, y: ny };
-      }
-      // Avoid producing a solved board (not fun), ensure solvable
-      if (!checkSolved(bd) && isSolvable(bd)) gotUnsolved = true;
-      tries++;
-    }
-    setBoard(deepCopyBoard(bd));
-    setMoves(0);
-    setWon(false);
-  }
+  // Main state
+  const [size, setSize] = useState(4);
+  const [tiles, setTiles] = useState([]);
+  const [emptyIdx, setEmptyIdx] = useState(0);
+  const [moveCount, setMoveCount] = useState(0);
+  const [gameWon, setGameWon] = useState(false);
+  const [history, setHistory] = useState([]); // For undo
+  const [timer, setTimer] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
+  const [fastestSolve, setFastestSolve] = useState(null); // Local best for size
 
-  /**
-   * On first mount, shuffle the board.
-   * This matches required: shuffle-on-mount, not just on replay/reset.
-   */
+  const timerRef = useRef();
+
+  // On grid size change
   useEffect(() => {
-    shuffleSolvableUnsolved();
+    initializeBoard(size);
     // eslint-disable-next-line
-  }, []);
+  }, [size]);
 
-  function handleTileClick(x, y) {
-    if (won) return; // No moves after win
-    if (!canMoveTile(board, x, y)) return;
-    const bcopy = deepCopyBoard(board);
-    const { x: bx, y: by } = findBlank(board);
-    // Swap tile and blank
-    bcopy[by][bx] = bcopy[y][x];
-    bcopy[y][x] = 0;
+  // Timer logic
+  useEffect(() => {
+    if (timerActive) {
+      timerRef.current = setInterval(() => setTimer((t) => t + 1), 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    return () => clearInterval(timerRef.current);
+  }, [timerActive]);
 
-    setBoard(bcopy);
-    setMoves((m) => m + 1);
-    if (checkSolved(bcopy)) {
-      setWon(true);
-      saveStats(moves + 1);
+  // Load best time/moves
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        // Best time and moves per-grid size (mmarcade-slidingtile-best-<size>)
+        const best = window.localStorage.getItem(`mmarcade-slidingtile-best-${size}`);
+        if (best) {
+          setFastestSolve(JSON.parse(best));
+        } else {
+          setFastestSolve(null);
+        }
+      } catch {}
+    }
+  }, [size, gameWon]);
+
+  // Format time as mm:ss
+  function formatTime(sec) {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  }
+
+  // Board init/reset: shuffle to random solvable/unsolved board
+  function initializeBoard(sz) {
+    const arr = Array.from({ length: sz * sz }, (_, i) => i);
+    let shuffled = [];
+    do {
+      shuffled = arr.slice().sort(() => Math.random() - 0.5);
+    } while (!isSolvable(shuffled, sz) || isSolved(shuffled));
+    setTiles(shuffled);
+    setEmptyIdx(shuffled.indexOf(0));
+    setMoveCount(0);
+    setGameWon(false);
+    setHistory([]);
+    setTimer(0);
+    setTimerActive(false);
+    // Re-load solve best for this size
+    if (typeof window !== "undefined") {
+      try {
+        const best = window.localStorage.getItem(`mmarcade-slidingtile-best-${sz}`);
+        setFastestSolve(best ? JSON.parse(best) : null);
+      } catch {}
     }
   }
 
-  function handleReplay() {
-    shuffleSolvableUnsolved();
+  // Move logic with undo history
+  function handleTileClick(idx) {
+    if (gameWon) return;
+    const row = Math.floor(idx / size);
+    const col = idx % size;
+    const emptyRow = Math.floor(emptyIdx / size);
+    const emptyCol = emptyIdx % size;
+    const isAdjacent =
+      (row === emptyRow && Math.abs(col - emptyCol) === 1) ||
+      (col === emptyCol && Math.abs(row - emptyRow) === 1);
+
+    if (isAdjacent) {
+      // Start timer on first move
+      if (moveCount === 0 && timer === 0) setTimerActive(true);
+      // Store history for undo (prev tiles, emptyIdx)
+      setHistory((prev) => [...prev, { tiles: [...tiles], emptyIdx, moveCount }]);
+      const newTiles = tiles.slice();
+      [newTiles[emptyIdx], newTiles[idx]] = [newTiles[idx], newTiles[emptyIdx]];
+      setTiles(newTiles);
+      setEmptyIdx(idx);
+      setMoveCount((m) => m + 1);
+
+      // Win check after move
+      if (isSolved(newTiles)) {
+        setTimerActive(false);
+        setGameWon(true);
+        saveBestIfNeeded(moveCount + 1, timer + 0, size);
+      }
+    }
   }
 
-  // Save best stats locally
-  function saveStats(movesVal) {
+  // Undo: revert to last prev state
+  function handleUndo() {
+    if (!history.length || moveCount === 0) return;
+    const last = history[history.length - 1];
+    setTiles(last.tiles);
+    setEmptyIdx(last.emptyIdx);
+    setMoveCount(last.moveCount);
+    setHistory((h) => h.slice(0, h.length - 1));
+    setGameWon(false);
+    setTimerActive(last.moveCount > 0);
+  }
+
+  // Restart button
+  function handleRestart() {
+    initializeBoard(size);
+  }
+
+  // Grid size selector handler
+  function handleSizeChange(e) {
+    const val = parseInt(e.target.value, 10);
+    if (!SIZES.includes(val)) return;
+    setSize(val);
+  }
+
+  // Keyboard: undo ("u" or "z"), restart ("r"), navigation
+  useEffect(() => {
+    function handler(e) {
+      if (e.key === "u" || e.key === "U" || e.key === "z" || e.key === "Z") {
+        handleUndo();
+      }
+      if (e.key === "r" || e.key === "R") {
+        handleRestart();
+      }
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight" || e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "h" || e.key === "j" || e.key === "k" || e.key === "l") {
+        // Allow future keyboard controls for tile sliding if desired
+        // (not implemented in base version - only pointer/click)
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+    // eslint-disable-next-line
+  }, [history, moveCount, size, tiles, emptyIdx]);
+
+  // PUBLIC_INTERFACE: isSolved (goal state for arbitrary size, all ascending w/only one 0 last)
+  function isSolved(arr) {
+    for (let i = 0; i < arr.length - 1; ++i) {
+      if (arr[i] !== i + 1) return false;
+    }
+    // Last tile must be empty
+    if (arr[arr.length - 1] !== 0) return false;
+    return true;
+  }
+
+  // PUBLIC_INTERFACE: isSolvable for arbitrary board size (classic N-puzzle rules)
+  function isSolvable(arr, n) {
+    let inv = 0;
+    for (let i = 0; i < arr.length; ++i) {
+      for (let j = i + 1; j < arr.length; ++j) {
+        if (arr[i] && arr[j] && arr[i] > arr[j]) inv++;
+      }
+    }
+    // If n is odd, inversions even → solvable
+    if (n % 2 === 1) return inv % 2 === 0;
+    // even n: blank on even row from bottom, inversions odd
+    const emptyRowFromBottom = n - Math.floor(arr.indexOf(0) / n);
+    if (emptyRowFromBottom % 2 === 0) return inv % 2 === 1;
+    return inv % 2 === 0;
+  }
+
+  // Best result: localStorage per grid size (as object)
+  function saveBestIfNeeded(moves, time, sz) {
     try {
       if (typeof window !== "undefined") {
-        const prevMoves = Number(
-          window.localStorage.getItem("mmarcade-slidingtile-bestmoves") || "10000"
-        );
-        if (!prevMoves || movesVal < prevMoves) {
-          window.localStorage.setItem("mmarcade-slidingtile-bestmoves", movesVal);
+        const key = `mmarcade-slidingtile-best-${sz}`;
+        let prev = window.localStorage.getItem(key);
+        let best = prev ? JSON.parse(prev) : null;
+        // Moves prioritized first
+        const shouldSave =
+          !best ||
+          moves < best.moves ||
+          (moves === best.moves && time < best.time);
+        if (shouldSave) {
+          window.localStorage.setItem(key, JSON.stringify({ moves, time }));
+          setFastestSolve({ moves, time });
         }
       }
     } catch {}
   }
 
-  /**
-   * Render the puzzle board
-   */
-  function renderBoard() {
-    return (
-      <div className="slidingpuzzle-board" aria-label="Sliding tile puzzle grid">
-        {board.map((row, y) =>
-          row.map((v, x) => {
-            const isBlank = v === 0;
-            return (
-              <button
-                key={`${y}-${x}`}
-                className={
-                  "tile" +
-                  (isBlank ? " blank" : "") +
-                  (canMoveTile(board, x, y) && !isBlank && !won ? " movable" : "")
-                }
-                disabled={isBlank || won || !canMoveTile(board, x, y)}
-                onClick={() => handleTileClick(x, y)}
-                aria-label={isBlank ? "Blank tile" : `Tile ${v}`}
-                tabIndex={isBlank ? -1 : 0}
-              >
-                {!isBlank && v}
-              </button>
-            );
-          })
-        )}
-      </div>
-    );
-  }
-
-  /**
-   * Show a congratulatory message if won!
-   */
-  function renderWinBanner() {
-    if (!won) return null;
-    return (
-      <div className="slidingpuzzle-banner">
-        🎉 Puzzle solved in <b>{moves}</b> moves!
-        <button className="btn" onClick={handleReplay} style={{ marginLeft: 24 }}>
-          Play Again
-        </button>
-      </div>
-    );
-  }
-
+  // UI rendering for grid, controls, stats
   return (
-    <div className="slidingpuzzle-root" style={{ minHeight: "100vh" }}>
-      <div className="slidingpuzzle-card">
-        <header className="slidingpuzzle-header">
-          <h2 className="slidingpuzzle-title">
-            <span className="slidingpuzzle-icon" aria-hidden="true">
-              🔲
-            </span>{" "}
-            Sliding Tile Puzzle
+    <div className="slidetile-root">
+      <main className="slidetile-main">
+        <header className="slidetile-header">
+          <h2 className="slidetile-title">
+            <span className="slidetile-emoji">🔲</span> Sliding Tile Puzzle
           </h2>
-          <div className="slidingpuzzle-subtitle">
-            Arrange tiles from 1–15 in order by sliding them. Fewer moves = better!
+          <div className="slidetile-controls-row">
+            <label className="slidetile-size-label" htmlFor="slidetile-size">
+              Grid:
+              <select
+                value={size}
+                id="slidetile-size"
+                onChange={handleSizeChange}
+                className="slidetile-size-selector"
+                disabled={moveCount > 0 && !gameWon}
+                aria-label="Grid size selector"
+              >
+                <option value={4}>4x4</option>
+                <option value={5}>5x5</option>
+                <option value={6}>6x6</option>
+              </select>
+            </label>
+            <div className="slidetile-timer-pill">
+              <span className="pill-caption">Time</span>
+              <span className="pill-value">{formatTime(timer)}</span>
+            </div>
+            <div className="slidetile-movectr">
+              <span className="moves-label">Moves</span>
+              <span className="moves-value">{moveCount}</span>
+            </div>
+            <button className="btn undo-btn" onClick={handleUndo} disabled={moveCount === 0 || !history.length}>
+              <span aria-hidden="true">↩</span> Undo
+            </button>
+            <button className="btn restart-btn" onClick={handleRestart}>
+              <span aria-hidden="true">↻</span> Restart
+            </button>
           </div>
         </header>
-        <section className="slidingpuzzle-boardzone">
-          {renderBoard()}
-        </section>
-        <footer className="slidingpuzzle-stats">
-          <span>
-            Moves: <b>{moves}</b>
-          </span>
-          <button className="btn" style={{ marginLeft: 18 }} onClick={handleReplay}>
-            ↻ Shuffle
-          </button>
-        </footer>
-        {renderWinBanner()}
-      </div>
-      <div className="slidingpuzzle-instructions">
-        Tap any movable tile next to the blank to slide. Solve the puzzle as fast as possible! <br />
-        <i>Note: This game shuffles to a random, solvable (and unsolved!) state on first load each time.</i>
-      </div>
+        {/* Tile Grid */}
+        <div
+          className={`slidetile-board grid${size}`}
+          style={{
+            gridTemplateColumns: `repeat(${size}, 1fr)`,
+            gridTemplateRows: `repeat(${size}, 1fr)`,
+            width: size === 4 ? 336 : size === 5 ? 400 : 468,
+            height: size === 4 ? 336 : size === 5 ? 400 : 468,
+            margin: "0 auto",
+            maxWidth: "98vw"
+          }}
+          aria-label="Sliding tile puzzle grid"
+        >
+          {tiles.map((v, idx) =>
+            v === 0 ? (
+              <div
+                key={idx}
+                className="tile empty"
+                tabIndex={-1}
+                aria-label="empty space"
+              ></div>
+            ) : (
+              <button
+                key={idx}
+                className="tile"
+                onClick={() => handleTileClick(idx)}
+                tabIndex={0}
+                aria-label={`Tile ${v}`}
+                disabled={gameWon}
+              >
+                {v}
+              </button>
+            )
+          )}
+        </div>
+        {/* Instructions / Win Msg */}
+        <div className={`slidetile-tip${gameWon ? " win" : ""}`}>
+          {gameWon ? (
+            <>
+              <span role="img" aria-label="Confetti">🎉</span> Solved {size}x{size} in {moveCount} moves and {formatTime(timer)}!
+              <br />
+              {fastestSolve
+                ? <span className="best-row">Your Best: {fastestSolve.moves} moves, {formatTime(fastestSolve.time)}</span>
+                : null
+              }
+              <span className="try-harder-tip">Try a harder grid size!</span>
+            </>
+          ) : (
+            <>
+              Arrange tiles 1 to {size * size - 1} (blank last). Click tiles to slide.<br />
+              Controls: <b>Undo</b> ({history.length > 0 ? "Available" : "N/A"}), <b>Restart</b>, <b>Grid Size</b>
+            </>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
