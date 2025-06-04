@@ -33,6 +33,7 @@ function App() {
             <Route path="/games/reaction" element={<ReactionRushPage />} />
             <Route path="/games/typing" element={<TypingChallengePage />} />
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
+            <Route path="/games/snake" element={<SnakeGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
