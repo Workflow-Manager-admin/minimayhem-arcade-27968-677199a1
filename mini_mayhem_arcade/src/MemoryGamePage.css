@@ -1,0 +1,360 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
+
+.memgame-root {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+  font-family: 'Montserrat', 'Inter', 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+  padding-top: 60px;
+}
+[data-theme="dark"] .memgame-root {
+  background: linear-gradient(128deg, #20232e 0%, #15132a 100%);
+}
+
+/* Blurry background shapes for arcade energy */
+.blur-bg1, .blur-bg2 {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(46px);
+  opacity: 0.51;
+  border-radius: 50%;
+  animation: floatblur 17s infinite ease-in-out alternate;
+}
+.blur-bg1 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle at 40% 60%, #68adc4 80%, #bfbfff00 100%);
+  left: -110px; top: 23vh;
+}
+.blur-bg2 {
+  width: 290px; height: 290px;
+  background: radial-gradient(circle at 70% 40%, #fff6b7 90%, #ffd7d777 100%);
+  right: -70px; top: 68vh;
+}
+@keyframes floatblur {
+  0% { transform: translateY(0) scale(1);}
+  100% { transform: translateY(-27px) scale(1.06);}
+}
+
+/* Main area */
+.memgame-main {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.92);
+  border-radius: 22px;
+  box-shadow: 0 13px 36px #6bbdfc29, 0 1px 28px #4f46e525;
+  padding: 37px 26px 30px 26px;
+  max-width: 440px;
+  width: 98vw;
+  margin-top: 34px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+[data-theme="dark"] .memgame-main {
+  background: rgba(36,39,61,0.94);
+  box-shadow: 0 11px 32px #22217038, 0 2px 18px #12121240;
+}
+.memgame-header {
+  width: 100%;
+  display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: space-between;
+  margin-bottom: 18px;
+  gap: 18px 6px;
+}
+.memgame-title {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: 2.1rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #68adc4;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.14;
+  flex: 1 1 auto;
+}
+[data-theme="dark"] .memgame-title { color: #68adc4; }
+.brain-emoji {
+  font-size: 1.5em;
+}
+.pill-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.pill {
+  background: #eceffd;
+  color: #353488;
+  border-radius: 24px;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-weight: 700;
+  padding: 5px 16px 5px 12px;
+  font-size: 1.07rem;
+  display: flex; align-items: center;
+  box-shadow: 0 2px 6px #68adc423;
+}
+.pill .pill-caption { opacity: 0.67; font-size: .86em; margin-right: 7px;}
+.pill .pill-value { font-size: 1.08em; font-weight: 900;}
+.pill.accent {
+  background: linear-gradient(90deg, #68adc4 70%, #4f46e5 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px #68adc493;
+}
+[data-theme="dark"] .pill { background: #24273d; color: #c7e6ff;}
+
+.btn {
+  font-family: inherit;
+  background: #68adc4;
+  color: #fff;
+  border: none;
+  border-radius: 13px;
+  padding: 7px 16px;
+  font-size: 1.03rem;
+  font-weight: 700;
+  letter-spacing: .015em;
+  cursor: pointer;
+  transition: background 0.17s, box-shadow 0.19s, color 0.17s;
+  box-shadow: 0 3px 16px #68adc422;
+  outline: none;
+}
+.btn.accent { background: #4f46e5; }
+.btn.accent:hover, .btn.accent:focus-visible {
+  background: #3730a3;
+}
+.btn.restart-btn {
+  background: #f59e44;
+  color: #fff;
+  padding: 6px 18px 6px 13px;
+  font-size: 0.99rem;
+  margin-left: 2px;
+  box-shadow: 0 2px 8px #f59e4432;
+}
+.btn.restart-btn:hover, .btn.restart-btn:focus-visible {
+  background: #ffbe76;
+  color: #211f32;
+}
+
+.memgame-board {
+  margin-top: 11px;
+  margin-bottom: 18px;
+  width: 320px;
+  max-width: 94vw;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 15px;
+  justify-items: center;
+  align-items: center;
+  perspective: 900px;
+}
+@media (max-width: 550px) {
+  .memgame-main { padding: 9vw 4vw 17vw 4vw; }
+  .memgame-board { width: 97vw; grid-gap: 6vw; }
+}
+.memcard {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 63px;
+  height: 75px;
+  perspective: 800px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  transition: filter 0.16s;
+  will-change: transform;
+}
+@media (max-width: 430px) {
+  .memcard { width: 47px; height: 55px; }
+}
+
+.memcard.disabled { pointer-events: none; opacity: 0.73; }
+.memcard-inner {
+  display: block;
+  transition: transform 0.38s cubic-bezier(.65,.43,.38,1.14);
+  transform-style: preserve-3d;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.memcard.flipped .memcard-inner {
+  transform: rotateY(180deg);
+}
+/* Card fronts */
+.memcard-front,
+.memcard-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.1rem;
+  box-shadow: 0 4px 22px #68adc429, 0 1.5px 8px #4f46e518;
+}
+.memcard-back {
+  background: linear-gradient(120deg, #68adc4 65%, #4f46e5 100%);
+  color: #fff;
+  border: 2.4px solid #eceffd;
+  font-size: 1.5rem;
+  z-index: 2;
+  content: "?";
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900;
+  transition: background 0.19s;
+  filter: brightness(1.14);
+}
+[data-theme="dark"] .memcard-back {
+  background: linear-gradient(120deg, #323672 62%, #68adc4 100%);
+  border-color: #353488;
+}
+.memcard-front {
+  background: #fff;
+  color: #15132a;
+  font-weight: 900;
+  font-size: 2.08rem;
+  transform: rotateY(180deg);
+  z-index: 3;
+  border: 2.4px solid #68adc4;
+  box-shadow: 0 10px 39px #68adc429;
+  transition: background 0.19s, color 0.23s;
+}
+[data-theme="dark"] .memcard-front {
+  background: #20232e;
+  color: #68adc4;
+  border-color: #24273d;
+}
+
+/* Win Tip / instructions */
+.memgame-tip {
+  margin-top: 10px;
+  color: #355b8f;
+  background: #f5faffdd;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  font-weight: 700;
+  opacity: 0.89;
+  padding: 6px 18px;
+}
+[data-theme="dark"] .memgame-tip {
+  color: #b9e7fc;
+  background: #1c1b38e0;
+}
+
+/* ----- Modal Styles ----- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(41,51,97,0.32);
+  z-index: 3333;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  transition: opacity 0.31s;
+  opacity: 0;
+  pointer-events: none;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal-content {
+  background: linear-gradient(117deg, #b4bef9dd 70%, #e1dbfed9 100%);
+  color: #3730a3;
+  box-shadow: 0 14px 64px #68adc439, 0px 8px 22px #24273D44;
+  padding: 38px 34px 32px 34px;
+  border-radius: 22px;
+  margin-top: 93px;
+  max-width: 370px;
+  min-width: 270px;
+  text-align: center;
+  animation: scaleModal 0.26s cubic-bezier(.65,.53,.27,1.17);
+  position: relative;
+}
+@keyframes scaleModal {
+  from { transform: scale(0.88) translateY(20px); opacity: 0;}
+  to { transform: scale(1) translateY(0); opacity: 1;}
+}
+[data-theme="dark"] .modal-content {
+  background: linear-gradient(118deg, #24273dbf 80%, #3730a3de 100%);
+  color: #eba3;
+}
+.modal-trophy {
+  font-size: 2.3rem;
+  display: inline-block;
+  margin-bottom: 7px;
+  text-shadow: 0 4px 20px #ffd70077;
+}
+.modal-title {
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 13px;
+  color: #4f46e5;
+}
+[data-theme="dark"] .modal-title { color: #edeffd; }
+.modal-stats {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin: 16px 0 12px 0;
+}
+.modal-stat-pill {
+  background: #eceffd;
+  color: #3730a3;
+  border-radius: 18px;
+  font-weight: 800;
+  font-size: 1.08rem;
+  padding: 7px 23px 6px 18px;
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 64px;
+}
+[data-theme="dark"] .modal-stat-pill {
+  background: #2c2e59;
+  color: #aefcff;
+}
+.modal-best-row {
+  margin-top: 9px;
+  font-size: 1.01rem;
+  color: #375dc2;
+  opacity: 0.78;
+}
+[data-theme="dark"] .modal-best-row { color: #98d7ed; }
+.modal-best-label { font-weight: 700; margin-right: 5px; }
+.modal-best-score { font-weight: 900; color: #355b8f;}
+[data-theme="dark"] .modal-best-score { color: #92f5f6;}
+.replay-btn {
+  min-width: 110px;
+  font-size: 1.13em;
+  margin: 21px 0 6px 0;
+  border-radius: 16px;
+}
+.modal-link-btn {
+  margin-top: 9px;
+  background: #eceffd;
+  color: #4f46e5;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 6px 21px;
+  transition: background 0.16s, color 0.14s;
+}
+.modal-link-btn:hover, .modal-link-btn:focus-visible {
+  background: #4f46e5;
+  color: #fff;
+}
+@media (max-width: 530px) {
+  .modal-content { padding: 18vw 4vw 10vw 4vw; min-width: unset; }
+}
+/* Modal: focus border */
+.btn:focus-visible, .modal-link-btn:focus-visible, .replay-btn:focus-visible {
+  outline: 2.5px solid #3730a3;
+  outline-offset: 2px;
+}
