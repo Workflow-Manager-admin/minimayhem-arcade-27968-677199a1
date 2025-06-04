@@ -1,0 +1,382 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
+
+/* ---- Main Layout ---- */
+.blockgame-root {
+  position: relative;
+  min-height: 100vh;
+  font-family: 'Montserrat', 'Inter', 'Roboto', sans-serif;
+  background: linear-gradient(120deg,#14142b 0%, #0b1b2e 100%);
+  display: flex; flex-direction: column; align-items: center;
+  overflow-x: hidden;
+}
+[data-theme="dark"] .blockgame-root {
+  background: linear-gradient(120deg, #1a193b 0%, #0b0a20 100%);
+}
+
+/* Glowy blurred backdrop shapes for energy - use neon colors */
+.blockgame-blur1, .blockgame-blur2 {
+  position: absolute; pointer-events: none; z-index: 0;
+  border-radius: 50%;
+  filter: blur(52px);
+  opacity: 0.44;
+  animation: blockblur-float 17s infinite alternate cubic-bezier(.99,.11,.73,1.37);
+}
+.blockgame-blur1 {
+  width: 410px; height: 410px;
+  left: -90px; top: 14vh;
+  background: radial-gradient(circle, #68fff7 0%, #ffb0dc 84%, #0000 100%);
+}
+.blockgame-blur2 {
+  width: 340px; height: 340px;
+  right: -110px; top: 62vh;
+  background: radial-gradient(circle, #85a8fd 0%, #16ffc7 74%, #0000 100%);
+}
+@keyframes blockblur-float {
+  0% { transform: translateY(0) scale(1);}
+  100% { transform: translateY(-27px) scale(1.065);}
+}
+
+/* ---- Main Card/zone ---- */
+.blockgame-main-card {
+  z-index: 2; position: relative;
+  margin: 65px auto 0 auto;
+  background: rgba(20, 20, 36, 0.98);
+  border-radius: 22px;
+  box-shadow: 0 16px 55px #16ffc720, 0 1px 38px #85a8fd3a;
+  padding: 32px 19px 23px 19px;
+  max-width: 500px; width: 95vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+[data-theme="dark"] .blockgame-main-card {
+  background: rgba(28, 30, 49, 0.98);
+  box-shadow: 0 14px 55px #16ffc728, 0 1px 30px #1a1f3f38;
+}
+
+/* ---- Header and Title ---- */
+.blockgame-header {
+  width: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; 
+  margin-bottom: 8px;
+  gap: 13px 9px;
+}
+.blockgame-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #62fff9;
+  letter-spacing: -1.2px;
+  margin: 0;
+  display: flex; gap: 9px; align-items: center;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  text-shadow: 0 2px 19px #16ffc7a0;
+}
+.blockgame-emoji {
+  font-size: 1.44em;
+  filter: drop-shadow(0 7px 15px #85a8fd44);
+}
+
+/* ---- Score/status pills ---- */
+.blockgame-pills {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 0;
+  flex-wrap: wrap;
+}
+.blockgame-pill {
+  background: #101f29;
+  color: #fff;
+  border-radius: 2em;
+  font-size: 0.97rem;
+  font-weight: 700;
+  padding: 7px 20px 7px 14px;
+  box-shadow: 0 2px 8px #68fff732;
+  display: flex; gap: 7px; align-items: center;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  letter-spacing: 0.05em;
+}
+.blockgame-pill .pill-label {opacity: 0.62; font-size: .96em;}
+.blockgame-pill .pill-value { font-size: 1.14em; font-weight: 900;}
+.blockgame-pill.accent {
+  background: linear-gradient(90deg, #12fff3 67%, #285bfc 100%);
+  color: #1a153a;
+  box-shadow: 0 5px 22px #12fff374;
+}
+[data-theme="dark"] .blockgame-pill { background: #161e2e; color: #7ffffc;}
+[data-theme="dark"] .blockgame-pill.accent { color: #111; }
+
+/* ---- Board ---- */
+.blockgame-board-zone {
+  margin: 16px 0 0 0;
+}
+.blockgame-board {
+  background: rgba(18, 22, 42, 0.91);
+  border-radius: 13px;
+  box-shadow: 0 9px 45px #16ffc71b, 0 1px 12px #85a8fd17;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  gap: 3.4px;
+  width: min(404px, 87vw);
+  aspect-ratio: 1/1;
+  margin: 0 auto;
+  padding: 7px;
+}
+.blockgame-board.board-over {
+  filter: grayscale(0.26) blur(0.2px) brightness(0.65);
+}
+.blockgame-cell {
+  background: #131a26;
+  border-radius: 6px;
+  transition: background 0.13s, box-shadow 0.22s;
+  min-width: 0; min-height: 0;
+  height: 100%; width: 100%;
+  border: none; outline: none;
+  box-shadow: 0 2px 8px #68fff72a;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  will-change: background, box-shadow, transform;
+}
+.blockgame-cell.filled {
+  background: var(--blockgame-cell-color, #68fff7) !important;
+  box-shadow: 0 3px 20px #12fff339;
+  animation: blockdrop 0.19s;
+  transition: background 0.18s cubic-bezier(.61,.38,.44,1.01), box-shadow 0.18s;
+}
+@keyframes blockdrop {
+  from { transform: scale(.9) translateY(-9px);}
+  to { transform: none;}
+}
+.blockgame-cell.preview {
+  box-shadow: 0 1px 17px #f8ae2c66, 0 0 7px #ffd84d55;
+  background: #ffd84d44 !important;
+  z-index: 3;
+}
+.blockgame-cell.over {
+  filter: brightness(0.67) blur(0.3px);
+}
+.blockgame-cell:focus-visible {
+  outline: 2.5px solid #285bfc;
+  outline-offset: -1px;
+}
+
+@media (max-width: 530px) {
+  .blockgame-board { width: 98vw; }
+}
+
+/* ---- Block Palette ---- */
+.blockgame-shapes-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 18px;
+  margin: 32px 0 8px 0;
+  width: 100%;
+}
+.blockgame-shape-picker {
+  background: #131c23;
+  border-radius: 17px;
+  box-shadow: 0 3px 16px #12fff322, 0 1px 9px #68fff74b;
+  padding: 13px 20px 14px 20px;
+  min-width: 54px; min-height: 54px;
+  cursor: pointer;
+  transition: box-shadow 0.18s, transform 0.16s, background 0.15s;
+  border: 2.5px solid transparent;
+  user-select: none;
+  display: flex; flex-direction: column; align-items: center;
+  position: relative;
+  outline: none;
+}
+.blockgame-shape-picker.selected {
+  border-color: #12fff3;
+  box-shadow: 0 8px 33px #85a8fd55;
+  background: #213974;
+  transition: border 0.13s;
+}
+.blockgame-shape-picker.unusable {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: blur(0.6px);
+}
+
+.blockgame-shape-label {
+  color: #ffd84d;
+  font-weight: 800;
+  font-size: 1rem;
+  margin-top: 7px;
+  text-shadow: 0 1px 7px #ffd84d77;
+  opacity: 0.71;
+  letter-spacing: 0.9px;
+}
+
+/* ---- Shapes Preview (in palette) ---- */
+.blockgame-shape-preview {
+  display: inline-grid;
+  grid-gap: 2.7px;
+  grid-template-columns: repeat(5, 15px);
+  grid-template-rows: repeat(5, 15px);
+  align-items: center; justify-content: center;
+  min-width: 45px; min-height: 45px;
+  margin: 0;
+}
+.blockgame-shape-cell, .blockgame-shape-empty {
+  width: 15px; height: 15px;
+  border-radius: 4px;
+  display: inline-block;
+  transition: background 0.14s;
+}
+.blockgame-shape-cell {
+  background: #68fff7;
+  box-shadow: 0 0 7px #68fff7b2;
+  border: 1.2px solid #fff8;
+}
+.blockgame-shape-empty {
+  background: transparent;
+}
+.blockgame-shape-picker.selected .blockgame-shape-cell {
+  filter: brightness(1.16) drop-shadow(0 0 11px #68fff784);
+}
+
+/* ---- Instructions ---- */
+.blockgame-instructions {
+  color: #b2fcff;
+  font-size: 1.03em;
+  text-align: center;
+  margin-top: 14px;
+  font-weight: 500;
+  letter-spacing: .01em;
+  background: #21397422;
+  padding: 7px 14px 6px 14px;
+  border-radius: 9px;
+  opacity: 0.89;
+}
+.blockgame-tip {
+  color: #ffd84d;
+  font-size: .98em;
+  opacity: 0.78;
+  letter-spacing: 0.09em;
+}
+
+/* ---- Buttons ---- */
+.blockgame-btn {
+  font-family: inherit;
+  background: #16ffc7;
+  color: #1b005d;
+  border: none;
+  border-radius: 11px;
+  padding: 7px 19px;
+  font-size: 1.07rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.19s, color 0.17s;
+  margin-left: 0.4em;
+  box-shadow: 0 2px 12px #16ffc732;
+  letter-spacing: 0.04em;
+}
+.blockgame-btn.s {
+  padding: 6px 14px;
+  font-size: .98rem;
+}
+.blockgame-btn:hover, .blockgame-btn:focus-visible {
+  background: #285bfc;
+  color: #fff;
+}
+
+.blockgame-btn:focus-visible {
+  outline: 2.5px solid #285bfc;
+  outline-offset: 2px;
+}
+
+
+/* ---- Modal Styles ---- */
+.blockgame-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(33, 61, 101, 0.32);
+  z-index: 55;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  pointer-events: all;
+  animation: bgfadein 0.24s;
+}
+@keyframes bgfadein { from { opacity: 0;} to { opacity: 1;} }
+
+.blockgame-modal-content {
+  position: relative;
+  background: linear-gradient(117deg, #12fff3cc 80%, #285bfcf1 100%);
+  color: #1a153a;
+  box-shadow: 0 21px 75px #16ffc756, 0px 5px 19px #0a1f43ab;
+  padding: 38px 32px 28px 32px;
+  border-radius: 22px;
+  margin-top: 78px;
+  min-width: 266px;
+  text-align: center;
+  z-index: 99;
+  animation: modalscale 0.25s cubic-bezier(.67,.66,.55,1.17);
+}
+@keyframes modalscale {
+  from { transform: scale(.91) translateY(25px); opacity: 0;}
+  to { transform: none; opacity: 1;}
+}
+
+.blockgame-modal-trophy {
+  font-size: 2.44rem;
+  margin-bottom: 7px;
+  filter: drop-shadow(0 2px 21px #ffd84d88);
+}
+.blockgame-modal-title {
+  font-size: 1.24rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 17px;
+  color: #285bfc;
+}
+.blockgame-modal-score-row {
+  font-size: 1.09rem;
+  color: #1a153a;
+  font-weight: 800;
+  margin: 7px 0 8px 0;
+}
+.blockgame-modal-label { color: #ffd84d; margin-right: 5px;}
+.blockgame-modal-value {
+  color: #285bfc;
+  font-weight: 900;
+}
+.blockgame-modal-btn {
+  min-width: 107px;
+  margin: 21px 8px 4px 8px;
+  font-size: 1.11em;
+  border-radius: 13px;
+  background: #ffd84d;
+  color: #273759;
+  font-weight: 900;
+  box-shadow: 0 2px 9px #ffd84d38;
+}
+.blockgame-modal-btn:hover, .blockgame-modal-btn:focus-visible {
+  background: #285bfc;
+  color: #fff;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 600px) {
+  .blockgame-main-card { padding-left: 2vw; padding-right: 2vw; }
+  .blockgame-modal-content { padding: 7vw 3vw 12vw 3vw; }
+}
+@media (max-width: 440px) {
+  .blockgame-title { font-size: 1.1rem; }
+  .blockgame-emoji { font-size: 1.05rem; }
+}
+
+/* --- Accessibility: visually indicate focus --- */
+.blockgame-shape-picker:focus-visible,
+.blockgame-btn:focus-visible {
+  outline: 2px solid #ffd84d;
+  outline-offset: 2px;
+}
