@@ -94,13 +94,13 @@ function getLocalHighScores() {
   let blockHighScore = null;
   let memoryGameScore = null;
   let reactionGameScore = null;
-  let typingBestWpm = null;
   let typingWordChallengeBest = null;
   let sudokuBestTime = null;
   let slidingBestMoves = null;
   let slidingBestTime = null;
   let lightBeamBestScore = null;
 
+  // Only variables and keys for snapshot widget.
   if (typeof window !== "undefined") {
     try {
       const blockScoreRaw = window.localStorage.getItem("mmarcade-blockgame-bestscore");
@@ -123,13 +123,8 @@ function getLocalHighScores() {
         reactionGameScore = parseInt(reactScoreRaw, 10);
       }
     } catch (e) { }
-    try {
-      const typingRaw = window.localStorage.getItem("mmarcade-typing-bestwpm");
-      if (typingRaw !== null && !isNaN(parseFloat(typingRaw))) {
-        typingBestWpm = Math.round(parseFloat(typingRaw) * 100) / 100;
-      }
-    } catch (e) { }
-    // Word Typing Challenge: Best score
+
+    // Display best score for Word Typing Challenge from "mmarcade-word-typing-bestscore"
     try {
       const typingChallengeRaw = window.localStorage.getItem("mmarcade-word-typing-bestscore");
       if (typingChallengeRaw !== null && !isNaN(parseInt(typingChallengeRaw, 10))) {
