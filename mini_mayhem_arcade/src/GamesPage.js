@@ -55,66 +55,44 @@ const GAMES = [
   }
 ];
 
-// Example featured game (could pick randomly per day in a real app)
-const FEATURED_GAME = {
-  name: "Reaction Speed",
-  icon: "⚡",
-  desc: "Test your reflexes! Hit the play button when the screen flashes – every millisecond counts. Be the fastest among friends.",
-  action: "/games/reaction"
-};
-
-/**
- * Get local high scores for display in scoreboard widget.
- * For Memory Game, load last score (moves/time) from localStorage if available.
- * For other games, keep as placeholder/static.
- */
 function getLocalHighScores() {
-  // Get Memory Game last score object { moves, time }
   let memoryGameScore = null;
   let reactionGameScore = null;
   let typingBestWpm = null;
+  let iceSlideBest = null;
 
   if (typeof window !== "undefined") {
     try {
       const memScoreRaw = window.localStorage.getItem("mmarcade-memgame-lastscore");
       if (memScoreRaw) {
         const { moves, time } = JSON.parse(memScoreRaw);
-        if (
-          typeof moves === "number" &&
-          typeof time === "number"
-        ) {
+        if (typeof moves === "number" && typeof time === "number") {
           memoryGameScore = { moves, time };
         }
       }
-    } catch (e) {
-      // ignore/invalid
-    }
-
-    // Read latest Reaction Rush score from localStorage
+    } catch (e) { }
     try {
       const reactScoreRaw = window.localStorage.getItem("reactionGameScore");
       if (reactScoreRaw !== null && !isNaN(parseInt(reactScoreRaw, 10))) {
         reactionGameScore = parseInt(reactScoreRaw, 10);
       }
-    } catch (e) {
-      // ignore
-    }
-
-    // Typing Challenge best WPM from localStorage
+    } catch (e) { }
     try {
       const typingRaw = window.localStorage.getItem("mmarcade-typing-bestwpm");
       if (typingRaw !== null && !isNaN(parseFloat(typingRaw))) {
         typingBestWpm = Math.round(parseFloat(typingRaw) * 100) / 100;
       }
-    } catch (e) {
-      // ignore/invalid
-    }
+    } catch (e) { }
+    try {
+      const iceRaw = window.localStorage.getItem("iceSlideScore");
+      if (iceRaw !== null && !isNaN(parseInt(iceRaw, 10))) {
+        iceSlideBest = parseInt(iceRaw, 10);
+      }
+    } catch (e) {}
   }
 
-  // Format Memory Game score
   let memoryDisplay;
   if (memoryGameScore) {
-    // e.g. "23 moves, 1:15"
     const m = Math.floor(memoryGameScore.time / 60);
     const s = memoryGameScore.time % 60;
     const timeStr = `${m}:${s < 10 ? "0" : ""}${s}`;
@@ -123,7 +101,6 @@ function getLocalHighScores() {
     memoryDisplay = "No score yet";
   }
 
-  // Format Reaction Speed (ms) score display
   let reactionDisplay;
   if (typeof reactionGameScore === "number" && !isNaN(reactionGameScore)) {
     if (reactionGameScore > 1200) {
@@ -135,7 +112,6 @@ function getLocalHighScores() {
     reactionDisplay = "No score yet";
   }
 
-  // Format Typing Challenge best WPM display
   let typingDisplay;
   if (typeof typingBestWpm === "number" && !isNaN(typingBestWpm)) {
     typingDisplay = typingBestWpm;
@@ -143,31 +119,19 @@ function getLocalHighScores() {
     typingDisplay = "No score yet";
   }
 
-  // Quick Math score from localStorage (key: quickMathScore)
-  let quickMathScore = null;
-  if (typeof window !== "undefined") {
-    try {
-      const raw = window.localStorage.getItem("quickMathScore");
-      if (raw !== null && !isNaN(parseInt(raw, 10))) {
-        quickMathScore = parseInt(raw, 10);
-      }
-    } catch (e) {
-      // ignore/invalid
-    }
-  }
-  let quickMathDisplay;
-  if (typeof quickMathScore === "number" && !isNaN(quickMathScore)) {
-    quickMathDisplay = quickMathScore;
+  // --- Ice Slide Puzzle score ---
+  let iceSlideDisplay;
+  if (typeof iceSlideBest === "number" && !isNaN(iceSlideBest)) {
+    iceSlideDisplay = iceSlideBest + " steps";
   } else {
-    quickMathDisplay = "No score yet";
+    iceSlideDisplay = "No score yet";
   }
 
-  // Other games remain placeholder for now
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
-    { game: "Quick Math", score: quickMathDisplay }
+    { game: "Ice Slide Puzzle", score: iceSlideDisplay }
   ];
 }
 
