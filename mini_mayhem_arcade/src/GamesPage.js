@@ -45,7 +45,8 @@ const GAMES = [
     icon: "➗",
     tagline: "Rapid math questions. Think and answer before time runs out!",
     tag: "Math",
-    color: "#48C78E"
+    color: "#48C78E",
+    playPath: "/games/quick-math"
   },
   {
     name: "Random Fun",
@@ -143,12 +144,31 @@ function getLocalHighScores() {
     typingDisplay = "No score yet";
   }
 
+  // Quick Math score from localStorage (key: quickMathScore)
+  let quickMathScore = null;
+  if (typeof window !== "undefined") {
+    try {
+      const raw = window.localStorage.getItem("quickMathScore");
+      if (raw !== null && !isNaN(parseInt(raw, 10))) {
+        quickMathScore = parseInt(raw, 10);
+      }
+    } catch (e) {
+      // ignore/invalid
+    }
+  }
+  let quickMathDisplay;
+  if (typeof quickMathScore === "number" && !isNaN(quickMathScore)) {
+    quickMathDisplay = quickMathScore;
+  } else {
+    quickMathDisplay = "No score yet";
+  }
+
   // Other games remain placeholder for now
   return [
     { game: "Memory Game", score: memoryDisplay },
     { game: "Reaction Speed", score: reactionDisplay },
     { game: "Typing Challenge", score: typingDisplay },
-    { game: "Quick Math", score: 34 }
+    { game: "Quick Math", score: quickMathDisplay }
   ];
 }
 
