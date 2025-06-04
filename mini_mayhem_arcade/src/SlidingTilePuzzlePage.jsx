@@ -246,15 +246,16 @@ function SlidingTilePuzzlePage() {
           </div>
         </header>
         {/* Tile Grid */}
+        {/* Responsive, square, fixed container (max 400px, max 90vw) */}
         <div
-          className={`slidetile-board grid${size}`}
+          className="slidetile-board"
           style={{
+            width: "min(400px, 90vw)",
+            height: "min(400px, 90vw)",
             gridTemplateColumns: `repeat(${size}, 1fr)`,
             gridTemplateRows: `repeat(${size}, 1fr)`,
-            width: size === 4 ? 336 : size === 5 ? 400 : 468,
-            height: size === 4 ? 336 : size === 5 ? 400 : 468,
-            margin: "0 auto",
-            maxWidth: "98vw"
+            gap: "9px",
+            margin: "0 auto"
           }}
           aria-label="Sliding tile puzzle grid"
         >
@@ -265,6 +266,12 @@ function SlidingTilePuzzlePage() {
                 className="tile empty"
                 tabIndex={-1}
                 aria-label="empty space"
+                style={{
+                  // Ensures min/max size: 100%
+                  width: "100%",
+                  height: "100%",
+                  aspectRatio: "1 / 1"
+                }}
               ></div>
             ) : (
               <button
@@ -274,6 +281,12 @@ function SlidingTilePuzzlePage() {
                 tabIndex={0}
                 aria-label={`Tile ${v}`}
                 disabled={gameWon}
+                style={{
+                  // Calculate the tile size as a fraction of the container
+                  width: "100%",
+                  height: "100%",
+                  aspectRatio: "1 / 1"
+                }}
               >
                 {v}
               </button>
