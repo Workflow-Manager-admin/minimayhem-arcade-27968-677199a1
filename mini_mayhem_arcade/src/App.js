@@ -15,6 +15,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AboutPrivacyPage from './AboutPrivacyPage.jsx';
 import HelpPage from './HelpPage.jsx'; // Help Page route integration
 import ContactPage from './ContactPage.jsx'; // Contact Page import
+import ComingSoon from './ComingSoon.jsx';
 
 /**
  * PUBLIC_INTERFACE
@@ -40,6 +41,11 @@ function App() {
             <Route path="/games/sudoku" element={<SudokuGamePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
+            {/* NEW: Shadow Runner placeholder route */}
+            <Route
+              path="/games/shadow-runner"
+              element={<ComingSoon title="Shadow Runner Coming Soon!" description="This endless runner mini-game is in development. Check back soon to dash and dodge your way to a new high score!" />}
+            />
             <Route path="/scoreboard" element={<ScoreboardPage />} />
             {/* About & Privacy page routed to /about-privacy */}
             <Route path="/about-privacy" element={<AboutPrivacyPage />} />
