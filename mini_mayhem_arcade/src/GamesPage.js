@@ -54,14 +54,6 @@ const GAMES = [
     playPath: "/games/typing-challenge"
   },
   {
-    name: "Light Beam Puzzle",
-    icon: "🔦",
-    tagline: "Bend the light! Rotate mirrors to guide a laser beam to the receiver. Animated glow, logic, & reflection fun.",
-    tag: "NEW",
-    color: "#4fd8ff",
-    playPath: "/games/light-beam"
-  },
-  {
     name: "Sudoku",
     icon: "🔢",
     tagline: "Fill the 9x9 grid so every row, column, and box has 1-9. Choose difficulty, undo, and beat your best time!",
