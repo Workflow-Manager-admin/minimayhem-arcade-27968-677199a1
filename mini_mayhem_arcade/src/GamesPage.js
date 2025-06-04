@@ -14,7 +14,6 @@ import { Link } from "react-router-dom";
 const FEATURE_GAME_ENABLED = true;
 const SCORE_SNAPSHOT_ENABLED = true;
 
-// Demo data for five mini-games, Quick Math replaced by Ice Slide Puzzle
 const GAMES = [
   {
     name: "Memory Game",
@@ -41,12 +40,12 @@ const GAMES = [
     playPath: "/games/typing"
   },
   {
-    name: "Ice Slide Puzzle",
-    icon: "🧊",
-    tagline: "Slide across icy tiles to reach the target 🎯! Careful: you can't stop until you hit a wall.",
+    name: "Sudoku",
+    icon: "🔢",
+    tagline: "Fill the 9x9 grid so every row, column, and box has 1-9. Choose difficulty, undo, and beat your best time!",
     tag: "Puzzle",
     color: "#68adc4",
-    playPath: "/games/ice-slide"
+    playPath: "/games/sudoku"
   },
   {
     name: "Random Fun",
