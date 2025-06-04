@@ -193,21 +193,32 @@ export default function ShadowRunnerPage() {
     setIsPaused(v => !v);
   }, []);
 
-  // Jump: if grounded & not sliding
+  // Jump: only if truly grounded and not sliding (robust event separation)
   const jumpAction = useCallback(() => {
     setPlayer((p) => {
+      // Avoid jump if already airborne or sliding (debounce)
       if (!p.grounded || p.isSliding) return p;
-      // Prevent jumping while in slide
       return { ...p, vy: -JUMP_V0, isJumping: true, grounded: false };
     });
     setRunHistory(hist => hist.concat({ type: "jump", frame: frameRef.current }));
   }, []);
 
-  // Slide: only if grounded & not currently sliding or jumping
+  // Slide: only if grounded, not sliding, not jumping, and not just finished landing (debounce)
   const slideAction = useCallback(() => {
     setPlayer((p) => {
       if (!p.grounded || p.isSliding || p.isJumping) return p;
-      return { ...p, isSliding: true, slideTimer: SLIDE_DURATION, height: Math.round(PLAYER_H * 0.64), y: (GAME_HEIGHT - GROUND_HEIGHT - Math.round(PLAYER_H * 0.64)), grounded: true };
+      // Move player Y up if current height > slide height
+      const targetHeight = Math.round(PLAYER_H * 0.64);
+      return {
+        ...p,
+        isSliding: true,
+        slideTimer: SLIDE_DURATION,
+        height: targetHeight,
+        y: (GAME_HEIGHT - GROUND_HEIGHT - targetHeight),
+        grounded: true,
+        isJumping: false,
+        vy: 0       // forcibly cancel any velocity for clean slide
+      };
     });
     setRunHistory(hist => hist.concat({ type: "slide", frame: frameRef.current }));
   }, []);
