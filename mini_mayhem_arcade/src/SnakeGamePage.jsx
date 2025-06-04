@@ -12,14 +12,16 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
  * - Obstacles (moving!), and food that disappears if not eaten in time
  * - Arcade scoring logic and high score/last score persist via localStorage
  */
-const BOARD_SIZE = 18; // Square board
+const BOARD_CELLS = 20; // SQUARE board; grid will always be BOARD_CELLS x BOARD_CELLS
+const CELL_SIZE = 20; // px per cell on main board, ensures board area = integer multiple
+
 const INITIAL_SNAKE = [
-  { x: 8, y: 7 },
-  { x: 7, y: 7 },
-  { x: 6, y: 7 },
+  { x: Math.floor(BOARD_CELLS / 2), y: Math.floor(BOARD_CELLS / 2) },
+  { x: Math.floor(BOARD_CELLS / 2) - 1, y: Math.floor(BOARD_CELLS / 2) },
+  { x: Math.floor(BOARD_CELLS / 2) - 2, y: Math.floor(BOARD_CELLS / 2) },
 ];
 const INITIAL_DIRECTION = { x: 1, y: 0 }; // right
-const GAME_SPEED_NORMAL = 130;  // ms per frame
+const GAME_SPEED_NORMAL = 110;  // ms per frame: fixed interval in 100-120ms range for smoothness
 const GAME_SPEED_FAST = 70;
 const FOOD_APPEAR_TIME = 6000;  // ms, how long special food lasts
 const BOMB_CHANCE = 0.11;       // Chance each food spawn
@@ -93,8 +95,8 @@ function randomCell(excludeList = []) {
   let tryCount = 0;
   while (tryCount < 80) {
     const cell = {
-      x: Math.floor(Math.random() * BOARD_SIZE),
-      y: Math.floor(Math.random() * BOARD_SIZE)
+      x: Math.floor(Math.random() * BOARD_CELLS),
+      y: Math.floor(Math.random() * BOARD_CELLS)
     };
     if (
       !excludeList.some(e => e.x === cell.x && e.y === cell.y)
@@ -104,8 +106,8 @@ function randomCell(excludeList = []) {
   }
   // fallback: may overlap
   return {
-    x: Math.floor(Math.random() * BOARD_SIZE),
-    y: Math.floor(Math.random() * BOARD_SIZE)
+    x: Math.floor(Math.random() * BOARD_CELLS),
+    y: Math.floor(Math.random() * BOARD_CELLS)
   };
 }
 // List util: deep equals
@@ -116,8 +118,8 @@ function cellEq(a, b) {
 // Snake movement, edge wrap
 function nextHead(head, direction) {
   return {
-    x: (head.x + direction.x + BOARD_SIZE) % BOARD_SIZE,
-    y: (head.y + direction.y + BOARD_SIZE) % BOARD_SIZE
+    x: (head.x + direction.x + BOARD_CELLS) % BOARD_CELLS,
+    y: (head.y + direction.y + BOARD_CELLS) % BOARD_CELLS
   };
 }
 
