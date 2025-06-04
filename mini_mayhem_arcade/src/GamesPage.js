@@ -131,9 +131,9 @@ function getLocalHighScores() {
         typingBestWpm = Math.round(parseFloat(typingRaw) * 100) / 100;
       }
     } catch (e) { }
-    // New: Read best score for Word Typing Challenge
+    // Read best score for Word Typing Challenge
     try {
-      const typingChallengeRaw = window.localStorage.getItem("mmarcade-typing-challenge-bestscore");
+      const typingChallengeRaw = window.localStorage.getItem("mmarcade-word-typing-bestscore");
       if (typingChallengeRaw !== null && !isNaN(parseFloat(typingChallengeRaw))) {
         typingWordChallengeBest = Math.round(parseFloat(typingChallengeRaw) * 100) / 100;
       }
@@ -184,12 +184,12 @@ function getLocalHighScores() {
 
   let typingChallengeDisplay =
     typeof typingWordChallengeBest === "number" && !isNaN(typingWordChallengeBest)
-      ? `${typingWordChallengeBest} Best Score`
+      ? `${typingWordChallengeBest} pts`
       : "No score yet";
 
   let lightBeamDisplay =
     typeof lightBeamBestScore === "number" && !isNaN(lightBeamBestScore)
-      ? `${lightBeamBestScore} best` // simple label, can update to "moves", "time", etc if game definition finalizes
+      ? `${lightBeamBestScore} best`
       : "No win yet";
 
   let sudokuDisplay = (typeof sudokuBestTime === "number" && !isNaN(sudokuBestTime))
@@ -205,7 +205,6 @@ function getLocalHighScores() {
       ? `${slidingBestMoves} moves, ${Math.floor(slidingBestTime / 60)}:${(slidingBestTime % 60).toString().padStart(2, "0")}`
       : "No win yet";
 
-  // Shadow Runner removed. 
   return [
     { game: "Block Game", score: blockDisplay },
     { game: "Memory Game", score: memoryDisplay },
