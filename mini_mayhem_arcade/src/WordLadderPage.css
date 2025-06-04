@@ -1,0 +1,337 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700,900|Inter:400,600,800&display=swap');
+
+.wl-root {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #c2e9fb 34%, #4f46e5 100%);
+  font-family: 'Montserrat', 'Inter', 'Roboto', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 66px;
+}
+[data-theme="dark"] .wl-root {
+  background: linear-gradient(128deg, #232526 0%, #1b1a40 100%);
+}
+/* Decorative shapes */
+.wl-blur1, .wl-blur2 {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.45;
+  z-index: 0;
+  pointer-events: none;
+}
+.wl-blur1 {
+  width: 270px; height: 270px;
+  background: radial-gradient(circle at 40% 60%, #68adc4 90%, #bfbfff00 100%);
+  top: 130px;
+  left: -90px;
+  animation: floatblur2 12s infinite ease-in-out alternate-reverse;
+}
+.wl-blur2 {
+  width: 180px; height: 180px;
+  background: radial-gradient(circle at 70% 40%, #9ff3e9 80%, #abd7ff00 100%);
+  top: 72vh;
+  right: -60px;
+  animation: floatblur2 13s infinite ease-in alternate;
+}
+@keyframes floatblur2 {
+  0% { transform: translateY(0) scale(0.97);}
+  100% { transform: translateY(-23px) scale(1.08);}
+}
+/* Main layout */
+.wl-main {
+  background: rgba(255,255,255,0.97);
+  border-radius: 23px;
+  box-shadow: 0 13px 36px #6bbdfc35, 0 1px 28px #4f46e522;
+  margin: 28px auto 0 auto;
+  padding: 46px 32px 32px 32px;
+  max-width: 410px;
+  width: 99vw;
+  position: relative;
+  z-index: 2;
+  display: flex; flex-direction: column; align-items: stretch;
+}
+[data-theme="dark"] .wl-main {
+  background: rgba(36,39,61,0.98);
+  box-shadow: 0 13px 38px #23227a33, 0 2px 14px #4f46e51c;
+}
+.wl-header {
+  margin-bottom: 25px;
+  text-align: center;
+}
+.wl-title {
+  font-family: 'Montserrat', 'Inter', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #68adc4;
+  margin: 0 0 4px 0;
+  display: flex; align-items: center; justify-content: center; gap: 9px;
+}
+[data-theme="dark"] .wl-title { color: #68adc4; }
+.wl-title-icon { font-size: 1.5em; }
+.wl-desc {
+  color: #4f46e5;
+  font-size: 1.03rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  letter-spacing: 0.01em;
+}
+[data-theme="dark"] .wl-desc { color: #9facef; }
+
+.wl-gamebox {
+  margin: 0 auto;
+  margin-bottom: 0;
+  background: linear-gradient(120deg, #dffefd 60%, #dde1fd 100%);
+  border-radius: 17px;
+  padding: 20px 22px 18px 22px;
+  box-shadow: 0 2px 21px #a2e4fd19;
+  text-align: center;
+}
+[data-theme="dark"] .wl-gamebox {
+  background: linear-gradient(120deg, #24273d 82%, #4854c9 100%);
+}
+
+.wl-chain-label {
+  font-weight: 600;
+  color: #358fa3;
+  letter-spacing: .07em;
+  margin-bottom: 6px;
+}
+[data-theme="dark"] .wl-chain-label { color: #a0ddf1; }
+.wl-chain-start { color: #16a4dd; font-weight: 700; letter-spacing: 0.05em;}
+.wl-chain-target { color: #3e2abc; font-weight: 800;}
+.wl-chain-list-zone {
+  display: flex; flex-wrap: wrap;
+  justify-content: center; align-items: center;
+  font-size: 1.12em;
+  gap: 6px;
+  margin-bottom: 12px;
+  margin-top: 2px;
+}
+.wl-chain-word {
+  background: #eef8ffbb;
+  color: #0e0e3a;
+  padding: 2px 11px;
+  border-radius: 11px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 4px #6bbdfc25;
+  font-family: 'Montserrat', sans-serif;
+  transition: background 0.22s;
+}
+[data-theme="dark"] .wl-chain-word {
+  background: #232867cc;
+  color: #f1f8fe;
+}
+.wl-chain-last {
+  background: #68adc4;
+  color: #fff;
+}
+.wl-arrow {
+  color: #329cef;
+  font-weight: 900;
+  margin: 0 2px;
+  font-size: 1.02em;
+  vertical-align: middle;
+}
+[data-theme="dark"] .wl-arrow { color: #68adc4; }
+
+.wl-form {
+  display: flex; gap: 9px; justify-content: center; align-items: center;
+  margin-bottom: 6px;
+}
+.wl-input {
+  font-size: 1.18rem;
+  font-family: inherit;
+  padding: 7px 14px;
+  border-radius: 10px;
+  border: 2px solid #68adc4;
+  outline: none;
+  transition: border-color 0.16s;
+  width: 122px;
+  max-width: 65vw;
+  background: #f7faff;
+  color: #24273d;
+  font-weight: 700;
+}
+.wl-input:focus { border-color: #4f46e5; }
+[data-theme="dark"] .wl-input {
+  background: #232867;
+  color: #aefcff;
+}
+.wl-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 7px 18px;
+  font-size: 1.13rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: background 0.13s, transform 0.13s;
+  margin-left: 1px;
+  margin-top: 1px;
+}
+.wl-btn:hover, .wl-btn:focus-visible {
+  background: #2442a6;
+  transform: scale(1.055);
+}
+.wl-btn-large {
+  font-size: 1.21em;
+  padding: 11px 27px;
+}
+.wl-btn-secondary {
+  background: #e5f1fb;
+  color: #423fa5;
+}
+.wl-btn-secondary:hover, .wl-btn-secondary:focus-visible {
+  background: #cde5fd;
+  color: #2442a6;
+}
+[data-theme="dark"] .wl-btn-secondary {
+  background: #323672;
+  color: #8cf1ff;
+}
+[data-theme="dark"] .wl-btn-secondary:hover {
+  background: #2442a6;
+  color: #fff;
+}
+.wl-meta {
+  margin: 11px auto 0 auto;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 8px 11px;
+}
+.wl-step-pill {
+  background: #68adc419;
+  color: #13347d;
+  border-radius: 18px;
+  font-weight: 900;
+  font-size: 1.16em;
+  padding: 7px 15px 6px 14px;
+  margin: 0 2px;
+}
+[data-theme="dark"] .wl-step-pill {
+  background: #353475;
+  color: #aefcff;
+}
+
+.wl-feedback {
+  margin: 7px 0 0 0;
+  color: #e62565;
+  font-weight: 800;
+  font-size: 1.08em;
+  background: #fff1f7;
+  border-radius: 9px;
+  padding: 6px 13px;
+  opacity: 0.93;
+  animation: shake .28s cubic-bezier(.36,.07,.19,.97) 1;
+}
+[data-theme="dark"] .wl-feedback {
+  background: #4c2158;
+  color: #ffe3f3;
+}
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px);}
+  20%, 80% { transform: translateX(+2px);}
+  30%, 50%, 70% {transform: translateX(-5px);}
+  40%, 60% {transform: translateX(+5px);}
+}
+.wl-hint {
+  margin-top: 10px;
+  color: #3e2abc;
+  background: #e7fcffea;
+  border-radius: 8px;
+  font-size: 1.07rem;
+  font-weight: 600;
+  padding: 7px 16px;
+  opacity: 0.97;
+  animation: fadeIn .3s;
+}
+[data-theme="dark"] .wl-hint {
+  color: #68adc4;
+  background: #1c1b50ee;
+}
+.wl-hint-label {
+  font-weight: 800;
+  font-size: 1em;
+  margin-right: 5px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0;}
+  to { opacity: 0.97;}
+}
+
+/* Win Banner */
+.wl-success-banner {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(21,21,63,0.23);
+  display: flex; align-items: flex-start; justify-content: center;
+  pointer-events: auto;
+  animation: fadeWinBanner .31s cubic-bezier(.13,.88,.37,1) 1;
+}
+@keyframes fadeWinBanner {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.wl-win-main {
+  margin-top: 106px;
+  background: linear-gradient(107deg, #d8e9fc 60%, #fefaef 100%);
+  color: #2635ab;
+  border-radius: 22px;
+  box-shadow: 0 14px 60px #4f46e537;
+  padding: 48px 37px 38px 37px;
+  min-width: 288px;
+  max-width: 360px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  animation: scaleWin .23s cubic-bezier(.15,.77,.39,1.08);
+}
+@keyframes scaleWin {
+  from { transform: scale(0.88) translateY(34px); opacity: 0;}
+  to { transform: scale(1) translateY(0); opacity: 1;}
+}
+[data-theme="dark"] .wl-win-main {
+  background: linear-gradient(117deg, #2f366e 65%, #cdf8ffbb 100%);
+  color: #f1f8fe;
+}
+.wl-trophy {
+  font-size: 2.3rem;
+  display: inline-block;
+  margin-bottom: 7px;
+  text-shadow: 0 4px 18px #ffd700aa;
+}
+.wl-win-title {
+  font-size: 1.41em;
+  font-weight: 900;
+  margin-bottom: 13px;
+  color: #4f46e5;
+  letter-spacing: 0.01em;
+}
+[data-theme="dark"] .wl-win-title { color: #78d1f9; }
+.wl-win-desc {
+  font-size: 1.03em;
+  margin-bottom: 16px;
+  color: #2635ab;
+  opacity: 0.91;
+}
+[data-theme="dark"] .wl-win-desc { color: #b9e7fc; }
+
+@media (max-width: 600px) {
+  .wl-main { 
+    padding: 9vw 2vw 11vw 2vw; 
+  }
+  .wl-win-main { padding: 15vw 4vw 12vw 4vw; min-width: unset; }
+}
+
+.wl-form .wl-input { font-size: 1.07rem; }
+.wl-form .wl-btn { font-size: 1.15em; }
+
+.wl-form { margin-top: 8px;}
