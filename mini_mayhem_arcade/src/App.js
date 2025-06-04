@@ -5,6 +5,7 @@ import LandingPage from './LandingPage';
 import GamesPage from './GamesPage';
 import MemoryGamePage from './MemoryGamePage.jsx';
 import ReactionRushPage from './ReactionRushPage.jsx';
+import TypingChallengePage from './TypingChallengePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -26,6 +27,7 @@ function App() {
             <Route path="/games" element={<GamesPage />} />
             <Route path="/games/memory" element={<MemoryGamePage />} />
             <Route path="/games/reaction" element={<ReactionRushPage />} />
+            <Route path="/games/typing" element={<TypingChallengePage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
         </main>
