@@ -7,6 +7,7 @@ import MemoryGamePage from './MemoryGamePage.jsx';
 import ReactionRushPage from './ReactionRushPage.jsx';
 import TypingChallengePage from './TypingChallengePage.jsx';
 import QuickMathPage from './QuickMathPage.jsx';
+import IceSlidePuzzlePage from './IceSlidePuzzlePage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 /**
@@ -29,6 +30,7 @@ function App() {
             <Route path="/games/memory" element={<MemoryGamePage />} />
             <Route path="/games/reaction" element={<ReactionRushPage />} />
             <Route path="/games/typing" element={<TypingChallengePage />} />
+            <Route path="/games/ice-slide" element={<IceSlidePuzzlePage />} />
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             {/* Optionally, add more routes like scoreboard/about/help in future */}
           </Routes>
