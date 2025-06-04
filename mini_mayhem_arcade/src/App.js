@@ -12,6 +12,7 @@ import SlidingTilePuzzlePage from './SlidingTilePuzzlePage.jsx';
 import BlockGamePage from './BlockGamePage.jsx';
 import ScoreboardPage from './ScoreboardPage.jsx';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AboutPrivacyPage from './AboutPrivacyPage.jsx';
 
 /**
  * PUBLIC_INTERFACE
@@ -38,9 +39,8 @@ function App() {
             <Route path="/games/quick-math" element={<QuickMathPage />} />
             <Route path="/games/sliding-tile" element={<SlidingTilePuzzlePage />} />
             <Route path="/scoreboard" element={<ScoreboardPage />} />
-            {/* About & Privacy page should be routed to /about-privacy */}
-            {/* The referenced component will be hooked up here when available */}
-            {/* <Route path="/about-privacy" element={<AboutPrivacyPage />} /> */}
+            {/* About & Privacy page routed to /about-privacy */}
+            <Route path="/about-privacy" element={<AboutPrivacyPage />} />
             {/* Optionally, add more routes like scoreboard/help in future */}
           </Routes>
         </main>
