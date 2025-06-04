@@ -209,9 +209,14 @@ function SettingsDropdown({ open, onClose, theme, setTheme }) {
           </button>
         </li>
         <li>
-          <a className="dropdown-menu-item" tabIndex={open ? 0 : -1} href="/about">
+          <Link
+            className="dropdown-menu-item"
+            tabIndex={open ? 0 : -1}
+            to="/about-privacy"
+            onClick={onClose}
+          >
             About &amp; Privacy
-          </a>
+          </Link>
         </li>
         <li>
           <a className="dropdown-menu-item" tabIndex={open ? 0 : -1} href="/help">
